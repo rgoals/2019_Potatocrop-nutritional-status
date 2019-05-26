@@ -233,7 +233,7 @@ ggplot(data, aes(reorder(Cultivar, Accuracy), Accuracy)) +
     theme(legend.title=element_blank(),
           axis.text.x=element_text(angle=90, hjust=1))+
     theme(text=element_text(family="Arial", face="bold", size=12))
-ggsave("images/cultivAcc.tiff", width=8, height=3)
+#ggsave("images/cultivAcc.tiff", width=8, height=3)
 ```
 
 Run the Chi-square homogenity test to compare prediction with a non-informative classification consisting of an equal distribution of 50% successful and 50% unsuccessful cases, using kknn.

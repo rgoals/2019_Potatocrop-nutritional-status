@@ -6,9 +6,9 @@ site: bookdown::bookdown_site
 documentclass: book
 output: bookdown::gitbook
 description: "This is a example of using the bookdown package to write a book for publication on Github. The output format for this example is bookdown::gitbook. Next features are set for after (bibliography and links)."
-bibliography: [book.bib, packages.bib]
-biblio-style: apalike
-link-citations: yes
+#bibliography: [book.bib, packages.bib]
+#biblio-style: apalike
+#link-citations: yes
 ---
 
 # Data preprocessing
@@ -186,7 +186,7 @@ ggmap(qc_fol) +
              size=3, shape=16, colour='aquamarine4', alpha=0.8) + coord_map("mercator") +
   theme_bw() +
   theme(text=element_text(family="Arial", face="bold", size=12))
-ggsave("images/fol-locations.png", width=10, height=8)
+#ggsave("images/fol-locations.png", width=10, height=8)
 ```
 
 Cultivars classes correction. 

@@ -18,7 +18,7 @@ TNs = train_df[train_df$yieldClass == 'HY' & train_df$pred_yield == 'HY', ]
 clrNo = c("clrN", "clrP", "clrK", "clrCa", "clrMg", "clrFv") # for simplicity
 ```
 
-### Dissimilarity index between compositions
+## Dissimilarity index between compositions
 
 - Euclidean distance as dissimilarity index
 - For each composition (line) in the "unbalanced specimens", calculate all the euclidean distances between all the compositions in "TNs" of the corresponding group
@@ -48,7 +48,7 @@ train_df$debal <- debal
 train_df %>% glimpse()
 ```
 
-### Rebalancing a misbalanced sample by perturbation
+## Rebalancing a misbalanced sample by perturbation
 
 Suppose we got this point selected at random in `unbalanced specimens`.
 
@@ -191,6 +191,6 @@ ggplot(data=dreshape, aes(x=variable, y=value, fill=vectors)) +
     theme_bw() +
     theme(legend.title=element_blank()) +
     theme(text=element_text(family="Arial", face="bold", size=12))
-ggsave("images/perturb_barplot.tiff",  width = 6, height = 4)
+#ggsave("images/perturb_barplot.tiff",  width = 6, height = 4)
 ```
 
