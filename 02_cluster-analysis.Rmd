@@ -1,4 +1,4 @@
-# Cluster analysis of cultivars using foliar NPKMgCa clr coordinates
+# Cluster analysis of potato cultivars {#chapitre-Clustering}
 
 We need a set of packages for data handling. Others will be loaded whenever needed.
 

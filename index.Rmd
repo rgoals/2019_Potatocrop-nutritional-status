@@ -11,7 +11,7 @@ description: "This is a example of using the bookdown package to write a book fo
 #link-citations: yes
 ---
 
-# Data preprocessing
+# Data processing {#chapitre-Data-Processing}
 
 We need package `tidyverse` for data handling, `DBI` and `RSQLite` packages to make connexion and extract usefull tables in the potato historical database file `pomme_de_terre.db`.
 
