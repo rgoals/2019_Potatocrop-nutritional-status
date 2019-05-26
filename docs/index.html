@@ -32,7 +32,7 @@
   
   
 
-<link rel="next" href="cluster-analysis-of-cultivars-using-foliar-npkmgca-clr-coordinates.html">
+<link rel="next" href="chapitre-Clustering.html">
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -103,12 +103,12 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li><a href="./">A Minimal Book Example</a></li>
 
 <li class="divider"></li>
-<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Data preprocessing</a></li>
-<li class="chapter" data-level="2" data-path="cluster-analysis-of-cultivars-using-foliar-npkmgca-clr-coordinates.html"><a href="cluster-analysis-of-cultivars-using-foliar-npkmgca-clr-coordinates.html"><i class="fa fa-check"></i><b>2</b> Cluster analysis of cultivars using foliar NPKMgCa clr coordinates</a></li>
-<li class="chapter" data-level="3" data-path="predicting-marketable-tuber-yield.html"><a href="predicting-marketable-tuber-yield.html"><i class="fa fa-check"></i><b>3</b> Predicting marketable tuber yield</a></li>
-<li class="chapter" data-level="4" data-path="perturbation-vector-theory.html"><a href="perturbation-vector-theory.html"><i class="fa fa-check"></i><b>4</b> Perturbation vector theory</a><ul>
-<li class="chapter" data-level="4.0.1" data-path="perturbation-vector-theory.html"><a href="perturbation-vector-theory.html#dissimilarity-index-between-compositions"><i class="fa fa-check"></i><b>4.0.1</b> Dissimilarity index between compositions</a></li>
-<li class="chapter" data-level="4.0.2" data-path="perturbation-vector-theory.html"><a href="perturbation-vector-theory.html#rebalancing-a-misbalanced-sample-by-perturbation"><i class="fa fa-check"></i><b>4.0.2</b> Rebalancing a misbalanced sample by perturbation</a></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Data processing</a></li>
+<li class="chapter" data-level="2" data-path="chapitre-Clustering.html"><a href="chapitre-Clustering.html"><i class="fa fa-check"></i><b>2</b> Cluster analysis of potato cultivars</a></li>
+<li class="chapter" data-level="3" data-path="Chapitre-Modeling.html"><a href="Chapitre-Modeling.html"><i class="fa fa-check"></i><b>3</b> Predicting marketable tuber yield</a></li>
+<li class="chapter" data-level="4" data-path="Chapitre-Perturbation-vector.html"><a href="Chapitre-Perturbation-vector.html"><i class="fa fa-check"></i><b>4</b> Perturbation vector theory</a><ul>
+<li class="chapter" data-level="4.1" data-path="Chapitre-Perturbation-vector.html"><a href="Chapitre-Perturbation-vector.html#dissimilarity-index-between-compositions"><i class="fa fa-check"></i><b>4.1</b> Dissimilarity index between compositions</a></li>
+<li class="chapter" data-level="4.2" data-path="Chapitre-Perturbation-vector.html"><a href="Chapitre-Perturbation-vector.html#rebalancing-a-misbalanced-sample-by-perturbation"><i class="fa fa-check"></i><b>4.2</b> Rebalancing a misbalanced sample by perturbation</a></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
 <li class="divider"></li>
@@ -136,8 +136,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p class="author"><em>zcoulibali</em></p>
 <p class="date"><em>2019-05-26</em></p>
 </div>
-<div id="data-preprocessing" class="section level1">
-<h1><span class="header-section-number">Chapter 1</span> Data preprocessing</h1>
+<div id="chapitre-Data-Processing" class="section level1">
+<h1><span class="header-section-number">Chapter 1</span> Data processing</h1>
 <p>We need package <code>tidyverse</code> for data handling, <code>DBI</code> and <code>RSQLite</code> packages to make connexion and extract usefull tables in the potato historical database file <code>pomme_de_terre.db</code>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(<span class="st">&quot;tidyverse&quot;</span>)  <span class="co"># loads dplyr &amp; ggplot2</span>
 <span class="kw">library</span>(<span class="st">&quot;DBI&quot;</span>)        <span class="co"># Database Interface for R</span>
@@ -316,7 +316,7 @@ fol_df<span class="op">$</span>Cultivar &lt;-<span class="st"> </span>forcats<sp
         </div>
       </div>
 
-<a href="cluster-analysis-of-cultivars-using-foliar-npkmgca-clr-coordinates.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="chapitre-Clustering.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
