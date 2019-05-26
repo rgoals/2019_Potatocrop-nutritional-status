@@ -1,0 +1,295 @@
+# Predicting marketable tuber yield
+
+Load data file `data_ionome.csv` saved from previous cluster analysis.
+
+```{r, warning=FALSE, message=FALSE}
+library("tidyverse")    # 'diplyr' and 'ggplot2'
+library('extrafont')    # Changing Fonts for Graphs
+df = read.csv2('data/data_ionome.csv')
+```
+
+```{r}
+colnames(df)[colnames(df)=="ionomicGroup"] <- "group_i" # make simplier
+df$group_i = factor(df$group_i)
+
+clr_no <- c("clr_N", "clr_P", "clr_K", "clr_Mg", "clr_Ca", "clr_Fv")
+clrNo <- c("clrN", "clrP", "clrK", "clrMg", "clrCa", "clrFv")
+colnames(df)[which(names(df) %in% clr_no)] <- clrNo
+
+df.sc = df # copy
+df.sc[, clrNo] <- apply(df.sc[, clrNo], 2, scale) # scale clr coordinates
+```
+
+Dummy code maturity order and ionomic group.
+
+```{r}
+if("Maturity5" %in% colnames(df.sc)) {
+  df.sc$Maturity5 <- model.matrix(~ordered(factor(df.sc$Maturity5)))[, 2]
+}
+
+if("group_i" %in% colnames(df.sc)) {
+  df.sc$group_i <- model.matrix(~ordered(factor(df.sc$group_i)))[, 2]
+}
+```
+
+Check the data frame structure.
+
+```{r}
+pc <- round(with(df.sc, prop.table(table(Cultivar)) * 100), 2)
+dist <- with(df.sc, cbind(freq = table(Cultivar), percentage = pc))
+dist <- data.frame(cbind(dist, rownames(dist)))
+colnames(dist)[3] <- "Cultivar"
+dist$freq <- as.numeric(as.character(dist$freq))
+dist %>% arrange(desc(freq))
+```
+
+Load libraries for machine learning functions.
+
+```{r, warning=FALSE, message=FALSE}
+library('caret')
+library('kknn')
+```
+
+Partioning data in Train and Test (evaluation) sets.
+
+```{r}
+set.seed(853739) # random.org
+split_index <- createDataPartition(df.sc$yieldClass,
+                                   group = "Cultivar",
+                                   p = 0.75,
+                                   list = FALSE,
+                                   times = 1)
+train <- df.sc[split_index, ]
+test <- df.sc[-split_index, ]
+
+## With clr coordinates
+ml_clr <- c(clrNo, 'yieldClass')
+train_clr = train[, ml_clr]
+test_clr = test[, ml_clr]
+
+## With clr and maturity classes
+ml_mc <- c(clrNo, 'Maturity5', 'yieldClass')
+train_mc = train[, ml_mc]
+test_mc = test[, ml_mc]
+
+## With clr and ionomic groups
+ml_grp <- c(clrNo, 'group_i', 'yieldClass')
+train_grp = train[, ml_grp]
+test_grp = test[, ml_grp]
+```
+
+The knn model will be trained on a grid.
+
+```{r}
+grid <-  expand.grid(kmax = c(7,9,12,15),    # neighborhood
+                     distance = 1:2,         # 1 for euclidean distance, 2 for Mahalannobis
+                     kernel = "optimal")
+grid
+```
+
+The models will be train with a `10-fold cross-validation (cv)` based on ` accuracy` as loss function.
+
+```{r}
+control <- trainControl(method = "cv", number = 10)
+metric <- "Accuracy"
+```
+
+Train Models:
+
+```{r}
+# a) Non-linear algorithm
+## kNN
+set.seed(7)
+kknn_clr <- train(yieldClass ~., data = train_clr, method = "kknn", 
+                  metric = metric, trControl = control, tuneGrid = grid)
+kknn_mc <- train(yieldClass ~., data = train_mc, method = "kknn", 
+                 metric = metric, trControl = control, tuneGrid = grid)
+kknn_grp <- train(yieldClass ~., data = train_grp, method = "kknn", 
+                  metric = metric, trControl = control, tuneGrid = grid)
+```
+
+```{r}
+# b) Advanced algorithms
+## SVM
+set.seed(7)
+svm_clr <- train(yieldClass ~., data = train_clr, method = "svmRadial", 
+                 metric = metric, trControl = control)
+svm_mc <- train(yieldClass ~., data = train_mc, method = "svmRadial", 
+                metric = metric, trControl = control)
+svm_grp <- train(yieldClass ~., data = train_grp, method = "svmRadial", 
+                 metric = metric, trControl = control)
+```
+
+```{r}
+## Random Forest
+set.seed(7)
+rf_clr <- train(yieldClass ~., data = train_clr, method = "rf", metric = metric, trControl = control)
+rf_mc <- train(yieldClass ~., data = train_mc, method = "rf", metric = metric, trControl = control)
+rf_grp <- train(yieldClass ~., data = train_grp, method = "rf", metric = metric, trControl = control)
+```
+
+Models results, to select the best model.
+
+```{r ml-traindotplot, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Comparison of models accuracies at training."}
+# Summary results
+results <- resamples(list(kknn_clr_solely = kknn_clr, 
+                          kknn_clr_and_ionomicgroup = kknn_grp, 
+                          kknn_clr_and_maturityclass = kknn_mc,
+                          
+                          svm_clr_solely = svm_clr, 
+                          svm_clr_and_ionomicgroup = svm_grp, 
+                          svm_clr_and_maturityclass = svm_mc,
+                          
+                          rf_clr_solely = rf_clr, 
+                          rf_clr_and_ionomicgroup = rf_grp, 
+                          rf_clr_and_maturityclass = rf_mc))
+
+#summary(results) with dotplot()
+options(repr.plot.width = 5, repr.plot.height = 4)
+dotplot(results)
+```
+
+Check the best model at training, but only accuracies with test sets are used as models quality metric.
+
+```{r}
+models_acc <- data.frame(Model = summary(results)$models,
+                       Accuracy = c(confusionMatrix(train_clr$yieldClass, predict(kknn_clr))$overall[1],
+                                    confusionMatrix(train_grp$yieldClass, predict(kknn_grp))$overall[1],
+                                    confusionMatrix(train_mc$yieldClass, predict(kknn_mc))$overall[1],
+                        
+                                    confusionMatrix(train_clr$yieldClass, predict(svm_clr))$overall[1],
+                                    confusionMatrix(train_grp$yieldClass, predict(svm_grp))$overall[1],
+                                    confusionMatrix(train_mc$yieldClass, predict(svm_mc))$overall[1],
+                                
+                                    confusionMatrix(train_clr$yieldClass, predict(rf_clr))$overall[1],
+                                    confusionMatrix(train_grp$yieldClass, predict(rf_grp))$overall[1],
+                                    confusionMatrix(train_mc$yieldClass, predict(rf_mc))$overall[1]))
+
+models_acc[order(models_acc[,"Accuracy"], decreasing = TRUE), ]
+```
+
+Quality metrics with test (evaluation) set.
+
+```{r}
+predicted_kknn_clr <- predict(kknn_clr, test_clr)
+predicted_kknn_mc <- predict(kknn_mc, test_mc)
+predicted_kknn_grp <- predict(kknn_grp, test_grp)
+
+predicted_svm_clr <- predict(svm_clr, test_clr)
+predicted_svm_mc <- predict(svm_mc, test_mc)
+predicted_svm_grp <- predict(svm_grp, test_grp)
+
+predicted_rf_clr <- predict(rf_clr, test_clr)
+predicted_rf_mc <- predict(rf_mc, test_mc)
+predicted_rf_grp <- predict(rf_grp, test_grp)
+
+#The best model
+
+tests_acc <- data.frame(Model = summary(results)$models,
+                        Accuracy_on_test = c(
+                                    confusionMatrix(test_clr$yieldClass, predicted_kknn_clr)$overall[1],
+                                    confusionMatrix(test_grp$yieldClass, predicted_kknn_grp)$overall[1],
+                                    confusionMatrix(test_mc$yieldClass, predicted_kknn_mc)$overall[1],
+                        
+                                    confusionMatrix(test_clr$yieldClass, predicted_svm_clr)$overall[1],
+                                    confusionMatrix(test_grp$yieldClass, predicted_svm_grp)$overall[1],
+                                    confusionMatrix(test_mc$yieldClass, predicted_svm_mc)$overall[1],
+                                
+                                    confusionMatrix(test_clr$yieldClass, predicted_rf_clr)$overall[1],
+                                    confusionMatrix(test_grp$yieldClass, predicted_rf_grp)$overall[1],
+                                    confusionMatrix(test_mc$yieldClass, predicted_rf_mc)$overall[1]))
+tests_acc[order(tests_acc[,"Accuracy_on_test"], decreasing = TRUE), ]
+```
+
+Yield Class Prediction with kknn algorithm on test set
+
+Order prediction quality metric by cultivar with `kknn` combining clr values and new clustered variable (`kknn_clr_and_ionomicgroup`).
+
+```{r}
+test$ypred = predicted_kknn_grp # adds predictions to test set
+
+cultivar_acc <- test %>%
+    group_by(Cultivar) %>%
+    do(Accuracy = as.numeric(confusionMatrix(.$yieldClass, .$ypred)$overall[1]),
+       N_obs = as.numeric(nrow(.)))
+
+cultivar_acc$Accuracy <- unlist(cultivar_acc$Accuracy)
+cultivar_acc$N_obs <- unlist(cultivar_acc$N_obs)
+
+data = data.frame(subset(cultivar_acc, Accuracy>0))
+data[order(data[,"Accuracy"], decreasing=T), ]
+```
+
+Check it with `geom_segment()`:
+
+```{r accuracy_cultivar, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Predictive accuracy for cultivars."}
+options(repr.plot.width = 8, repr.plot.height = 4)
+ggplot(data, aes(reorder(Cultivar, Accuracy), Accuracy)) +
+    geom_point(aes(color=cut(Accuracy, breaks = c(0, 0.70, 0.90, 1)))) +
+    geom_segment(aes(x=Cultivar, xend=Cultivar, y=0, yend=Accuracy, 
+                     color=cut(Accuracy, breaks = c(0, 0.70, 0.90, 1))), size=1) +
+    xlab("Cultivar") +
+    theme_bw() + 
+    theme(legend.title=element_blank(),
+          axis.text.x=element_text(angle=90, hjust=1))+
+    theme(text=element_text(family="Arial", face="bold", size=12))
+ggsave("images/cultivAcc.tiff", width=8, height=3)
+```
+
+Run the Chi-square homogenity test to compare prediction with a non-informative classification consisting of an equal distribution of 50% successful and 50% unsuccessful cases, using kknn.
+
+```{r}
+cm <- confusionMatrix(predicted_kknn_grp, test_grp$yieldClass) # confusion matrix
+cm$table
+```
+
+
+```{r}
+# Model's classification
+good_class <- cm$table[1,1]+cm$table[2,2] # HY or LY and correctly predicted
+misclass <- cm$table[1,2]+cm$table[2,1]   # wrong classification
+ml_class <- c(good_class, misclass)
+
+# Non-informative model
+total <- sum(cm$table)                    # number of samples
+good_nim <- 0.50 * total
+misclass_nim <- 0.50 * total
+non_inf_model <- c(good_nim, misclass_nim)
+
+# Matrix for chisquare test
+m <- rbind(ml_class, non_inf_model)
+m
+
+# chisq.test
+khi2_test <- chisq.test(m)
+khi2_test
+```
+
+The null hypothesis for a non-informative classification is rejected after the chi-square homogeneity test.
+
+The train data set with predicted yield classes `train_df` backup will be used to test perturbation vector theory in the next file.
+
+```{r}
+pred_yield <- predict(kknn_grp, train_grp)
+train_df = data.frame(cbind(df[split_index, ], pred_yield))
+write.csv2(train_df, "data/train_df.csv")
+nrow(train_df)
+```
+
+True Negatives (TN) specimens in this study are observations of the training data set with high yield (HY) and correctly predicted. Compute clr centroids for True Negatives `with original` clr values; use original data frame `df`. 
+
+```{r}
+TNs = train_df[train_df$yieldClass == 'HY' & pred_yield == 'HY', ]
+nrow(TNs)
+```
+
+The next cell computes clr balances Centroids for ionomic groups.
+
+```{r}
+TNmedianNorms <- TNs %>%
+  group_by(group_i) %>%
+  select(clrNo) %>%
+  summarise_all(list(median))
+TNmedianNorms
+```
+

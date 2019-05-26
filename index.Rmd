@@ -6,9 +6,9 @@ site: bookdown::bookdown_site
 documentclass: book
 output: bookdown::gitbook
 description: "This is a example of using the bookdown package to write a book for publication on Github. The output format for this example is bookdown::gitbook. Next features are set for after (bibliography and links)."
-#bibliography: [book.bib, packages.bib]
-#biblio-style: apalike
-#link-citations: yes
+bibliography: [book.bib, packages.bib]
+biblio-style: apalike
+link-citations: yes
 ---
 
 # Data preprocessing

@@ -1,0 +1,196 @@
+# Perturbation vector theory
+
+The first step is to compute a dissimilarity index according to the distance from the closest healthy point (the closest TN). Let's load data set.
+
+```{r, warning=FALSE, message=FALSE}
+library("tidyverse")     # dplyr and ggplot2
+library(extrafont)        # Changing Fonts for Graphs
+
+train_df = read.csv2("data/train_df.csv")
+train_df <- train_df %>% select(-X.1, -X) # to discard extra columns
+train_df$group_i = factor(train_df$group_i)
+```
+
+As considered in previous `1.2_machine learning.ipynb` file, True Negatives (TN) specimens in this study are observations of the training data set with high yield (HY) and correctly predicted.
+
+```{r}
+TNs = train_df[train_df$yieldClass == 'HY' & train_df$pred_yield == 'HY', ]
+clrNo = c("clrN", "clrP", "clrK", "clrCa", "clrMg", "clrFv") # for simplicity
+```
+
+### Dissimilarity index between compositions
+
+- Euclidean distance as dissimilarity index
+- For each composition (line) in the "unbalanced specimens", calculate all the euclidean distances between all the compositions in "TNs" of the corresponding group
+- Return the smallest euclidean distance as the unbalanced index of the composition.
+
+Function to compute euclidean distance
+
+```{r}
+eucl_dist_f <- function(x, y) {
+    sqrt(sum((x-y)^2))
+}
+```
+
+Compute debalance (or imbalance) index (`debal`) using this loop.
+
+```{r}
+debal <- c()
+debal_index <- c()
+for (i in 1:nrow(train_df)) {
+    clr_i <- as.numeric(train_df[i, clrNo])
+    eucl_dist <- apply(TNs %>% filter(group_i == train_df[i, 'group_i']) %>% select(clrNo), 
+                       1, function(x) eucl_dist_f(x=x, y=clr_i))
+    debal_index[i] <- which.min(eucl_dist)
+    debal[i] <- eucl_dist[debal_index[i]]
+}
+train_df$debal <- debal
+train_df %>% glimpse()
+```
+
+### Rebalancing a misbalanced sample by perturbation
+
+Suppose we got this point selected at random in `unbalanced specimens`.
+
+```{r}
+#set.seed(932559) # random.org
+unbalanced <- subset(train_df, debal !=0)
+misbalanced <- unbalanced[sample(nrow(unbalanced), 1), ]
+misbalanced
+```
+
+Or even, you can use the most unbalanced occurrence, ... why not !
+
+```{r}
+(misbalanced = unbalanced[which.max(unbalanced$debal), ])
+```
+
+How to rebalance it?
+
+The first step is to find `in TNs of the corresponding ionomic group` the closest balanced point.
+
+Let's re-compute the euclidean distance, like for a new (an unknown) point:
+
+```{r}
+misbalanced <- misbalanced[clrNo]
+eucl_dist_misbal <- apply(TNs[, clrNo], 1, function(x) eucl_dist_f(x=x, y=misbalanced))
+index_misbal <- which.min(t(data.frame(eucl_dist_misbal))) # return the index of the sample
+index_misbal
+```
+
+Euclidean distance matched with the corresponding `debal` value:
+
+```{r}
+misbal = eucl_dist_misbal[index_misbal] # to compare to corresponding debal value
+misbal
+```
+
+The `closest point in the TNs` data set is this one:
+
+```{r}
+closest <- TNs[index_misbal, ]
+closest
+```
+
+Note that Ionomics groups of the misbalanced and the closest composition are the same ... most of the times ! You need package `compositions` for further clr back-transformation de compositional space.
+
+```{r, warning=FALSE, message=FALSE}
+require('compositions')
+```
+
+Perturbation in compositional space plays the same role as translation plays in real space. Some natural processes in nature can be interpreted as a change from one composition `C1` to another `C2` through the application of a perturbation:
+
+> `p ⊕ C1 ====> C2`.
+
+The difference between `the new observation`  and the closest TN composition can be back-transformed to the compositional space. The obtained vector is the `perturbation vector`.
+
+```{r}
+closest = closest[clrNo]
+clr_diff = closest - misbalanced
+clr_diff
+```
+
+```{r}
+comp_names <- c("N", "P", "K", "Ca", "Mg", "Fv")
+perturbation_vector <- clrInv(clr_diff)
+names(perturbation_vector) <- comp_names
+```
+
+Compute the compositions of the ilr coordinates of the misbalanced point, as well as the closest TN point:
+
+```{r}
+misbal_comp <- clrInv(misbalanced)
+names(misbal_comp) <- comp_names
+
+closest_comp <- clrInv(closest)
+names(closest_comp) <- comp_names
+
+pmc = rbind(perturbation_vector, misbal_comp, closest_comp)
+rownames(pmc) = c("perturbation_vector","misbal_comp","closest_comp")
+pmc # data frame made up of perturbation vector, misbalanced composition and the closest reference sample
+```
+
+For each vector, check that the simplex is closed to 1.
+
+```{r}
+sum(perturbation_vector); sum(misbal_comp); sum(closest_comp)
+```
+
+The closest composition minus the misbalanced composition should return the perturbation vector.
+
+```{r}
+print(closest_comp - misbal_comp) # soustraction
+print(perturbation_vector)        # for comparison
+```
+
+Or even, perturb the misbalanced point by the perturbation vector, you should obtain the closest TN point:
+
+```{r}
+print(misbal_comp + perturbation_vector) # perturbation
+print(closest_comp)                      # for comparison
+```
+
+So, the assumption is true.
+
+The next codes try to show the concept using plots using clr coordinates. 
+
+```{r}
+d = data.frame(rbind(misbalanced, closest, clr_diff)) # mis, cl, per
+vectors = c("observation", "reference", "perturbation")
+d$vectors = factor(vectors)
+d
+```
+
+This data frame must be reshape for ggplot.
+
+```{r, warning=FALSE, message=FALSE}
+require("reshape") # function melt() 
+dreshape = melt(d)
+dreshape
+```
+
+Plot with dots for each vector.
+
+```{r hi-perturb-dotplot, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Perturbation vector computation example dotplot using the most imbalanced foliar sample."}
+options(repr.plot.width = 6, repr.plot.height = 3)
+ggplot(data = dreshape, aes(x = value, y = vectors)) +
+    geom_point() +
+    facet_wrap(~ variable, scales = "free_x") +
+    labs(x='clr coordinate', y ='') +
+    theme(text=element_text(family="Arial", face="bold", size=12))
+#ggsave("images/perturb_dotplot.tiff",  width = 6, height = 4)
+```
+
+
+
+```{r hi-perturb-barplot, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Perturbation vector computation example barplot using the most imbalanced foliar sample."}
+options(repr.plot.width = 5, repr.plot.height = 3)
+ggplot(data=dreshape, aes(x=variable, y=value, fill=vectors)) +
+    geom_bar(stat="identity", position=position_dodge()) +
+    coord_flip() +
+    theme_bw() +
+    theme(legend.title=element_blank()) +
+    theme(text=element_text(family="Arial", face="bold", size=12))
+ggsave("images/perturb_barplot.tiff",  width = 6, height = 4)
+```
+

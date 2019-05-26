@@ -1,0 +1,405 @@
+# Cluster analysis of cultivars using foliar NPKMgCa clr coordinates
+
+We need a set of packages for data handling. Others will be loaded whenever needed.
+
+```{r, warning=FALSE, message=FALSE}
+library("tidyverse")       # loads dplyr & ggplot2
+library('ellipse')         # plot ellipses
+library("mvoutlier")       # sign1, multivariate outliers detection
+library("ade4")            # discriminant analysis
+library("vegan")           # data clustering
+library("extrafont")       # Changing Fonts for Graphs
+```
+
+We will also use a custom function for discriminant analysis plots.
+
+```{r}
+source('https://raw.githubusercontent.com/essicolo/AgFun/master/plotDA_trad.R')
+source("https://raw.githubusercontent.com/essicolo/AgFun/master/plotDA_gg.R")
+```
+
+Load data file from previous `1.0_data preprocessing.Rmd` codes.
+
+```{r}
+fol_df <- read.csv2("data/fol_df.csv")
+# Key columns selection
+keys_col <- c('NoEssai', 'NoBloc', 'NoTraitement')
+clr_no <- c("clr_N", "clr_P", "clr_K", "clr_Mg", "clr_Ca", "clr_Fv")
+cult_yield <- c('Cultivar', 'Maturity5', 'AnalyseFoliaireStade', 'RendVendable')
+```
+
+For cluster analysis, keep only high yielders, i.e. yield 65% quantile cutter for each cultivar. The `cutQ` table contains the yield delimiter for each cultivar.
+
+
+```{r, warning=FALSE}
+cutQ <- fol_df %>%
+  group_by(Cultivar) %>%
+  select(RendVendable) %>%
+  summarise_if(is.numeric, quantile, probs=0.65, na.rm = TRUE) %>%
+  rename(rv_cut = RendVendable)
+```
+
+The `cutQ` table is used to add the variable `yieldClass` to `fol_df`.
+
+```{r}
+fol_df <- fol_df %>%
+  left_join(cutQ, by = "Cultivar") %>%
+  mutate(yieldClass = fct_relevel(ifelse(RendVendable >= rv_cut, "HY", "LY"), "LY"))
+```
+
+For sake of verification, we compute average yield per yieldClass.
+
+```{r, warning=FALSE}
+meanYield = fol_df %>%
+    group_by(yieldClass) %>%
+    select(RendVendable) %>%
+    summarise_if(is.numeric, mean, na.rm = TRUE)
+meanYield
+```
+
+`clr` centroids computation
+
+Compositional data transformation is done in the loaded file. We keep only clr-transformed coordinates for high yielders, at 10 % blossom (AnalyseFoliaireStade = 10% fleur).
+
+```{r}
+highYielders_df <- fol_df %>%
+  mutate(isNA = apply(.[c(clr_no, cult_yield)], 1, anyNA)) %>%
+  mutate(is10pcf = AnalyseFoliaireStade == "10% fleur") %>%
+  filter(!isNA & is10pcf & yieldClass == "HY" & NoEssai != "2") %>% 
+  select(one_of(keys_col, clr_no, cult_yield)) %>%
+  droplevels()
+nrow(highYielders_df)
+```
+
+So, 1401 lines of observations (or samples) will be used for clustering. Check how many rows of data you have for each cultivar:
+
+```{r}
+percentage <- round(with(highYielders_df, prop.table(table(Cultivar)) * 100), 2)
+distribution <- with(highYielders_df, cbind(nHY = table(Cultivar), percent = percentage))
+
+distribution <- data.frame(cbind(distribution, rownames(distribution)))
+colnames(distribution)[3] <- "Cultivar"
+
+distribution$nHY <- as.numeric(as.character(distribution$nHY)) # nHY = number of samples
+distribution$percent <- as.numeric(as.character(distribution$percent)) # percentage
+distribution %>% arrange(desc(nHY)) # arrange in descending order
+```
+
+Some cultivars are well represented, like Goldrush and Superior. Let's compute numbers of cultivars and trials for high yielders.
+
+```{r}
+data.frame(nbr_cultivars = n_distinct(highYielders_df$Cultivar, na.rm = T), 
+           nbr_trials = n_distinct(highYielders_df$NoEssai, na.rm = T))
+```
+
+A table with cultivars, maturity classes and median clr values (*i.e.*, Centroids).
+
+```{r}
+highYielders_clr <- highYielders_df %>%
+  group_by(Cultivar, Maturity5) %>%
+  select(Cultivar, Maturity5, starts_with("clr")) %>%
+  summarise_all(list(median))
+highYielders_clr
+```
+
+Identify outliers with a criterion of 0.975 by cultivar, if cultivars contain at leat 20 rows. If less than 20 rows, all rows are kept. The new data frame is used for discriminant analysis `lda_df`.
+
+```{r, warning=FALSE, message=FALSE}
+highYielders_df_IO <- highYielders_df %>% 
+  group_by(Cultivar) %>% 
+  select(starts_with("clr")) %>%
+  do({
+    if (nrow(.) < 20) {
+      IO = rep(1, nrow(.))
+    } else {
+      IO = sign1(.[,-1], qcrit=0.975)$wfinal01
+    }
+    cbind(.,IO)
+  })
+
+lda_df <- highYielders_df_IO %>%
+              filter(IO == 1) %>%
+              droplevels()
+nrow(lda_df)
+lda_df %>% head()
+```
+
+Axis reduction with LDA Linear Discriminant Analysis
+
+```{r}
+lda_df$Cultivar <- factor(lda_df$Cultivar)
+pca_fol <- dudi.pca(lda_df[clr_no], scannf = FALSE, scale = FALSE)
+lda_fol <- discrimin(dudi = pca_fol, fac = factor(lda_df$Cultivar), scannf = FALSE)
+lda_fol_score = lda_fol$li
+lda_fol_loading = lda_fol$fa
+```
+
+```{r}
+lda_fol_group = lda_df$Cultivar
+n_cultivar = table(lda_df$Cultivar)
+# Do not schow Cultivars whose number of occurrences is < 5
+n_filter <- lda_fol_group %in% names(n_cultivar[n_cultivar >= 5]) 
+filter_cultivars <- names(n_cultivar[n_cultivar >= 5])
+lda_df_filter <- lda_df[n_filter, ]
+```
+
+The distance biplot, a first view.
+
+```{r d-biplot-1, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Discriminant distance biplot of potato cultivars."}
+options(repr.plot.width = 6, repr.plot.height = 6)
+plot_lda(score=lda_fol_score[n_filter, ],
+         loading=lda_fol_loading[n_filter, ],
+         group = lda_fol_group[n_filter],
+         ell_dev=FALSE, 
+         ell_err= FALSE, #TRUE, 
+         scale_load = 0.5,
+         level=0.95,
+         legend=FALSE,
+         label=TRUE,
+         transparency=0.3, xlim = c(-2.5, 2), ylim = c(-3.5, 3.5),
+         points=F)
+```
+
+K-means clustering using clr centroïds for high yielders
+
+The next data frame is the same as `highYielders_clr` without maturity classes.
+
+```{r, message=FALSE}
+highYieldersCentroids <- highYielders_df %>%
+  group_by(Cultivar) %>%
+  select(starts_with("clr")) %>%
+  summarise_all(list(median))
+```
+
+We use `Calinski-Harabasz (1974) criterion (package vegan)` for clustering.
+
+```{r}
+set.seed(194447)
+highYieldersKmeans <- cascadeKM(highYieldersCentroids[, -1], inf.gr = 3, sup.gr = 8, criterion = "calinski")
+```
+
+Plot K-means clustering results.
+
+```{r clustering, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="K-means partitions comparison (calinski criterion)."}
+options(repr.plot.width = 6, repr.plot.height = 4)
+plot(highYieldersKmeans) 
+```
+
+The red dot of the right hand side graph shows 4 optimal clustering partitions. Check the differnt partitions data frame.
+
+```{r}
+highYieldersKmeans$partition %>% head()
+```
+
+Consider `4 groups` from clustering according to `calinski criterion`, this corresponds to the column 2 or use **4 groups** as column name directly, and add it up to the previous data frame.
+
+```{r}
+highYieldersCentroids$kgroup <- highYieldersKmeans$partition[, "4 groups"]
+```
+
+Compute discriminant scores centroïdes for cultivars.
+
+```{r}
+lda_centroids <- lda_fol_score %>%
+  mutate(group = lda_fol_group) %>%
+  group_by(group) %>%
+  summarise_all(list(mean))
+```
+
+Plot Cultivar groups in LDA with a custom function.
+
+```{r d-biplot-2, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Discriminant distance biplot of potato cultivars showing ionomics groups."}
+options(repr.plot.width = 6, repr.plot.height = 6)
+#png("images/clustering.png", width=3000, height=1400, res = 300)
+plot_lda(score=lda_fol_score[n_filter, ],
+         loading=lda_fol_loading[n_filter, ],
+         group = lda_fol_group[n_filter],
+         ell_dev=FALSE, 
+         ell_err= FALSE, #TRUE, 
+         scale_load = 0.4,
+         level=0.95,
+         legend=FALSE,
+         label=TRUE,
+         transparency=0.4, xlim = c(-2.5, 2), ylim = c(-3.5, 3.5),
+         points=F)
+
+coll = factor(highYieldersCentroids[highYieldersCentroids$Cultivar %in% filter_cultivars, 'kgroup'][[1]])
+
+# remove the cultivar column
+points(lda_centroids[lda_centroids$group %in% filter_cultivars, c('DS1', 'DS2')], 
+       pch = 19,
+       col = coll, # colours dots for groups or clusters.
+       cex = 0.9)
+
+legend(-2.5, 3, 
+       legend = paste(rep('cluster', nlevels(coll)), as.numeric(levels(coll))), 
+       pch = 19,
+       col = unique(coll),  
+       cex = 0.9)
+```
+
+It's a bit difficult to colour cultivar names in the plot with the custom function. Use functions from packages `ggplot2`, `ggrepel` and `plotly` instead. The package `ggplot2` is already loaded with `tidyverse`. New data frames are created with useful variables.
+
+```{r, warning=FALSE, message=FALSE}
+library("ggrepel")
+library("plotly")
+
+cultivars_filtre <- data.frame(Cultivar = filter_cultivars, i_group=coll)
+
+df <- data.frame(
+    score = lda_fol_score[n_filter, ],
+    loadings = lda_fol_loading[n_filter,],
+    Cultivar = lda_fol_group[n_filter]
+                )
+df <- df %>% left_join(cultivars_filtre, by="Cultivar")
+df %>% head()
+```
+
+```{r, warning=FALSE}
+centroids = lda_centroids[lda_centroids$group %in% filter_cultivars, ]
+names(centroids)[match("group", names(centroids))] <- "Cultivar"
+centroids <- centroids %>% left_join(cultivars_filtre, by="Cultivar")
+centroids %>% head()
+```
+
+Plot with ggplot2
+
+```{r gg-biplot, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Discriminant biplot and cluster analysis result of potato cultivars."}
+#png("data/clustering.png", width=3000, height=1400, res = 300)
+options(repr.plot.width = 9, repr.plot.height = 9)
+g <- ggplot(centroids, aes(DS1, DS2, label = Cultivar, col=i_group)) +
+  geom_text_repel() +
+  geom_point(alpha = 0.5) +
+  theme_classic(base_size = 12) +
+  scale_color_manual(values=c("red", "magenta", "blue", "black")) + 
+  theme(axis.text=element_text(size=12)) +
+  theme(text=element_text(family="Arial", face="bold", size=12))
+
+# Add discriminant loadings using geom_segment and arrow
+x=0; y=0; labels = c(clr_no, rep(NA, nrow(df)-length(clr_no)))
+g + geom_segment(data=df, mapping=aes(x=x, y=y, xend=x+loadings.DS1, yend=y+loadings.DS2), 
+                 arrow=arrow(), size = 1, color="grey80") + 
+    geom_text(data=df, mapping=aes(x=loadings.DS1, y=loadings.DS2, label=labels), size=5, color="black") +
+    geom_hline(yintercept=0, color="black", linetype=2) +
+    geom_vline(mapping=aes(xintercept=0), color="black", linetype=2) + 
+    theme(axis.line=element_blank())
+#ggsave("images/cultivar_clust.png", width=10, height=8, dpi = 300)
+```
+
+Push Cultivars yield cut-off and ionomics groups in the data frame.
+
+```{r, warning=FALSE, message=FALSE}
+ionomicGroup <- data.frame(lda_centroids[, 1], 
+                           ionomicGroup = factor(highYieldersKmeans$partition[, "4 groups"]))
+colnames(ionomicGroup)[colnames(ionomicGroup)=="group"] <- "Cultivar"
+cutQ <- cutQ[-1, ] # to discard missing cultivars
+colnames(cutQ)[which(names(cutQ) == "rv_cut")] <- "yieldCutoff"
+cutQ_ig <- cutQ %>% left_join(ionomicGroup, by = "Cultivar")
+
+fol_df <- fol_df %>% 
+    left_join(y = cutQ_ig, by = 'Cultivar') %>%
+    select(-rv_cut)
+```
+
+Processing data for Machine Learning `dfml`, saved as `data_ionome.csv`. Exctract usefull columns from `fol_df`. Conserve only `complete cases.
+
+```{r}
+dfml <- fol_df %>%
+  mutate(isNA = apply(.[c(clr_no, cult_yield)], 1, anyNA)) %>%
+  mutate(is10pcf = AnalyseFoliaireStade == "10% fleur") %>%
+  filter(!isNA & is10pcf & NoEssai != "2") %>% 
+  select(one_of(c(keys_col, clr_no, cult_yield, 'yieldClass', 'ionomicGroup'))) %>%
+  select(-AnalyseFoliaireStade) %>%
+  droplevels() %>% 
+  filter(complete.cases(.))
+nrow(dfml)
+```
+
+Backup
+
+```{r}
+write.csv2(dfml, "data/data_ionome.csv")
+```
+
+Linear mixed effect modeling of yield relative to the `ionome*ionomicGroup` interaction (extraction of the interactions coefficients).
+
+```{r, warning=FALSE, message=FALSE}
+library("nlme")
+source("data/functions.R") # contains a costum r-square function
+dfml$Cultivar <- factor(dfml$Cultivar)
+dfml$Maturity5 <- relevel(dfml$Maturity5, ref="late")
+dfml$Cultivar <- relevel(dfml$Cultivar, ref="Goldrush")
+dfml$NoEssai <- factor(dfml$NoEssai)
+colnames(dfml)[colnames(dfml)=="ionomicGroup"] <- "group_i"
+dfml$group_i <- factor(dfml$group_i)
+
+clr_no <- c("clr_N", "clr_P", "clr_K", "clr_Ca", "clr_Mg", "clr_Fv")
+clrNo <- c("clrN", "clrP", "clrK", "clrCa", "clrMg", "clrFv") # for plot
+colnames(dfml)[which(names(dfml) %in% clr_no)] <- clrNo
+```
+
+Scale clr coordinates
+
+```{r}
+dfml.sc <- dfml  # copy
+dfml.sc[, clrNo] <- apply(dfml.sc[, clrNo], 2, scale)
+```
+
+Fit linear mixed model. 
+
+Discard the filling value to deal with singularity problem.
+
+```{r}
+used_clr = c("clrN", "clrP", "clrK", "clrCa", "clrMg") # without "clr_Fv"
+lmm <- lme(RendVendable ~ (clrN + clrP + clrK + clrCa + clrMg):group_i, 
+            data=dfml.sc, 
+            random= ~1|NoEssai)
+
+pseudoR2 = rsq(dfml.sc$RendVendable, predict(lmm))
+pseudoR2
+```
+
+Extract the interactions coefficients and their p-values (pv) matrix:
+
+```{r}
+pv <- summary(lmm)$tTable[-1,]
+pv
+```
+
+Also extract their confident intervals, and process data for the plot.
+
+```{r}
+interval <- tibble(Estimate = intervals(lmm)$fixed[-1, 2],
+                    LL = intervals(lmm)$fixed[-1, 1], 
+                    UL = intervals(lmm)$fixed[-1, 3]) 
+
+interval$variable <- rep('NA', nrow(interval))
+interval$variable <- rownames(intervals(lmm)$fixed)[-1]
+interval$ionomic_group <- rep(paste("group", 1:nlevels(dfml$group_i)), length(clrNo)-1)
+interval$used_clr <- rep(used_clr, each = nlevels(dfml$group_i))
+
+interval$pvalue <- pv[,"p-value"]
+interval$is_significant = ifelse(interval$pvalue <= 0.05,
+                                      'P < 0.05',
+                                      'P > 0.05')
+interval
+```
+
+Plot with ggplot2.
+
+```{r coefficients, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Effect of ionome perturbation on marketable yield as illustrated by a linear mixed effect model."}
+options(repr.plot.width = 5, repr.plot.height = 5)
+gg <- ggplot(data = interval, mapping = aes(x = Estimate, y = used_clr, color=is_significant)) +
+         facet_grid(ionomic_group ~ .) + #, scales = 'free', space = 'free') +
+         geom_vline(xintercept = 0, lty = 2) +
+         geom_segment(mapping = aes(x = LL, xend = UL, y = used_clr, yend = used_clr)) +
+         geom_point() +
+         #scale_color_grey(start=.1, end=0) +
+         labs(x = "Coefficient", y = "") +
+         theme_bw() +
+         theme(text=element_text(family="Arial", face="bold", size=12))
+gg + theme(legend.title = element_blank())#, legend.position = 'bottom')
+ggsave("images/coef_lmm.tiff", width = 5, height = 5, dpi = 300)
+```
+
+
