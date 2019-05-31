@@ -11,7 +11,8 @@ description: "This is a example of using the bookdown package to write a book fo
 #link-citations: yes
 ---
 
-# Data processing {#chapitre-Data-Processing}
+# Data processing {#Chapter-Data-Processing}
+## Data sets
 
 We need package `tidyverse` for data handling, `DBI` and `RSQLite` packages to make connexion and extract usefull tables in the potato historical database file `pomme_de_terre.db`.
 
@@ -61,7 +62,7 @@ colnames(fol_df)[which(names(fol_df) %in% macro)] <- macro_elts
 glimpse(fol_df)
 ```
 
-Arrange data table
+## Arranging the data frame
 
 Set trial number as factor
 
@@ -174,21 +175,6 @@ fol_df <- fol_df %>% select(keys_col, coord_year, cult_yield, "AnalyseFoliaireSt
 glimpse(fol_df)
 ```
 
-Map experimental sites locations
-
-```{r fol-locations, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Location of experimental sites (green dots) in the Québec potato data set."}
-library("ggmap") # maps with ggplot2
-library("extrafont") # Changing Fonts for Graphs
-qc_fol <- get_stamenmap(bbox = c(left=-76, right=-68, bottom=45, top=50), 
-                        zoom=7, maptype = 'toner-lite')
-ggmap(qc_fol) +
-  geom_point(data=unique(fol_df[c('LonDD', 'LatDD')]), aes(x=LonDD, y=LatDD),
-             size=3, shape=16, colour='aquamarine4', alpha=0.8) + coord_map("mercator") +
-  theme_bw() +
-  theme(text=element_text(family="Arial", face="bold", size=12))
-#ggsave("images/fol-locations.png", width=10, height=8)
-```
-
 Cultivars classes correction. 
 
 Cultivar `Mystere` and `Vivaldi` have different maturity classes in the data set, `mid-season late` and `late` for `Mystere`, then `early mid-season` and `mid-season` for `Vivaldi`. Their new maturity classes names are based on a majority vote.
@@ -215,4 +201,19 @@ Backup for cluster analysis:
 
 ```{r}
 write.csv2(fol_df, 'data/fol_df.csv')
+```
+
+## Map of experimental sites locations
+
+```{r fol-locations, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Location of experimental sites (green dots) in the Québec potato data set."}
+library("ggmap") # maps with ggplot2
+library("extrafont") # Changing Fonts for Graphs
+qc_fol <- get_stamenmap(bbox = c(left=-76, right=-68, bottom=45, top=50), 
+                        zoom=7, maptype = 'toner-lite')
+ggmap(qc_fol) +
+  geom_point(data=unique(fol_df[c('LonDD', 'LatDD')]), aes(x=LonDD, y=LatDD),
+             size=3, shape=16, colour='aquamarine4', alpha=0.8) + coord_map("mercator") +
+  theme_bw() +
+  theme(text=element_text(family="Arial", face="bold", size=12))
+#ggsave("images/fol-locations.png", width=10, height=8)
 ```

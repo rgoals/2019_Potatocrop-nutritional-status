@@ -1,4 +1,5 @@
-# Cluster analysis of potato cultivars {#chapitre-Clustering}
+# Cluster analysis of potato cultivars {#Chapter-Clustering}
+## Load and handle data
 
 We need a set of packages for data handling. Others will be loaded whenever needed.
 
@@ -31,7 +32,7 @@ cult_yield <- c('Cultivar', 'Maturity5', 'AnalyseFoliaireStade', 'RendVendable')
 For cluster analysis, keep only high yielders, i.e. yield 65% quantile cutter for each cultivar. The `cutQ` table contains the yield delimiter for each cultivar.
 
 
-```{r, warning=FALSE}
+```{r, warning=FALSE, message=FALSE}
 cutQ <- fol_df %>%
   group_by(Cultivar) %>%
   select(RendVendable) %>%
@@ -57,7 +58,7 @@ meanYield = fol_df %>%
 meanYield
 ```
 
-`clr` centroids computation
+## `clr` centroids computation
 
 Compositional data transformation is done in the loaded file. We keep only clr-transformed coordinates for high yielders, at 10 % blossom (AnalyseFoliaireStade = 10% fleur).
 
@@ -82,7 +83,7 @@ colnames(distribution)[3] <- "Cultivar"
 
 distribution$nHY <- as.numeric(as.character(distribution$nHY)) # nHY = number of samples
 distribution$percent <- as.numeric(as.character(distribution$percent)) # percentage
-distribution %>% arrange(desc(nHY)) # arrange in descending order
+distribution %>% arrange(desc(nHY)) %>% head(10) # arrange in descending order
 ```
 
 Some cultivars are well represented, like Goldrush and Superior. Let's compute numbers of cultivars and trials for high yielders.
@@ -124,7 +125,7 @@ nrow(lda_df)
 lda_df %>% head()
 ```
 
-Axis reduction with LDA Linear Discriminant Analysis
+## Axis reduction with LDA Linear Discriminant Analysis
 
 ```{r}
 lda_df$Cultivar <- factor(lda_df$Cultivar)
@@ -160,7 +161,7 @@ plot_lda(score=lda_fol_score[n_filter, ],
          points=F)
 ```
 
-K-means clustering using clr centroïds for high yielders
+## K-means clustering using clr centroïds for high yielders
 
 The next data frame is the same as `highYielders_clr` without maturity classes.
 
@@ -321,6 +322,7 @@ Backup
 write.csv2(dfml, "data/data_ionome.csv")
 ```
 
+## clr and ionomics groups interactions effects
 Linear mixed effect modeling of yield relative to the `ionome*ionomicGroup` interaction (extraction of the interactions coefficients).
 
 ```{r, warning=FALSE, message=FALSE}

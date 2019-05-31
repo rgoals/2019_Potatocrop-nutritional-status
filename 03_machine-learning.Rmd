@@ -1,4 +1,5 @@
-# Predicting marketable tuber yield {#Chapitre-Modeling}
+# Predicting marketable tuber yield {#Chapter-Modeling}
+## Load data file
 
 Load data file `data_ionome.csv` saved from previous cluster analysis.
 
@@ -40,8 +41,12 @@ dist <- with(df.sc, cbind(freq = table(Cultivar), percentage = pc))
 dist <- data.frame(cbind(dist, rownames(dist)))
 colnames(dist)[3] <- "Cultivar"
 dist$freq <- as.numeric(as.character(dist$freq))
-dist %>% arrange(desc(freq))
+dist %>% arrange(desc(freq)) %>% head(10) # or discard the last part to see all.
 ```
+
+## Machine learning
+
+Partioning data in Train and Test (evaluation) sets.
 
 Load libraries for machine learning functions.
 
@@ -49,8 +54,6 @@ Load libraries for machine learning functions.
 library('caret')
 library('kknn')
 ```
-
-Partioning data in Train and Test (evaluation) sets.
 
 ```{r}
 set.seed(853739) # random.org
@@ -127,6 +130,8 @@ rf_clr <- train(yieldClass ~., data = train_clr, method = "rf", metric = metric,
 rf_mc <- train(yieldClass ~., data = train_mc, method = "rf", metric = metric, trControl = control)
 rf_grp <- train(yieldClass ~., data = train_grp, method = "rf", metric = metric, trControl = control)
 ```
+
+## Assessing goodness of fit
 
 Models results, to select the best model.
 

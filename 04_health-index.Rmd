@@ -1,4 +1,4 @@
-# Perturbation vector theory {#Chapitre-Perturbation-vector}
+# Perturbation vector theory {#Chapter-Perturbation-vector}
 
 The first step is to compute a dissimilarity index according to the distance from the closest healthy point (the closest TN). Let's load data set.
 
