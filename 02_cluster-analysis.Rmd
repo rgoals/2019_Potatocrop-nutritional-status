@@ -1,5 +1,10 @@
 # Cluster analysis of potato cultivars {#Chapter-Clustering}
-## Load and handle data
+
+## Objective
+
+Although plant health is a continuous domain rather than a categorical status, yield thresholds are useful for decision-making. Because yield potential varies widely among cultivars, I use this chapter to split experimental data into low- and high-productivity categories using a marketable yield delimiter at the 65th percentile for each cultivar. Hence, I use high yielders subpopulation (samples which marketable yield is larger than the yield cut-off) to perform a cascade k-means clustering aiming to discriminate Groups of similar multivariate compositions (`ionomics groups`). I combine a discriminant analysis to check the macroelements that best discriminate cultivars. I also check the performence of Groups discrimination by computing the `Groups X clr-coordinates` interaction effect coefficients in a linear mixed effect model. I finally append the new variable `ionomicGroup`to the leaves clr data frame and discard all the rows with any missing data. I map the experimental sites locations in the second sudsection of this chapter.
+
+## Useful libraries for data handling
 
 We need a set of packages for data handling. Others will be loaded whenever needed.
 
@@ -10,6 +15,10 @@ library("mvoutlier")       # sign1, multivariate outliers detection
 library("ade4")            # discriminant analysis
 library("vegan")           # data clustering
 library("extrafont")       # Changing Fonts for Graphs
+library("ggrepel")
+library("plotly")
+library("nlme")
+source("data/functions.R") # contains a costum r-square function
 ```
 
 We will also use a custom function for discriminant analysis plots.
@@ -19,10 +28,12 @@ source('https://raw.githubusercontent.com/essicolo/AgFun/master/plotDA_trad.R')
 source("https://raw.githubusercontent.com/essicolo/AgFun/master/plotDA_gg.R")
 ```
 
+## Leaves processed compositions data set
+
 Load data file from previous `1.0_data preprocessing.Rmd` codes.
 
 ```{r}
-fol_df <- read.csv2("data/fol_df.csv")
+fol_df <- read_csv("output/fol_df.csv")
 # Key columns selection
 keys_col <- c('NoEssai', 'NoBloc', 'NoTraitement')
 clr_no <- c("clr_N", "clr_P", "clr_K", "clr_Mg", "clr_Ca", "clr_Fv")
@@ -241,10 +252,7 @@ legend(-2.5, 3,
 
 It's a bit difficult to colour cultivar names in the plot with the custom function. Use functions from packages `ggplot2`, `ggrepel` and `plotly` instead. The package `ggplot2` is already loaded with `tidyverse`. New data frames are created with useful variables.
 
-```{r, warning=FALSE, message=FALSE}
-library("ggrepel")
-library("plotly")
-
+```{r}
 cultivars_filtre <- data.frame(Cultivar = filter_cultivars, i_group=coll)
 
 df <- data.frame(
@@ -319,15 +327,13 @@ nrow(dfml)
 Backup
 
 ```{r}
-write.csv2(dfml, "data/data_ionome.csv")
+write_csv(dfml, "output/leaf_ml_df.csv")
 ```
 
 ## clr and ionomics groups interactions effects
 Linear mixed effect modeling of yield relative to the `ionome*ionomicGroup` interaction (extraction of the interactions coefficients).
 
-```{r, warning=FALSE, message=FALSE}
-library("nlme")
-source("data/functions.R") # contains a costum r-square function
+```{r}
 dfml$Cultivar <- factor(dfml$Cultivar)
 dfml$Maturity5 <- relevel(dfml$Maturity5, ref="late")
 dfml$Cultivar <- relevel(dfml$Cultivar, ref="Goldrush")
