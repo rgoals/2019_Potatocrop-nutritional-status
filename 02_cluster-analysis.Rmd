@@ -2,43 +2,60 @@
 
 ## Objective
 
-Although plant health is a continuous domain rather than a categorical status, yield thresholds are useful for decision-making. Because yield potential varies widely among cultivars, I use this chapter to split experimental data into low- and high-productivity categories using a marketable yield delimiter at the 65th percentile for each cultivar. Hence, I use high yielders subpopulation (samples which marketable yield is larger than the yield cut-off) to perform a cascade k-means clustering aiming to discriminate Groups of similar multivariate compositions (`ionomics groups`). I combine a discriminant analysis to check the macroelements that best discriminate cultivars. I also check the performence of Groups discrimination by computing the `Groups X clr-coordinates` interaction effect coefficients in a linear mixed effect model. I finally append the new variable `ionomicGroup`to the leaves clr data frame and discard all the rows with any missing data. I map the experimental sites locations in the second sudsection of this chapter.
+***
+Although plant health is a continuous domain rather than a categorical status, yield thresholds are useful for decision-making. Because yield potential varies widely among cultivars, I use this chapter to split experimental data into low- and high-productivity categories using a marketable yield delimiter at the 65th percentile for each cultivar. Hence, I use high yielders subpopulation (samples which marketable yield is larger than the yield cut-off) to perform a cascade k-means clustering aiming to discriminate Groups of similar multivariate compositions (`ionomics groups`). I combine a discriminant analysis to check the macroelements that best discriminate cultivars. I also check the performence of Groups discrimination by computing the `Groups X clr-coordinates` interaction effect coefficients in a linear mixed effect model. I finally append the new variable `ionomicGroup`to the leaves clr data frame and discard all the rows with any missing data. I map the experimental sites locations in the third sudsection of this chapter. The output data file is called `leaf_ml_df.csv` i.e., the data frame for machine learning chapter \@ref(Chapter-Modeling).
+***
 
-## Useful libraries for data handling
+## Useful libraries and custom functions
 
-We need a set of packages for data handling. Others will be loaded whenever needed.
+We need a set of packages for data handling and visualization like the `tidyverse` package presented in previous chapter \@ref(Chapter-Data-Processing), [ellipse](https://rdrr.io/cran/ellipse/) offers functions for drawing ellipses and ellipse-Like confidence regions (maybe I will set this option to FLASE for graph simplicity), [mvoutlier](https://rdrr.io/cran/mvoutlier/) for multivariate outliers detection, [ade4](http://pbil.univ-lyon1.fr/ADE-4) gathers tools for multivariate data analysis (I use it for discriminant analysis), [vegan](https://rdrr.io/cran/vegan/) performs cluster analysis by k-means or cascade k-means clustering, [ggmap](https://github.com/dkahle/ggmap) makes it easy to retrieve raster map tiles from online mapping services like Google Maps and Stamen Maps and plot them using the ggplot2 framework, [extrafont](https://www.r-pkg.org/pkg/extrafont) for custom fonts for graphs with ggplot2, [ggrepel](https://github.com/slowkow/ggrepel) provides text and label geoms for 'ggplot2' that help to avoid overlapping text labels, [plotly](https://plotly-r.com) ..., [nlme](https://www.rdocumentation.org/packages/nlme) for linear and non-linear mixed effect modeling. Some custom functions are also loaded mainly for Pseudo r-square caculation with linear mixed effect model and discriminant biplot.
 
 ```{r, warning=FALSE, message=FALSE}
-library("tidyverse")       # loads dplyr & ggplot2
-library('ellipse')         # plot ellipses
-library("mvoutlier")       # sign1, multivariate outliers detection
-library("ade4")            # discriminant analysis
-library("vegan")           # data clustering
-library("extrafont")       # Changing Fonts for Graphs
+library("tidyverse")
+library('ellipse')
+library("mvoutlier")
+library("ade4")
+library("vegan")
+#library("ggmap")
+library("extrafont")
 library("ggrepel")
-library("plotly")
+#library("plotly")
 library("nlme")
-source("data/functions.R") # contains a costum r-square function
-```
-
-We will also use a custom function for discriminant analysis plots.
-
-```{r}
+source("data/functions.R")
 source('https://raw.githubusercontent.com/essicolo/AgFun/master/plotDA_trad.R')
-source("https://raw.githubusercontent.com/essicolo/AgFun/master/plotDA_gg.R")
 ```
 
 ## Leaves processed compositions data set
 
-Load data file from previous `1.0_data preprocessing.Rmd` codes.
+For this chapter, the initial data set is the outcome of the prvious chapter (\@ref(Chapter-Data-Processing)) `leaf_clust_df`. I load the data frame and create vectors of columns I will use in this chapter.
 
 ```{r}
-fol_df <- read_csv("output/fol_df.csv")
+leaf_clust_df <- read_csv("output/leaf_clust_df.csv")
 # Key columns selection
 keys_col <- c('NoEssai', 'NoBloc', 'NoTraitement')
 clr_no <- c("clr_N", "clr_P", "clr_K", "clr_Mg", "clr_Ca", "clr_Fv")
-cult_yield <- c('Cultivar', 'Maturity5', 'AnalyseFoliaireStade', 'RendVendable')
+cultivarAndyield <- c('Cultivar', 'Maturity5', 'RendVendable')
+extra_col <- c('LatDD', 'LonDD', 'AnalyseFoliaireStade')
 ```
+
+The next cell maps experimental sites locations.
+
+```{r leaf_df-sites-locations, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Location of experimental sites (green dots) in the Québec potato data set."}
+library("ggmap")
+qc_leaf <- get_stamenmap(bbox = c(left=-76, right=-68, bottom=45, top=50), 
+                        zoom=7, maptype = 'toner-lite')
+ggmap(qc_leaf) +
+  geom_point(data = leaf_clust_df %>%
+               select(LonDD, LatDD) %>%
+               unique(), aes(x = LonDD, y = LatDD),
+             size = 2, shape = 1) + 
+  coord_map("mercator") +
+  theme_bw() +
+  theme(text = element_text(family = "Arial", face = "bold", size = 12))
+#ggsave("images/leaf_clust_df-sites-locations.png", width=10, height=8)
+```
+
+
 
 For cluster analysis, keep only high yielders, i.e. yield 65% quantile cutter for each cultivar. The `cutQ` table contains the yield delimiter for each cultivar.
 
