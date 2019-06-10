@@ -5,7 +5,7 @@ date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
 documentclass: book
 output: bookdown::gitbook
-description: "This is a example of using the bookdown package to write a book for publication on Github. The output format for this example is bookdown::gitbook. Next features are set out for after (bibliography and links)."
+description: "This is a example of using the bookdown package to write a book that describ the statistical computations of my PhD Project, for publication on Github. The output format choosed is bookdown::gitbook. Next features are set out for after (bibliography and links)."
 #bibliography: [book.bib, packages.bib]
 #biblio-style: apalike
 #link-citations: yes
@@ -13,253 +13,1092 @@ description: "This is a example of using the bookdown package to write a book fo
 
 # Data processing {#Chapter-Data-Processing}
 
-## Ojective
+## Ojective {#Objective}
 
 ***
-This chapter is the first of a series of R markdown codes aiming to describe computations methodology used to derive the results and conclusions of the article. The useful variables are the first mature leaf (4th from top, sampled at the beginning of blossom stage) Nitrogen, phosphorus, potassium, calcium and magnesium  compositions, cultivar used in experiments, cultivar maturity classes and marketable tuber yield. These variables are extracted from the Québec potato raw data table (`raw_potato_df`) and handled to obtain variables useful for cultivars cluster analysis and tuber yield class prediction. A previous exploration has shown that oligoelements contained too much missing values, for this reason these elements were excluded. The chapter ends with the backup of a cleaned and complete data frame useful for next chapters. 
+This chapter is the first of a series of R markdown codes aiming to describe computations methodology used to derive the results and conclusions of potato nutrient diagnosis article. The data set is a collection of potato surveys and nitrogen (N), phosphorous (P) and potassium (K) fertilizer trials conducted in Quebec from 1970 to 2017 between the US border at the 45^th parallel and the Northern limit of cultivation at the 49^th parallel. The useful variables are the first mature leaf (4^th from top, sampled at the beginning of blossom stage) nitrogen, phosphorus, potassium, calcium and magnesium compositions, cultivars used in experiments, cultivar maturity classes and tuber marketable yield. These variables are extracted from the Québec potato raw data table (`raw_potato_df`) and handled to obtain useful variables for cluster analysis and tuber yield class prediction. A previous exploration has shown that oligoelements contained too many missing values, for this reason these elements were excluded from analysis. The chapter ends with the backup of a processed data frame useful for next chapters. 
 ***
 
+## Useful libraries for data handling
 
-We need package `tidyverse` for data handling, `DBI` and `RSQLite` packages to make connexion and extract usefull tables in the potato historical database file `pomme_de_terre.db`.
-
-```{r, message=FALSE, warning=FALSE}
-library("tidyverse")  # loads dplyr & ggplot2
-library("DBI")        # Database Interface for R
-library("RSQLite")    # SQLite Interface for R
-db <- dbConnect(SQLite(), dbname = "data/pomme_de_terre.db")  # Connect to potato database
-```
-
-Select tables in the created connexion.
+I need package [tidyverse](https://www.tidyverse.org/) which loads a set of packages for data handling and vizualisation. I used [Amelia](https://www.rdocumentation.org/packages/Amelia/versions/1.7.5) for missing data vizualisation, [mice](http://stefvanbuuren.github.io/mice/) for missing data imputation and [compositions](http://www.stat.boogaart.de/compositions) to transforme compositions into compositionnal space.
 
 ```{r, message=FALSE, warning=FALSE}
-data_df <- dbReadTable(db, "MetaData") %>% 
-  left_join(dbReadTable(db, "FoliarAnalysis"), by='NoEssai') %>% 
-  left_join(dbReadTable(db, "TreatmentVariable"), by=c('NoEssai', 'NoBloc', 'NoTraitement')) %>% 
-  left_join(dbReadTable(db, "MaturityOrder"), by = 'Cultivar') %>% 
-  as_tibble()
+library("tidyverse")
+library('Amelia')
+library("mice")
+library("compositions")
 ```
 
-Load recent collected trials data from the project experiments and the Quebec Ministry of Agriculture, Fisheries and Food (MAPAQ) trials.
+## Québec potato data set
 
-```{r}
-trials_df <- read.csv2("data/donneesEssaisPdt.csv", sep = ';', dec = '.')
+I load the Québec potato raw data set `raw_potato_df.csv` available for the project.
+
+```{r, message=FALSE, warning=FALSE}
+raw_potato_df <- read_csv("data/raw_potato_df.csv")
 ```
 
-Select usefull variables
+## Selection of useful variables
 
-Select usefull columns for computations, with macroelements `N, P, K, Mg, Ca` only because oligoelements have too much missing data. The year is not needed instead it permits to know how long ago expériements have been monitored. Geographical coordinates are used to map sites locations.
+I create custom vectors of attributes which help select useful data columns for computations. The year of experiment is not needed instead it permits to know how long ago expériements have been monitored.  Geographical coordinates will be needed to map experimental sites locations later.
 
 ```{r}
 keys_col <- c('NoEssai', 'NoBloc', 'NoTraitement')
-macro <- c("AnalyseFoliaireN","AnalyseFoliaireP","AnalyseFoliaireK", "AnalyseFoliaireCa","AnalyseFoliaireMg")
-coord_year <- c('Annee', 'LatDD', 'LonDD')
-cult_yield <- c('Cultivar', 'Maturity5', 'RendVendable')
-usefull_col <- c(keys_col, macro, coord_year, cult_yield, 'AnalyseFoliaireStade')
-macro_elts <- c("N", "P", "K", "Ca", "Mg") # for simplicity
+longNameMacro <- c("AnalyseFoliaireN","AnalyseFoliaireP","AnalyseFoliaireK", "AnalyseFoliaireCa","AnalyseFoliaireMg")
+extra_col <- c('Annee', 'LatDD', 'LonDD', 'AnalyseFoliaireStade')
+cultivarAndyield <- c('Cultivar', 'Maturity5', 'RendVendable')
+useful_col <- c(keys_col, extra_col, cultivarAndyield, longNameMacro)
+macroElements <- c("N", "P", "K", "Ca", "Mg") # for simplicity
 ```
 
-Reduced and joined data frame becomes `fol_df` the foliar data frame:
+The reduced data frame becomes `leaf_df` which stands for the diagnostic leaves macroelements composition data frame combining corresponding cultivars data, marketable yield, year of experiment and sites geographical coordinates.
 
 ```{r}
-data_df <- data_df %>% select(usefull_col)
-trials_df <- trials_df %>% select(usefull_col)
-fol_df <- rbind(data_df, trials_df)
-colnames(fol_df)[which(names(fol_df) %in% macro)] <- macro_elts
-glimpse(fol_df)
+leaf_df <- raw_potato_df %>% select(useful_col)
+colnames(leaf_df)[which(names(leaf_df) %in% longNameMacro)] <- macroElements
+glimpse(leaf_df)
 ```
 
 ## Arranging the data frame
 
-Set trial number as factor
+I set trial number `NoEssai` as factor, relevel categorical `maturity` order variable and choose cultivar `Superior` as reference as it has the maximum number of observations in the data frame.
 
 ```{r}
-fol_df$NoEssai <- as.factor(fol_df$NoEssai)
+percentage <- round(with(leaf_df, prop.table(table(Cultivar)) * 100), 2)
+distribution <- with(leaf_df, cbind(numbOfsamples = table(Cultivar), percentage = percentage))
+distribution <- data.frame(cbind(distribution, rownames(distribution)))
+colnames(distribution)[3] <- "Cultivar"
+distribution$numbOfsamples <- as.numeric(as.character(distribution$numbOfsamples))
+distribution$percentage <- as.numeric(as.character(distribution$percentage))
+distribution %>% arrange(desc(numbOfsamples)) %>% head(5)
 ```
-
-Choose cultivar `Goldrush` as reference, it as the maximum number of observations in the data frame.
 
 ```{r}
-fol_df$Cultivar <-  relevel(factor(fol_df$Cultivar), ref = "Goldrush")
+leaf_df$NoEssai <- as.factor(leaf_df$NoEssai)
+leaf_df$Cultivar <-  relevel(factor(leaf_df$Cultivar), ref = "Superior")
+leaf_df$Maturity5 <- ordered(leaf_df$Maturity5, 
+                            levels = c("early","early mid-season",
+                                       "mid-season","mid-season late","late"))
 ```
 
-Relevel categorical `maturity` order.
+I portrait missing values for the sake of imputation. As explained in the \@ref(Objective) section, I will retain after this processing only reasonably imputable data i.e., missing data of a sample less than half the number of studied attributes. The next cell maps the portrait of missing values.
 
-```{r}
-fol_df$Maturity5 <- ordered(fol_df$Maturity5, 
-                            levels = c("early","early mid-season","mid-season","mid-season late","late"))
-```
-
-Leaf ionome with macroelements
-
-```{r}
-leafIonome <- fol_df[macro_elts]
-```
-
-Some custom functions are used for compositional analysis. The libraries `robCompositions`, `compositions` and `Amelia` are used for robust imputation with kNN (long process), compositional transformations and to portrait missing values respectively.
-
-```{r}
-source('https://raw.githubusercontent.com/essicolo/AgFun/master/ilrNA.R')
-source('https://raw.githubusercontent.com/essicolo/AgFun/master/ilrDefinition.R')
-source("https://raw.githubusercontent.com/essicolo/AgFun/master/codadend2.R")
-```
-
-```{r, message=FALSE, warning=FALSE}
-library("robCompositions")  # impCoda & impKNNa: for data imputation
-library("compositions")  # for ILR transformations: acomp, ilr, ilrInv
-require('Amelia')   # Portrait of missing values
-```
-
-Portrait of missing macroelements
-
-```{r matrix-missing-data, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Portrait of missing macroelements."}
+```{r matrix-missing-comp, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Portrait of missing macroelements."}
+leafIonome <- leaf_df[macroElements]
 missmap(leafIonome)
 ```
 
-Impute missing data for samples (rows) with less than 3 missing elements among the five. The next cell initializes this computation codes.
+This figure compiles the samples identifiers on the Y axis and macroelements on the X axis. A complete horizontal unique color band indicates wether the 5 elements are totally observed (blue band) or totally missing (red band). Only N and P have missing values that will be imputed and retained at the end. The totally missing compositions will be removed. The next cell initializes this process.
 
 ```{r}
 # keep track of empty rows:
-fol_df$leafIonome_allNA <- apply(fol_df[macro_elts], 1, function(X) all(is.na(X)))
+leaf_df$leaf_allNA <- apply(leaf_df[macroElements], 1, function(X) all(is.na(X)))
 # keep track of rows where there is any NA:
-fol_df$leafIonome_anyNA <- apply(fol_df[macro_elts], 1, function(X) any(is.na(X)))
+leaf_df$leaf_anyNA <- apply(leaf_df[macroElements], 1, function(X) any(is.na(X)))
 # number of NAs (missing values):
-fol_df$leafIonome_countNA <- apply(fol_df[macro_elts], 1, function(X) sum(is.na(X)))
-# Only impute if the next variable value is set to FALSE
-fol_df$leafIonome_hasTooMuchNA <- fol_df$leafIonome_countNA >= 3
+leaf_df$leaf_countNA <- apply(leaf_df[macroElements], 1, function(X) sum(is.na(X)))
 ```
 
-Imputation:
+The next cell performs three times imputation and compiles the mean (average) for each sample and for each element in a new table stored in a subfolder `output`. At this step imputation is made for all the missing values of the complete table. Too many missing data rows will be discarded later.
 
 ```{r}
 # Warning: could be a long process
-leaf_imputeRob <- impKNNa(as.matrix(fol_df[!fol_df$leafIonome_hasTooMuchNA, macro_elts]),
-                           metric = "Aitchison", k = 6, primitive = TRUE,
-                           normknn = TRUE, adj = 'median')
-colnames(leaf_imputeRob$xImp) <- paste0(colnames(leaf_imputeRob$xImp), '_imp')
-leaf_imputeRob$xImp %>% head() # a view of new imputed compositions
+perform_imputation <- TRUE
+if (perform_imputation) {
+  leaf_mice <- leaf_df %>%
+    select(macroElements) %>%
+    mice(data = ., m = 3, method = "rf")
+  leaf_complete <- Reduce("+", complete(leaf_mice, action = "all"))/ leaf_mice$m
+  names(leaf_complete) <- paste0(names(leaf_complete), "_imp")
+  write_csv(leaf_complete, "output/leaf_complete.csv")
+} else {
+  leaf_complete <- read_csv("output/leaf_complete.csv")
+}
 ```
 
-Push imputed columns to the data frame. The nutrients diagnosis will be performed with imputed compositions.
+With the next cell I append imputed columns to the data frame. The nutrients diagnosis will be performed with imputed compositions.
 
 ```{r}
-fol_df <- left_join(x = fol_df,
-                     y = data.frame(NoEssai = fol_df$NoEssai[!fol_df$leafIonome_hasTooMuchNA],
-                                    NoBloc = fol_df$NoBloc[!fol_df$leafIonome_hasTooMuchNA],
-                                    NoTraitement = fol_df$NoTraitement[!fol_df$leafIonome_hasTooMuchNA],
-                                    leaf_imputeRob$xImp),
-                     by = keys_col)
-fol_df <- fol_df %>% select(-c("leafIonome_allNA", "leafIonome_anyNA", "leafIonome_countNA",                                                     "leafIonome_hasTooMuchNA"))
+leaf_df <- bind_cols(leaf_df, leaf_complete)
+leaf_df <- leaf_df %>% select(-c("leaf_allNA", "leaf_anyNA"))
 ```
 
-Compute Fv. `Fv` stands for filling value, an amalgamation of all other elements closing the simplex to 100%.
+[Compositional data](https://en.wikipedia.org/wiki/Compositional_data) are data where the elements of the composition are non-negative and sum to unity. I compute `Fv` standing for `filling value`, an amalgamation of all other elements closing the [simplex](https://en.wikipedia.org/wiki/Simplex) to 100%.
 
 ```{r}
-fol_df$Fv_imp <- 100 - rowSums(fol_df[, colnames(leaf_imputeRob$xImp)]) # computes the Fv
-leaf.macro_imp <- c(colnames(leaf_imputeRob$xImp), 'Fv_imp') # new colnames vector of macroelements
-leaf.macro_imp
+leaf_df <- leaf_df %>%
+  mutate(sum_imp = rowSums(select(., paste0(macroElements, "_imp"))),
+         Fv_imp = 100 - sum_imp) %>%
+  select(-sum_imp)
+if (!"Fv" %in% macroElements) macroElements <- c(macroElements, "Fv")
 ```
 
-Compute centered log-ratios `clr` only for complete cases.
+I use centered log-ratio (`clr`) transformation for discriminant analysis and perturbation vector concept assessment.The next cell perform this calculation. The `clr` coordinates are computed in an external (intermediate) data table. 
 
 ```{r}
-leafIonomeComp <- acomp(fol_df[leaf.macro_imp])
-leafIonomeClr <- clr(leafIonomeComp)
+leaf_composition <- leaf_df %>%
+  select(paste0(macroElements, "_imp")) %>%
+  acomp(.)
+leaf_clr <- clr(leaf_composition) %>%
+  unclass() %>%
+  as_tibble()
+names(leaf_clr) <- paste0("clr_", macroElements)
+write_csv(leaf_clr, "output/leaf_clr.csv")
 ```
 
+The next cell binds these clr-transformed compositions to the raw composition data frame and retains useful columns. I also used this cell to discard all the samples with too many missing composition.
+
 ```{r}
-leafIonomeClr[apply(leafIonomeComp, 1, anyNA), ] <- NA   # discard for rows with any NA
-leafIonomeDefClr <- paste0("clr_", c(macro_elts, 'Fv'))  # computed clr colnames vector
-colnames(leafIonomeClr) <- leafIonomeDefClr
-leafIonomeClr <- cbind(fol_df[keys_col], leafIonomeClr)  # bind clr variables to keys columns
+leaf_df <- bind_cols(leaf_df, leaf_clr)
+leaf_df <- leaf_df %>% 
+  select(keys_col, extra_col, cultivarAndyield, "leaf_countNA", starts_with("clr")) %>% 
+  filter(leaf_countNA <= 3)
 ```
 
-Push clr coordinates to `fol_df` and reduce the data frame to usefull columns
+## Cultivars classes correction. 
+
+From a previous checking, I noticed that cultivars `Mystere` and `Vivaldi` have different repported maturity classes in the data set, `mid-season late` and `late` for `Mystere`, then `early mid-season` and `mid-season` for `Vivaldi` respectively. Their new maturity classes names are based on a majority vote for this study. The next cell perform this correction. I also make missing values explicit for this categorical variable.
 
 ```{r}
-fol_df <- left_join(fol_df, leafIonomeClr, by = keys_col)
-fol_df <- fol_df %>% select(keys_col, coord_year, cult_yield, "AnalyseFoliaireStade", leafIonomeDefClr)
-glimpse(fol_df)
+leaf_df$Maturity5[leaf_df$Cultivar == "Mystere"] <- "late"
+leaf_df$Maturity5[leaf_df$Cultivar == "Vivaldi"] <- "early mid-season"
+leaf_df$Cultivar <- forcats::fct_explicit_na(leaf_df$Cultivar) # makes missing values explicit.
 ```
 
-Cultivars classes correction. 
+## Summarise and backup
 
-Cultivar `Mystere` and `Vivaldi` have different maturity classes in the data set, `mid-season late` and `late` for `Mystere`, then `early mid-season` and `mid-season` for `Vivaldi`. Their new maturity classes names are based on a majority vote.
-
-```{r}
-fol_df$Maturity5[fol_df$Cultivar == "Mystere"] <- "late"
-fol_df$Maturity5[fol_df$Cultivar == "Vivaldi"] <- "early mid-season"
-fol_df$Cultivar <- forcats::fct_explicit_na(fol_df$Cultivar)
-```
-
-Summarise the data frame.
+Finally, I summarized the processed data frame to record the years of begining and ending of experiment, the remaining number of experiments, cultivars and maturity classes. The definitive leaves data frame is stored as `leaf_clust_df.csv` in `output` subfolder as it is an intermediate file, for cluster analysis (Chapter \@ref(Chapter-Clustering)). 
 
 ```{r}
-fol_df %>%
+leaf_df %>%
   summarise(start_year = min(Annee, na.rm = TRUE),
             end_year = max(Annee, na.rm = TRUE),
-            nbr_trials = n_distinct(NoEssai, na.rm = TRUE),
-            nbr_cultivars = n_distinct(Cultivar, na.rm = TRUE),
-            nbr_maturityClass = n_distinct(Maturity5, na.rm = TRUE)
+            numb_trials = n_distinct(NoEssai, na.rm = TRUE),
+            numb_cultivars = n_distinct(Cultivar, na.rm = TRUE),
+            numb_maturityClasses = n_distinct(Maturity5, na.rm = TRUE)
             )
+write_csv(leaf_df, 'output/leaf_clust_df.csv')
 ```
 
-Backup for cluster analysis:
-
-```{r}
-write.csv2(fol_df, 'data/fol_df.csv')
-```
-
-## Map of experimental sites locations
-
-```{r fol-locations, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Location of experimental sites (green dots) in the Québec potato data set."}
-library("ggmap") # maps with ggplot2
-library("extrafont") # Changing Fonts for Graphs
-qc_fol <- get_stamenmap(bbox = c(left=-76, right=-68, bottom=45, top=50), 
-                        zoom=7, maptype = 'toner-lite')
-ggmap(qc_fol) +
-  geom_point(data=unique(fol_df[c('LonDD', 'LatDD')]), aes(x=LonDD, y=LatDD),
-             size=3, shape=16, colour='aquamarine4', alpha=0.8) + coord_map("mercator") +
-  theme_bw() +
-  theme(text=element_text(family="Arial", face="bold", size=12))
-#ggsave("images/fol-locations.png", width=10, height=8)
-```
 
 <!--chapter:end:index.Rmd-->
 
-
 # Cluster analysis of potato cultivars {#Chapter-Clustering}
 
-Placeholder
+## Objective
 
+***
+Although plant health is a continuous domain rather than a categorical status, yield thresholds are useful for decision-making. Because yield potential varies widely among cultivars, I use this chapter to split experimental data into low- and high-productivity categories using a marketable yield delimiter at the 65th percentile for each cultivar. Hence, I use high yielders subpopulation (samples which marketable yield is larger than the yield cut-off) to perform a cascade k-means clustering aiming to discriminate Groups of similar multivariate compositions (`ionomics groups`). I combine a discriminant analysis to check the macroelements that best discriminate cultivars. I also check the performence of Groups discrimination by computing the `Groups X clr-coordinates` interaction effect coefficients in a linear mixed effect model. I finally append the new variable `ionomicGroup`to the leaves clr data frame and discard all the rows with any missing data. I map the experimental sites locations in the third sudsection of this chapter. The output data file is called `leaf_ml_df.csv` i.e., the data frame for machine learning chapter \@ref(Chapter-Modeling).
+***
 
-## Load and handle data
+## Useful libraries and custom functions
+
+We need a set of packages for data handling and visualization like the `tidyverse` package presented in previous chapter \@ref(Chapter-Data-Processing), [ellipse](https://rdrr.io/cran/ellipse/) offers functions for drawing ellipses and ellipse-Like confidence regions (maybe I will set this option to FLASE for graph simplicity), [mvoutlier](https://rdrr.io/cran/mvoutlier/) for multivariate outliers detection, [ade4](http://pbil.univ-lyon1.fr/ADE-4) gathers tools for multivariate data analysis (I use it for discriminant analysis), [vegan](https://rdrr.io/cran/vegan/) performs cluster analysis by k-means or cascade k-means clustering, [ggmap](https://github.com/dkahle/ggmap) makes it easy to retrieve raster map tiles from online mapping services like Google Maps and Stamen Maps and plot them using the ggplot2 framework, [extrafont](https://www.r-pkg.org/pkg/extrafont) for custom fonts for graphs with ggplot2, [ggrepel](https://github.com/slowkow/ggrepel) provides text and label geoms for 'ggplot2' that help to avoid overlapping text labels, [plotly](https://plotly-r.com) ..., [nlme](https://www.rdocumentation.org/packages/nlme) for linear and non-linear mixed effect modeling. Some custom functions are also loaded mainly for Pseudo r-square caculation with linear mixed effect model and discriminant biplot.
+
+```{r, warning=FALSE, message=FALSE}
+library("tidyverse")
+library('ellipse')
+library("mvoutlier")
+library("ade4")
+library("vegan")
+library("extrafont")
+library("ggrepel")
+library("ggmap")
+#library("plotly")
+library("nlme")
+source("data/functions.R")
+source('https://raw.githubusercontent.com/essicolo/AgFun/master/plotDA_trad.R')
+```
+
+## Leaves processed compositions data set
+
+For this chapter, the initial data set is the outcome of the prvious chapter (\@ref(Chapter-Data-Processing)) `leaf_clust_df`. I load the data frame and create vectors of columns I will use in this chapter.
+
+```{r}
+leaf_clust_df <- read_csv("output/leaf_clust_df.csv")
+keys_col <- c('NoEssai', 'NoBloc', 'NoTraitement')
+clr_no <- c("clr_N", "clr_P", "clr_K", "clr_Mg", "clr_Ca", "clr_Fv")
+cultivarAndyield <- c('Cultivar', 'Maturity5', 'RendVendable')
+extra_col <- c('LatDD', 'LonDD', 'AnalyseFoliaireStade')
+```
+
+The next cell maps experimental sites locations.
+
+```{r leaf_df-sites-locations, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Location of experimental sites (green dots) in the Québec potato data set."}
+#library("ggmap")
+qc_leaf <- get_stamenmap(bbox = c(left=-76, right=-68, bottom=45, top=50), 
+                        zoom=7, maptype = 'toner-lite')
+ggmap(qc_leaf) +
+  geom_point(data = leaf_clust_df %>%
+               select(LonDD, LatDD) %>%
+               unique(), aes(x = LonDD, y = LatDD),
+             size = 2, shape = 1) + 
+  coord_map("mercator") +
+  theme_bw() +
+  theme(text = element_text(family = "Arial", face = "bold", size = 12))
+#ggsave("images/leaf_clust_df-sites-locations.png", width=10, height=8)
+```
+
+## High yielders delimiter
+
+For cluster analysis, I keep only high yielders i.e. yield 65% quantile cutter for each cultivar. The `cutQ` table contains the yield delimiter for each cultivar. Then, this table is used to add the variable `yieldClass` to `leaf_clust_df`. `HY` and `LY` stand for high yield and low yield respectively.
+
+```{r}
+cutQ <- leaf_clust_df %>%
+  group_by(Cultivar) %>%
+  select(RendVendable) %>%
+  summarise_if(is.numeric, quantile, probs=0.65, na.rm = TRUE) %>%
+  rename(rv_cut = RendVendable)
+leaf_clust_df <- leaf_clust_df %>%
+  left_join(cutQ, by = "Cultivar") %>%
+  mutate(yieldClass = fct_relevel(ifelse(RendVendable >= rv_cut, "HY", "LY"), "LY"))
+```
+
+For sake of verification, I compute average yield per yieldClass.
+
+```{r, warning=FALSE}
+meanYield = leaf_clust_df %>%
+    group_by(yieldClass) %>%
+    select(RendVendable) %>%
+    summarise_if(is.numeric, mean, na.rm = TRUE)
+meanYield
+```
+
+Average marketable yield is 40.48 Mg ha-1 for high yielders and 24.78 Mg ha^-1 for low yielders. In comparison, average potato tuber yields in 2017 in Canada and in Québec were respectively 40 Mg ha^-1 and 38.4 Mg ha^-1.
+
 ## `clr` centroids computation
-## Axis reduction with LDA Linear Discriminant Analysis
-## K-means clustering using clr centroïds for high yielders
-## clr and ionomics groups interactions effects
+
+Compositional data transformation is done in the loaded file. I keep only clr-transformed coordinates for high yielders, at 10 % blossom (AnalyseFoliaireStade = 10% fleur) in the next chunk.
+
+```{r}
+highYielders_df <- leaf_clust_df %>%
+  mutate(isNA = apply(.[c(clr_no, cultivarAndyield)], 1, anyNA)) %>%
+  mutate(is10pcf = AnalyseFoliaireStade == "10% fleur") %>%
+  filter(!isNA & is10pcf & yieldClass == "HY" & NoEssai != "2") %>% 
+  select(one_of(keys_col, clr_no, cultivarAndyield)) %>%
+  droplevels()
+nrow(highYielders_df)
+```
+
+So, `r nrow(highYielders_df)` lines of observations (samples) will be used for potato cultivars clustering. I Check how many rows of data are they for each cultivar.
+
+```{r}
+percentage <- round(with(highYielders_df, prop.table(table(Cultivar)) * 100), 2)
+distribution <- with(highYielders_df, cbind(numHY = table(Cultivar), percentage = percentage))
+distribution <- data.frame(cbind(distribution, rownames(distribution)))
+colnames(distribution)[3] <- "Cultivar"
+distribution$numHY <- as.numeric(as.character(distribution$numHY)) # numHY = number of samples
+distribution$percentage <- as.numeric(as.character(distribution$percentage))
+distribution %>% arrange(desc(numHY)) %>% head(5) # arrange in descending order
+```
+
+Some cultivars are well represented, like Superior and Goldrush. Let's compute number of cultivars and trials in the data frame.
+
+```{r}
+data.frame(numb_cultivars = n_distinct(highYielders_df$Cultivar, na.rm = TRUE),
+           numb_trials = n_distinct(highYielders_df$NoEssai, na.rm = TRUE))
+```
+
+I create a table with cultivars, maturity classes and computed median clr values i.e., clr centroids.
+
+```{r}
+highYielders_clr <- highYielders_df %>%
+  group_by(Cultivar, Maturity5) %>%
+  select(Cultivar, Maturity5, starts_with("clr")) %>%
+  summarise_all(list(median))
+highYielders_clr
+```
+
+I use multivariate outliers detection technic to identify outliers with a criterion  of detection limit of 0.975 by cultivar only if cultivars contain at leat 20 rows. If less than 20 rows, all rows are kept. The new data frame will be used for discriminant analysis. I call it `lda_df`.
+
+```{r, warning=FALSE, message=FALSE}
+highYielders_df_IO <- highYielders_df %>%
+  group_by(Cultivar) %>%
+  select(starts_with("clr")) %>%
+  do({
+    if (nrow(.) < 20) {
+      IO = rep(1, nrow(.))
+    } else {
+      IO = sign1(.[,-1], qcrit=0.975)$wfinal01
+    }
+    cbind(.,IO)
+  })
+
+lda_df <- highYielders_df_IO %>%
+              filter(IO == 1) %>%
+              droplevels()
+nrow(lda_df)
+```
+
+Hence, `r nrow(highYielders_df)-nrow(lda_df)` outliers have been discarded from the analysis. The remaining data frame contains `r n_distinct(lda_df$Cultivar, na.rm = TRUE)` cultivars from `r n_distinct(lda_df$NoEssai, na.rm = TRUE)` trials.
+
+## Axis reduction
+
+Leaves composition data are compositionnal data (non-negative and summing to unity) so are multivariate. As argued by [Legendre et Legendre,  2012](https://www.elsevier.com/books/numerical-ecology/legendre/978-0-444-53868-0) It is not possible to draw such a diagram on paper with more than two or eventually three dimensions, however, even though it is a perfectly valid mathematical construct. For the purpose of analysis, I will project the multidimensional scatter diagram onto bivariate graphs whose axes are known to be of particular interest. The axes of these graphs are chosen to represent a large fraction of the variability of the multidimensional `N-P-K-Mg-Ca-Fv` data matrix, in a space with reduced (i.e. lower) dimensionality relative to the original data set. With the next chunks, I perform a duality diagram (or [dudi](http://pbil.univ-lyon1.fr/ade4/ade4-html/dudi.html)) PCA (priciple component analysis) and store scores and loadings. I also filter the data frame so that cultivars with less than 5 occurences will be masked on the resulting biplot.
+
+```{r}
+pca_leaf <- dudi.pca(lda_df[clr_no], scannf = FALSE, scale = FALSE)
+lda_leaf <- discrimin(dudi = pca_leaf, fac = factor(lda_df$Cultivar), scannf = FALSE)
+lda_leaf_score = lda_leaf$li
+lda_leaf_loading = lda_leaf$fa
+```
+
+```{r}
+lda_df$Cultivar <- factor(lda_df$Cultivar)
+lda_leaf_group <- lda_df$Cultivar
+n_cultivar <- table(lda_df$Cultivar)
+# Do not schow Cultivars whose number of occurrences is < 5
+n_filter <- lda_leaf_group %in% names(n_cultivar[n_cultivar >= 5])
+filter_cultivars <- names(n_cultivar[n_cultivar >= 5])
+lda_df_filter <- lda_df[n_filter, ]
+```
+
+I can plot the tThe distance biplot as result of discriminant analysis. I use a custom function.
+
+```{r distance-biplot, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Discriminant distance biplot of potato cultivars."}
+options(repr.plot.width = 6, repr.plot.height = 6)
+plot_lda(score = lda_leaf_score[n_filter, ],
+         loading = lda_leaf_loading[n_filter, ],
+         group = lda_leaf_group[n_filter],
+         ell_dev = FALSE, 
+         ell_err = FALSE, #TRUE, 
+         scale_load = 0.5,
+         level = 0.95,
+         legend = FALSE,
+         label = TRUE,
+         transparency = 0.3, xlim = c(-2, 2), ylim = c(-3.5, 3),
+         points = FALSE)
+```
+
+The first discriminant axis (`DS1`) is formed mainly by Mg, K and N. The second discriminant axis (`DS2`) is driven mainly by the Fv, K and weakely by Ca. I perform cluster analysis in next subsection.
+
+## Cascade K Means clustering
+
+What is cascade K Means Clustering? It is an an unsupervised learning algorithm inspired by its similar [K Means clustering](https://www.r-bloggers.com/k-means-clustering-in-r/) both trying to cluster data based on their similarity. There is no outcome to be predicted. The algorithm just tries to find patterns in the data. In k means clustering, we have to specify the number of clusters we want the data to be grouped into. In cascade K means method, we give a minimum and a maximum number of cluster wanted. The algorithm randomly assigns each observation to a cluster, and finds the centroid of each cluster. Then, the algorithm iterates through two steps: 
+
+1. reassign data points to the cluster whose centroid is closest,
+1. Calculate new centroid of each cluster.
+
+These two steps are repeated till the within cluster variation cannot be reduced any further. The within cluster variation is calculated as the sum of the euclidean distance between the data points and their respective cluster centroids. 
+
+I use the high yielders clr centroids (medians) for cultivars in a next data frame which is the same as `highYielders_clr` without maturity classes, and `Calinski-Harabasz (1974) criterion (package vegan)` for clustering.The chunk also plots the process results.
+
+```{r clustering, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="K-means partitions comparison (calinski criterion)."}
+highYieldersCentroids <- highYielders_df %>%
+  group_by(Cultivar) %>%
+  select(starts_with("clr")) %>%
+  summarise_all(list(median))
+set.seed(5773)
+highYieldersKmeans <- cascadeKM(highYieldersCentroids[, -1], 
+                                inf.gr = 3, sup.gr = 6, criterion = "Calinski")
+options(repr.plot.width = 6, repr.plot.height = 4)
+plot(highYieldersKmeans) 
+```
+
+The red dot of the right hand side graph shows 3 optimal clustering partitions which is the inferior limit I gave to the process. I check the partitions data frame.
+
+```{r}
+highYieldersKmeans$partition %>% head()
+```
+
+I consider `4 groups` established from clustering (`...`) corresponding to the second column. I can use the reference of the column or its name `4 groups` directly. I add it up to the centroids data frame.
+
+```{r}
+highYieldersCentroids$kgroup <- highYieldersKmeans$partition[, "4 groups"]
+```
+
+I compute discriminant scores centroïdes for cultivars.
+
+```{r}
+lda_centroids <- lda_leaf_score %>%
+  mutate(group = lda_leaf_group) %>%
+  group_by(group) %>%
+  summarise_all(list(mean))
+```
+
+Plot Cultivar groups in LDA with a custom function.
+
+```{r d-biplot-2, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Discriminant distance biplot of potato cultivars showing ionomics groups."}
+options(repr.plot.width = 6, repr.plot.height = 6)
+plot_lda(score=lda_leaf_score[n_filter, ],
+         loading=lda_leaf_loading[n_filter, ],
+         group = lda_leaf_group[n_filter],
+         ell_dev=FALSE, 
+         ell_err= FALSE, #TRUE, 
+         scale_load = 0.4,
+         level=0.95,
+         legend=FALSE,
+         label=TRUE,
+         transparency=0.4, xlim = c(-2.5, 2), ylim = c(-3.5, 3.5),
+         points=F)
+# colour dots for groups (or clusters)
+col = factor(highYieldersCentroids[highYieldersCentroids$Cultivar %in% filter_cultivars, 'kgroup'][[1]])
+
+# remove the cultivar column
+points(lda_centroids[lda_centroids$group %in% filter_cultivars, c('DS1', 'DS2')], 
+       pch = 19, col = col, cex = 0.9)
+
+legend(-2.5, 3, 
+       legend = paste(rep('cluster', nlevels(col)), as.numeric(levels(col))), 
+       pch = 19, col = unique(col), cex = 0.9)
+```
+
+It's a bit difficult to colour cultivar name in the plot with the custom function. I use functions from packages `ggplot2`, `ggrepel` and `plotly` instead. New intermediate data frames are created for this purpose.
+
+```{r}
+cultivars_filtre <- data.frame(Cultivar = filter_cultivars, i_group=col)
+
+df <- data.frame(
+    score = lda_leaf_score[n_filter, ],
+    loadings = lda_leaf_loading[n_filter,],
+    Cultivar = lda_leaf_group[n_filter]
+                )
+df <- df %>% left_join(cultivars_filtre, by="Cultivar")
+df %>% head()
+```
+
+```{r, warning=FALSE}
+centroids = lda_centroids[lda_centroids$group %in% filter_cultivars, ]
+names(centroids)[match("group", names(centroids))] <- "Cultivar"
+centroids <- centroids %>% left_join(cultivars_filtre, by="Cultivar")
+centroids %>% head()
+```
+
+The chunk below plots discriminant biplot with colours corresponding to ionomics groups.
+
+```{r gg-biplot, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Discriminant biplot and cluster analysis result of potato cultivars."}
+options(repr.plot.width = 9, repr.plot.height = 9)
+g <- ggplot(centroids, aes(DS1, DS2, label = Cultivar, col=i_group)) +
+  geom_text_repel() +
+  geom_point(alpha = 0.5) +
+  theme_classic(base_size = 12) +
+  scale_color_manual(values=c("red", "magenta", "blue", "black")) + 
+  theme(axis.text=element_text(size=12)) +
+  theme(text=element_text(family="Arial", face="bold", size=12))
+
+# Add discriminant loadings using geom_segment() and arrow()
+x=0; y=0; labels = c(clr_no, rep(NA, nrow(df)-length(clr_no)))
+g + geom_segment(data=df, mapping=aes(x=x, y=y, xend=x+loadings.DS1, yend=y+loadings.DS2), 
+                 arrow=arrow(), size = 1, color="grey80") + 
+    geom_text(data=df, mapping=aes(x=loadings.DS1, y=loadings.DS2, label=labels), 
+              size=5, color="black") +
+    geom_hline(yintercept=0, color="black", linetype=2) +
+    geom_vline(mapping=aes(xintercept=0), color="black", linetype=2) + 
+    theme(axis.line=element_blank())
+#ggsave("images/cultivar_clust.png", width=10, height=8, dpi = 300)
+```
+
+I push cultivars yield cut-off and ionomics groups in the initial data frame.
+
+```{r, warning=FALSE, message=FALSE}
+ionomicGroup <- data.frame(lda_centroids[, 1], 
+                           ionomicGroup = factor(highYieldersKmeans$partition[, "4 groups"]))
+colnames(ionomicGroup)[colnames(ionomicGroup)=="group"] <- "Cultivar"
+cutQ <- cutQ[-1, ] # to discard missing cultivar names
+colnames(cutQ)[which(names(cutQ) == "rv_cut")] <- "yieldCutoff"
+cutQ_ig <- cutQ %>% left_join(ionomicGroup, by = "Cultivar")
+
+leaf_clust_df <- leaf_clust_df %>% 
+    left_join(y = cutQ_ig, by = 'Cultivar') %>%
+    select(-rv_cut)
+```
+
+## Arranging data for Machine Learning 
+
+I select useful columns for the next chapter (\@ref(Chapter-Modeling)) and save the new table as `dfml.csv`. I conserve only `complete cases`.
+
+```{r}
+new_col <- c('yieldCutoff', 'yieldClass', 'ionomicGroup')
+dfml <- leaf_clust_df %>%
+  select(one_of(c(keys_col, clr_no, cultivarAndyield, new_col, 'AnalyseFoliaireStade'))) %>%
+  mutate(isNA = apply(.[c(clr_no, cultivarAndyield)], 1, anyNA)) %>%
+  mutate(is10pcf = AnalyseFoliaireStade == "10% fleur") %>%
+  filter(!isNA & is10pcf & NoEssai != "2") %>% 
+  select(-c(AnalyseFoliaireStade, isNA, is10pcf)) %>%
+  droplevels() %>% 
+  filter(complete.cases(.))
+nrow(dfml)
+write_csv(dfml, "output/dfml.csv")
+```
+
+Hence, the data table contains `r nrow(dfml)` for the next chapter (Machine learning).
+
+## clr X ionomics groups interactions effects
+
+I use a linear mixed effect model to assess the effect of clr coordinates on tubers marketable yield between ionomics groups. This last subsection perfom this analysis by extracting and ploting the interaction coefficients of the model.
+
+```{r}
+dfml$Cultivar <- factor(dfml$Cultivar)
+dfml$Maturity5 <- relevel(dfml$Maturity5, ref = "late")
+dfml$NoEssai <- factor(dfml$NoEssai)
+colnames(dfml)[colnames(dfml)=="ionomicGroup"] <- "group_i"
+dfml$group_i <- factor(dfml$group_i)
+
+clr_no <- c("clr_N", "clr_P", "clr_K", "clr_Ca", "clr_Mg", "clr_Fv")
+clrNo <- c("clrN", "clrP", "clrK", "clrCa", "clrMg", "clrFv") # for plot
+colnames(dfml)[which(names(dfml) %in% clr_no)] <- clrNo
+```
+
+I scale clr coordinates before ajusting linear mixed model. Discard the filling value to deal with singularity problem.
+
+```{r}
+dfml.sc <- dfml  # copy
+dfml.sc[, clrNo] <- apply(dfml.sc[, clrNo], 2, scale)
+used_clr = c("clrN", "clrP", "clrK", "clrCa", "clrMg") # without "clr_Fv"
+
+lmm <- lme(RendVendable ~ (clrN + clrP + clrK + clrCa + clrMg):group_i, 
+            data=dfml.sc, 
+            random= ~1|NoEssai)
+
+pseudoR2 = rsq(dfml.sc$RendVendable, predict(lmm))
+pseudoR2
+```
+
+The next code extracts the interactions coefficients of the model and their p-values (pv) matrix.
+
+```{r}
+pv <- summary(lmm)$tTable[-1,]
+pv
+```
+
+Then, I extract their confident intervals, and process data for the plot.
+
+```{r}
+interval <- tibble(Estimate = intervals(lmm)$fixed[-1, 2],
+                    LL = intervals(lmm)$fixed[-1, 1], 
+                    UL = intervals(lmm)$fixed[-1, 3]) 
+
+interval$variable <- rep('NA', nrow(interval))
+interval$variable <- rownames(intervals(lmm)$fixed)[-1]
+interval$ionomic_group <- rep(paste("group", 1:nlevels(dfml$group_i)), length(clrNo)-1)
+interval$used_clr <- rep(used_clr, each = nlevels(dfml$group_i))
+
+interval$pvalue <- pv[,"p-value"]
+interval$is_significant = ifelse(interval$pvalue <= 0.05,
+                                      'P < 0.05',
+                                      'P > 0.05')
+interval
+```
+
+This cell plots the interaction coefficients and their confident intervals using ggplot2.
+
+```{r coefficients, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Effect of ionome perturbation on marketable yield as illustrated by a linear mixed effect model."}
+options(repr.plot.width = 5, repr.plot.height = 5)
+gg <- ggplot(data = interval, mapping = aes(x = Estimate, y = used_clr, color=is_significant)) +
+         facet_grid(ionomic_group ~ .) + #, scales = 'free', space = 'free') +
+         geom_vline(xintercept = 0, lty = 2) +
+         geom_segment(mapping = aes(x = LL, xend = UL, y = used_clr, yend = used_clr)) +
+         geom_point() +
+         labs(x = "Coefficient", y = "") +
+         theme_bw() +
+         theme(text=element_text(family="Arial", face="bold", size=12))
+gg + theme(legend.title = element_blank())#, legend.position = 'bottom')
+#ggsave("images/coef_lmm.tiff", width = 5, height = 5, dpi = 300)
+```
+
+
 
 <!--chapter:end:02_cluster-analysis.Rmd-->
 
-
 # Predicting marketable tuber yield {#Chapter-Modeling}
-
-Placeholder
-
-
 ## Load data file
+
+Load data file `data_ionome.csv` saved from previous cluster analysis.
+
+```{r, warning=FALSE, message=FALSE}
+library("tidyverse")    # 'diplyr' and 'ggplot2'
+library('extrafont')    # Changing Fonts for Graphs
+df = read_csv('output/dfml.csv')
+```
+
+```{r}
+colnames(df)[colnames(df)=="ionomicGroup"] <- "group_i" # make simplier
+df$group_i = factor(df$group_i)
+
+clr_no <- c("clr_N", "clr_P", "clr_K", "clr_Mg", "clr_Ca", "clr_Fv")
+clrNo <- c("clrN", "clrP", "clrK", "clrMg", "clrCa", "clrFv")
+colnames(df)[which(names(df) %in% clr_no)] <- clrNo
+
+df.sc = df # copy
+df.sc[, clrNo] <- apply(df.sc[, clrNo], 2, scale) # scale clr coordinates
+```
+
+Dummy code maturity order and ionomic group.
+
+```{r}
+if("Maturity5" %in% colnames(df.sc)) {
+  df.sc$Maturity5 <- model.matrix(~ordered(factor(df.sc$Maturity5)))[, 2]
+}
+
+if("group_i" %in% colnames(df.sc)) {
+  df.sc$group_i <- model.matrix(~ordered(factor(df.sc$group_i)))[, 2]
+}
+```
+
+Check the data frame structure.
+
+```{r}
+pc <- round(with(df.sc, prop.table(table(Cultivar)) * 100), 2)
+dist <- with(df.sc, cbind(freq = table(Cultivar), percentage = pc))
+dist <- data.frame(cbind(dist, rownames(dist)))
+colnames(dist)[3] <- "Cultivar"
+dist$freq <- as.numeric(as.character(dist$freq))
+dist %>% arrange(desc(freq)) %>% head(10) # or discard the last part to see all.
+```
+
 ## Machine learning
+
+Partioning data in Train and Test (evaluation) sets.
+
+Load libraries for machine learning functions.
+
+```{r, warning=FALSE, message=FALSE}
+library('caret')
+library('kknn')
+```
+
+```{r}
+set.seed(853739) # random.org
+split_index <- createDataPartition(df.sc$yieldClass,
+                                   group = "Cultivar",
+                                   p = 0.75,
+                                   list = FALSE,
+                                   times = 1)
+train <- df.sc[split_index, ]
+test <- df.sc[-split_index, ]
+
+## With clr coordinates
+ml_clr <- c(clrNo, 'yieldClass')
+train_clr = train[, ml_clr]
+test_clr = test[, ml_clr]
+
+## With clr and maturity classes
+ml_mc <- c(clrNo, 'Maturity5', 'yieldClass')
+train_mc = train[, ml_mc]
+test_mc = test[, ml_mc]
+
+## With clr and ionomic groups
+ml_grp <- c(clrNo, 'group_i', 'yieldClass')
+train_grp = train[, ml_grp]
+test_grp = test[, ml_grp]
+```
+
+The knn model will be trained on a grid.
+
+```{r}
+grid <-  expand.grid(kmax = c(7,9,12,15),    # neighborhood
+                     distance = 1:2,         # 1 for euclidean distance, 2 for Mahalannobis
+                     kernel = "optimal")
+grid
+```
+
+The models will be train with a `10-fold cross-validation (cv)` based on ` accuracy` as loss function.
+
+```{r}
+control <- trainControl(method = "cv", number = 10)
+metric <- "Accuracy"
+```
+
+Train Models:
+
+```{r}
+# a) Non-linear algorithm
+## kNN
+set.seed(7)
+kknn_clr <- train(yieldClass ~., data = train_clr, method = "kknn", 
+                  metric = metric, trControl = control, tuneGrid = grid)
+kknn_mc <- train(yieldClass ~., data = train_mc, method = "kknn", 
+                 metric = metric, trControl = control, tuneGrid = grid)
+kknn_grp <- train(yieldClass ~., data = train_grp, method = "kknn", 
+                  metric = metric, trControl = control, tuneGrid = grid)
+```
+
+```{r}
+# b) Advanced algorithms
+## SVM
+set.seed(7)
+svm_clr <- train(yieldClass ~., data = train_clr, method = "svmRadial", 
+                 metric = metric, trControl = control)
+svm_mc <- train(yieldClass ~., data = train_mc, method = "svmRadial", 
+                metric = metric, trControl = control)
+svm_grp <- train(yieldClass ~., data = train_grp, method = "svmRadial", 
+                 metric = metric, trControl = control)
+```
+
+```{r}
+## Random Forest
+set.seed(7)
+rf_clr <- train(yieldClass ~., data = train_clr, method = "rf", metric = metric, trControl = control)
+rf_mc <- train(yieldClass ~., data = train_mc, method = "rf", metric = metric, trControl = control)
+rf_grp <- train(yieldClass ~., data = train_grp, method = "rf", metric = metric, trControl = control)
+```
+
 ## Assessing goodness of fit
+
+Models results, to select the best model.
+
+```{r ml-traindotplot, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Comparison of models accuracies at training."}
+# Summary results
+results <- resamples(list(kknn_clr_solely = kknn_clr, 
+                          kknn_clr_and_ionomicgroup = kknn_grp, 
+                          kknn_clr_and_maturityclass = kknn_mc,
+                          
+                          svm_clr_solely = svm_clr, 
+                          svm_clr_and_ionomicgroup = svm_grp, 
+                          svm_clr_and_maturityclass = svm_mc,
+                          
+                          rf_clr_solely = rf_clr, 
+                          rf_clr_and_ionomicgroup = rf_grp, 
+                          rf_clr_and_maturityclass = rf_mc))
+
+#summary(results) with dotplot()
+options(repr.plot.width = 5, repr.plot.height = 4)
+dotplot(results)
+```
+
+Check the best model at training, but only accuracies with test sets are used as models quality metric.
+
+```{r}
+models_acc <- data.frame(Model = summary(results)$models,
+                       Accuracy = c(confusionMatrix(train_clr$yieldClass, predict(kknn_clr))$overall[1],
+                                    confusionMatrix(train_grp$yieldClass, predict(kknn_grp))$overall[1],
+                                    confusionMatrix(train_mc$yieldClass, predict(kknn_mc))$overall[1],
+                        
+                                    confusionMatrix(train_clr$yieldClass, predict(svm_clr))$overall[1],
+                                    confusionMatrix(train_grp$yieldClass, predict(svm_grp))$overall[1],
+                                    confusionMatrix(train_mc$yieldClass, predict(svm_mc))$overall[1],
+                                
+                                    confusionMatrix(train_clr$yieldClass, predict(rf_clr))$overall[1],
+                                    confusionMatrix(train_grp$yieldClass, predict(rf_grp))$overall[1],
+                                    confusionMatrix(train_mc$yieldClass, predict(rf_mc))$overall[1]))
+
+models_acc[order(models_acc[,"Accuracy"], decreasing = TRUE), ]
+```
+
+Quality metrics with test (evaluation) set.
+
+```{r}
+predicted_kknn_clr <- predict(kknn_clr, test_clr)
+predicted_kknn_mc <- predict(kknn_mc, test_mc)
+predicted_kknn_grp <- predict(kknn_grp, test_grp)
+
+predicted_svm_clr <- predict(svm_clr, test_clr)
+predicted_svm_mc <- predict(svm_mc, test_mc)
+predicted_svm_grp <- predict(svm_grp, test_grp)
+
+predicted_rf_clr <- predict(rf_clr, test_clr)
+predicted_rf_mc <- predict(rf_mc, test_mc)
+predicted_rf_grp <- predict(rf_grp, test_grp)
+
+#The best model
+
+tests_acc <- data.frame(Model = summary(results)$models,
+                        Accuracy_on_test = c(
+                                    confusionMatrix(test_clr$yieldClass, predicted_kknn_clr)$overall[1],
+                                    confusionMatrix(test_grp$yieldClass, predicted_kknn_grp)$overall[1],
+                                    confusionMatrix(test_mc$yieldClass, predicted_kknn_mc)$overall[1],
+                        
+                                    confusionMatrix(test_clr$yieldClass, predicted_svm_clr)$overall[1],
+                                    confusionMatrix(test_grp$yieldClass, predicted_svm_grp)$overall[1],
+                                    confusionMatrix(test_mc$yieldClass, predicted_svm_mc)$overall[1],
+                                
+                                    confusionMatrix(test_clr$yieldClass, predicted_rf_clr)$overall[1],
+                                    confusionMatrix(test_grp$yieldClass, predicted_rf_grp)$overall[1],
+                                    confusionMatrix(test_mc$yieldClass, predicted_rf_mc)$overall[1]))
+tests_acc[order(tests_acc[,"Accuracy_on_test"], decreasing = TRUE), ]
+```
+
+Yield Class Prediction with kknn algorithm on test set
+
+Order prediction quality metric by cultivar with `kknn` combining clr values and new clustered variable (`kknn_clr_and_ionomicgroup`).
+
+```{r}
+test$ypred = predicted_kknn_grp # adds predictions to test set
+
+cultivar_acc <- test %>%
+    group_by(Cultivar) %>%
+    do(Accuracy = as.numeric(confusionMatrix(.$yieldClass, .$ypred)$overall[1]),
+       N_obs = as.numeric(nrow(.)))
+
+cultivar_acc$Accuracy <- unlist(cultivar_acc$Accuracy)
+cultivar_acc$N_obs <- unlist(cultivar_acc$N_obs)
+
+data = data.frame(subset(cultivar_acc, Accuracy>0))
+data[order(data[,"Accuracy"], decreasing=T), ]
+```
+
+Check it with `geom_segment()`:
+
+```{r accuracy_cultivar, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Predictive accuracy for cultivars."}
+options(repr.plot.width = 8, repr.plot.height = 4)
+ggplot(data, aes(reorder(Cultivar, Accuracy), Accuracy)) +
+    geom_point(aes(color=cut(Accuracy, breaks = c(0, 0.70, 0.90, 1)))) +
+    geom_segment(aes(x=Cultivar, xend=Cultivar, y=0, yend=Accuracy, 
+                     color=cut(Accuracy, breaks = c(0, 0.70, 0.90, 1))), size=1) +
+    xlab("Cultivar") +
+    theme_bw() + 
+    theme(legend.title=element_blank(),
+          axis.text.x=element_text(angle=90, hjust=1))+
+    theme(text=element_text(family="Arial", face="bold", size=12))
+#ggsave("images/cultivAcc.tiff", width=8, height=3)
+```
+
+Run the Chi-square homogenity test to compare prediction with a non-informative classification consisting of an equal distribution of 50% successful and 50% unsuccessful cases, using kknn.
+
+```{r}
+cm <- confusionMatrix(predicted_kknn_grp, test_grp$yieldClass) # confusion matrix
+cm$table
+```
+
+
+```{r}
+# Model's classification
+good_class <- cm$table[1,1]+cm$table[2,2] # HY or LY and correctly predicted
+misclass <- cm$table[1,2]+cm$table[2,1]   # wrong classification
+ml_class <- c(good_class, misclass)
+
+# Non-informative model
+total <- sum(cm$table)                    # number of samples
+good_nim <- 0.50 * total
+misclass_nim <- 0.50 * total
+non_inf_model <- c(good_nim, misclass_nim)
+
+# Matrix for chisquare test
+m <- rbind(ml_class, non_inf_model)
+m
+
+# chisq.test
+khi2_test <- chisq.test(m)
+khi2_test
+```
+
+The null hypothesis for a non-informative classification is rejected after the chi-square homogeneity test.
+
+The train data set with predicted yield classes `train_df` backup will be used to test perturbation vector theory in the next file.
+
+```{r}
+pred_yield <- predict(kknn_grp, train_grp)
+train_df = data.frame(cbind(df[split_index, ], pred_yield))
+write_csv(train_df, "output/train_df.csv")
+nrow(train_df)
+```
+
+True Negatives (TN) specimens in this study are observations of the training data set with high yield (HY) and correctly predicted. Compute clr centroids for True Negatives `with original` clr values; use original data frame `df`. 
+
+```{r}
+TNs = train_df[train_df$yieldClass == 'HY' & pred_yield == 'HY', ]
+nrow(TNs)
+```
+
+The next cell computes clr balances Centroids for ionomic groups.
+
+```{r}
+TNmedianNorms <- TNs %>%
+  group_by(group_i) %>%
+  select(clrNo) %>%
+  summarise_all(list(median))
+TNmedianNorms
+```
+
 
 <!--chapter:end:03_machine-learning.Rmd-->
 
-
 # Perturbation vector theory {#Chapter-Perturbation-vector}
 
-Placeholder
+The first step is to compute a dissimilarity index according to the distance from the closest healthy point (the closest TN). Let's load data set.
 
+```{r, warning=FALSE, message=FALSE}
+library("tidyverse")     # dplyr and ggplot2
+library(extrafont)        # Changing Fonts for Graphs
+
+train_df = read_csv("output/train_df.csv")
+train_df <- train_df %>% select(-X.1, -X) # to discard extra columns
+train_df$group_i = factor(train_df$group_i)
+```
+
+As considered in previous `03_machine-learning.ipynb` file, True Negatives (TN) specimens in this study are observations of the training data set with high yield (HY) and correctly predicted.
+
+```{r}
+TNs = train_df[train_df$yieldClass == 'HY' & train_df$pred_yield == 'HY', ]
+clrNo = c("clrN", "clrP", "clrK", "clrCa", "clrMg", "clrFv") # for simplicity
+```
 
 ## Dissimilarity index between compositions
+
+- Euclidean distance as dissimilarity index
+- For each composition (line) in the "unbalanced specimens", calculate all the euclidean distances between all the compositions in "TNs" of the corresponding group
+- Return the smallest euclidean distance as the unbalanced index of the composition.
+
+Function to compute euclidean distance
+
+```{r}
+eucl_dist_f <- function(x, y) {
+    sqrt(sum((x-y)^2))
+}
+```
+
+Compute debalance (or imbalance) index (`debal`) using this loop.
+
+```{r}
+debal <- c()
+debal_index <- c()
+for (i in 1:nrow(train_df)) {
+    clr_i <- as.numeric(train_df[i, clrNo])
+    eucl_dist <- apply(TNs %>% filter(group_i == train_df[i, 'group_i']) %>% select(clrNo), 
+                       1, function(x) eucl_dist_f(x=x, y=clr_i))
+    debal_index[i] <- which.min(eucl_dist)
+    debal[i] <- eucl_dist[debal_index[i]]
+}
+train_df$debal <- debal
+train_df %>% glimpse()
+```
+
 ## Rebalancing a misbalanced sample by perturbation
+
+Suppose we got this point selected at random in `unbalanced specimens`.
+
+```{r}
+#set.seed(932559) # random.org
+unbalanced <- subset(train_df, debal !=0)
+misbalanced <- unbalanced[sample(nrow(unbalanced), 1), ]
+misbalanced
+```
+
+Or even, you can use the most unbalanced occurrence, ... why not !
+
+```{r}
+(misbalanced = unbalanced[which.max(unbalanced$debal), ])
+```
+
+How to rebalance it?
+
+The first step is to find `in TNs of the corresponding ionomic group` the closest balanced point.
+
+Let's re-compute the euclidean distance, like for a new (an unknown) point:
+
+```{r}
+misbalanced <- misbalanced[clrNo]
+eucl_dist_misbal <- apply(TNs[, clrNo], 1, function(x) eucl_dist_f(x=x, y=misbalanced))
+index_misbal <- which.min(t(data.frame(eucl_dist_misbal))) # return the index of the sample
+index_misbal
+```
+
+Euclidean distance matched with the corresponding `debal` value:
+
+```{r}
+misbal = eucl_dist_misbal[index_misbal] # to compare to corresponding debal value
+misbal
+```
+
+The `closest point in the TNs` data set is this one:
+
+```{r}
+closest <- TNs[index_misbal, ]
+closest
+```
+
+Note that Ionomics groups of the misbalanced and the closest composition are the same ... most of the times ! You need package `compositions` for further clr back-transformation de compositional space.
+
+```{r, warning=FALSE, message=FALSE}
+require('compositions')
+```
+
+Perturbation in compositional space plays the same role as translation plays in real space. Some natural processes in nature can be interpreted as a change from one composition `C1` to another `C2` through the application of a perturbation:
+
+> `p ⊕ C1 ====> C2`.
+
+The difference between `the new observation`  and the closest TN composition can be back-transformed to the compositional space. The obtained vector is the `perturbation vector`.
+
+```{r}
+closest = closest[clrNo]
+clr_diff = closest - misbalanced
+clr_diff
+```
+
+```{r}
+comp_names <- c("N", "P", "K", "Ca", "Mg", "Fv")
+perturbation_vector <- clrInv(clr_diff)
+names(perturbation_vector) <- comp_names
+```
+
+Compute the compositions of the ilr coordinates of the misbalanced point, as well as the closest TN point:
+
+```{r}
+misbal_comp <- clrInv(misbalanced)
+names(misbal_comp) <- comp_names
+
+closest_comp <- clrInv(closest)
+names(closest_comp) <- comp_names
+
+pmc = rbind(perturbation_vector, misbal_comp, closest_comp)
+rownames(pmc) = c("perturbation_vector","misbal_comp","closest_comp")
+pmc # data frame made up of perturbation vector, misbalanced composition and the closest reference sample
+```
+
+For each vector, check that the simplex is closed to 1.
+
+```{r}
+sum(perturbation_vector); sum(misbal_comp); sum(closest_comp)
+```
+
+The closest composition minus the misbalanced composition should return the perturbation vector.
+
+```{r}
+print(closest_comp - misbal_comp) # soustraction
+print(perturbation_vector)        # for comparison
+```
+
+Or even, perturb the misbalanced point by the perturbation vector, you should obtain the closest TN point:
+
+```{r}
+print(misbal_comp + perturbation_vector) # perturbation
+print(closest_comp)                      # for comparison
+```
+
+So, the assumption is true.
+
+The next codes try to show the concept using plots using clr coordinates. 
+
+```{r}
+d = data.frame(rbind(misbalanced, closest, clr_diff)) # mis, cl, per
+vectors = c("observation", "reference", "perturbation")
+d$vectors = factor(vectors)
+d
+```
+
+This data frame must be reshape for ggplot.
+
+```{r, warning=FALSE, message=FALSE}
+require("reshape") # function melt() 
+dreshape = melt(d)
+dreshape
+```
+
+Plot with dots for each vector.
+
+```{r hi-perturb-dotplot, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Perturbation vector computation example dotplot using the most imbalanced foliar sample."}
+options(repr.plot.width = 6, repr.plot.height = 3)
+ggplot(data = dreshape, aes(x = value, y = vectors)) +
+    geom_point() +
+    facet_wrap(~ variable, scales = "free_x") +
+    labs(x='clr coordinate', y ='') +
+    theme(text=element_text(family="Arial", face="bold", size=12))
+#ggsave("images/perturb_dotplot.tiff",  width = 6, height = 4)
+```
+
+
+
+```{r hi-perturb-barplot, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Perturbation vector computation example barplot using the most imbalanced foliar sample."}
+options(repr.plot.width = 5, repr.plot.height = 3)
+ggplot(data=dreshape, aes(x=variable, y=value, fill=vectors)) +
+    geom_bar(stat="identity", position=position_dodge()) +
+    coord_flip() +
+    theme_bw() +
+    theme(legend.title=element_blank()) +
+    theme(text=element_text(family="Arial", face="bold", size=12))
+#ggsave("images/perturb_barplot.tiff",  width = 6, height = 4)
+```
+
 
 <!--chapter:end:04_health-index.Rmd-->
 

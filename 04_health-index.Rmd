@@ -6,12 +6,12 @@ The first step is to compute a dissimilarity index according to the distance fro
 library("tidyverse")     # dplyr and ggplot2
 library(extrafont)        # Changing Fonts for Graphs
 
-train_df = read.csv2("data/train_df.csv")
+train_df = read_csv("output/train_df.csv")
 train_df <- train_df %>% select(-X.1, -X) # to discard extra columns
 train_df$group_i = factor(train_df$group_i)
 ```
 
-As considered in previous `1.2_machine learning.ipynb` file, True Negatives (TN) specimens in this study are observations of the training data set with high yield (HY) and correctly predicted.
+As considered in previous `03_machine-learning.ipynb` file, True Negatives (TN) specimens in this study are observations of the training data set with high yield (HY) and correctly predicted.
 
 ```{r}
 TNs = train_df[train_df$yieldClass == 'HY' & train_df$pred_yield == 'HY', ]

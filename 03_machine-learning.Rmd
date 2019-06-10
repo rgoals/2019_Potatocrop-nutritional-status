@@ -6,7 +6,7 @@ Load data file `data_ionome.csv` saved from previous cluster analysis.
 ```{r, warning=FALSE, message=FALSE}
 library("tidyverse")    # 'diplyr' and 'ggplot2'
 library('extrafont')    # Changing Fonts for Graphs
-df = read.csv2('data/data_ionome.csv')
+df = read_csv('output/dfml.csv')
 ```
 
 ```{r}
@@ -277,7 +277,7 @@ The train data set with predicted yield classes `train_df` backup will be used t
 ```{r}
 pred_yield <- predict(kknn_grp, train_grp)
 train_df = data.frame(cbind(df[split_index, ], pred_yield))
-write.csv2(train_df, "data/train_df.csv")
+write_csv(train_df, "output/train_df.csv")
 nrow(train_df)
 ```
 

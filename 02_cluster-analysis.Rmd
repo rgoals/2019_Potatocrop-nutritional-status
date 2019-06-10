@@ -196,32 +196,27 @@ What is cascade K Means Clustering? It is an an unsupervised learning algorithm 
 
 These two steps are repeated till the within cluster variation cannot be reduced any further. The within cluster variation is calculated as the sum of the euclidean distance between the data points and their respective cluster centroids. 
 
-I use the high yielders clr centroids for cultivars in a next data frame which is the same as `highYielders_clr` without maturity classes, and `Calinski-Harabasz (1974) criterion (package vegan)` for clustering.
+I use the high yielders clr centroids (medians) for cultivars in a next data frame which is the same as `highYielders_clr` without maturity classes, and `Calinski-Harabasz (1974) criterion (package vegan)` for clustering.The chunk also plots the process results.
 
-```{r, message=FALSE}
+```{r clustering, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="K-means partitions comparison (calinski criterion)."}
 highYieldersCentroids <- highYielders_df %>%
   group_by(Cultivar) %>%
   select(starts_with("clr")) %>%
   summarise_all(list(median))
-set.seed(194474)
+set.seed(5773)
 highYieldersKmeans <- cascadeKM(highYieldersCentroids[, -1], 
-                                inf.gr = 2, sup.gr = 8, criterion = "ssi")
-```
-
-The next chunk plots the process results.
-
-```{r clustering, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="K-means partitions comparison (calinski criterion)."}
+                                inf.gr = 3, sup.gr = 6, criterion = "Calinski")
 options(repr.plot.width = 6, repr.plot.height = 4)
 plot(highYieldersKmeans) 
 ```
 
-The red dot of the right hand side graph shows 4 optimal clustering partitions. Check the differnt partitions data frame.
+The red dot of the right hand side graph shows 3 optimal clustering partitions which is the inferior limit I gave to the process. I check the partitions data frame.
 
 ```{r}
 highYieldersKmeans$partition %>% head()
 ```
 
-Consider `4 groups` from clustering according to `calinski criterion`, this corresponds to the column 2 or use **4 groups** as column name directly, and add it up to the previous data frame.
+I consider `4 groups` established from clustering (`...`) corresponding to the second column. I can use the reference of the column or its name `4 groups` directly. I add it up to the centroids data frame.
 
 ```{r}
 highYieldersCentroids$kgroup <- highYieldersKmeans$partition[, "4 groups"]
@@ -240,9 +235,9 @@ Plot Cultivar groups in LDA with a custom function.
 
 ```{r d-biplot-2, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Discriminant distance biplot of potato cultivars showing ionomics groups."}
 options(repr.plot.width = 6, repr.plot.height = 6)
-plot_lda(score=lda_fol_score[n_filter, ],
-         loading=lda_fol_loading[n_filter, ],
-         group = lda_fol_group[n_filter],
+plot_lda(score=lda_leaf_score[n_filter, ],
+         loading=lda_leaf_loading[n_filter, ],
+         group = lda_leaf_group[n_filter],
          ell_dev=FALSE, 
          ell_err= FALSE, #TRUE, 
          scale_load = 0.4,
@@ -263,7 +258,7 @@ legend(-2.5, 3,
        pch = 19, col = unique(col), cex = 0.9)
 ```
 
-It's a bit difficult to colour cultivar names in the plot with the custom function. I use functions from packages `ggplot2`, `ggrepel` and `plotly` instead. The package `ggplot2` is already loaded with `tidyverse`. New data frames are created with useful variables.
+It's a bit difficult to colour cultivar name in the plot with the custom function. I use functions from packages `ggplot2`, `ggrepel` and `plotly` instead. New intermediate data frames are created for this purpose.
 
 ```{r}
 cultivars_filtre <- data.frame(Cultivar = filter_cultivars, i_group=col)
@@ -308,7 +303,7 @@ g + geom_segment(data=df, mapping=aes(x=x, y=y, xend=x+loadings.DS1, yend=y+load
 #ggsave("images/cultivar_clust.png", width=10, height=8, dpi = 300)
 ```
 
-I push cultivars yield cut-off and ionomics groups in initial data frame.
+I push cultivars yield cut-off and ionomics groups in the initial data frame.
 
 ```{r, warning=FALSE, message=FALSE}
 ionomicGroup <- data.frame(lda_centroids[, 1], 
@@ -318,34 +313,38 @@ cutQ <- cutQ[-1, ] # to discard missing cultivar names
 colnames(cutQ)[which(names(cutQ) == "rv_cut")] <- "yieldCutoff"
 cutQ_ig <- cutQ %>% left_join(ionomicGroup, by = "Cultivar")
 
-leaf_df <- leaf_df %>% 
+leaf_clust_df <- leaf_clust_df %>% 
     left_join(y = cutQ_ig, by = 'Cultivar') %>%
     select(-rv_cut)
 ```
 
-Processing data for Machine Learning `dfml`, saved as `data_ionome.csv`. Exctract usefull columns from `fol_df`. Conserve only `complete cases. Backup
+## Arranging data for Machine Learning 
+
+I select useful columns for the next chapter (\@ref(Chapter-Modeling)) and save the new table as `dfml.csv`. I conserve only `complete cases`.
 
 ```{r}
-dfml <- leaf_df %>%
+new_col <- c('yieldCutoff', 'yieldClass', 'ionomicGroup')
+dfml <- leaf_clust_df %>%
+  select(one_of(c(keys_col, clr_no, cultivarAndyield, new_col, 'AnalyseFoliaireStade'))) %>%
   mutate(isNA = apply(.[c(clr_no, cultivarAndyield)], 1, anyNA)) %>%
   mutate(is10pcf = AnalyseFoliaireStade == "10% fleur") %>%
   filter(!isNA & is10pcf & NoEssai != "2") %>% 
-  select(one_of(c(keys_col, clr_no, cultivarAndyield, 'yieldClass', 'ionomicGroup'))) %>%
-  select(-AnalyseFoliaireStade) %>%
+  select(-c(AnalyseFoliaireStade, isNA, is10pcf)) %>%
   droplevels() %>% 
   filter(complete.cases(.))
 nrow(dfml)
-write_csv(dfml, "output/leaf_ml_df.csv")
+write_csv(dfml, "output/dfml.csv")
 ```
 
-## clr and ionomics groups interactions effects
+Hence, the data table contains `r nrow(dfml)` for the next chapter (Machine learning).
 
-Linear mixed effect modeling of yield relative to the `ionome*ionomicGroup` interaction (extraction of the interactions coefficients).
+## clr X ionomics groups interactions effects
+
+I use a linear mixed effect model to assess the effect of clr coordinates on tubers marketable yield between ionomics groups. This last subsection perfom this analysis by extracting and ploting the interaction coefficients of the model.
 
 ```{r}
 dfml$Cultivar <- factor(dfml$Cultivar)
-dfml$Maturity5 <- relevel(dfml$Maturity5, ref="late")
-dfml$Cultivar <- relevel(dfml$Cultivar, ref="Goldrush")
+dfml$Maturity5 <- relevel(dfml$Maturity5, ref = "late")
 dfml$NoEssai <- factor(dfml$NoEssai)
 colnames(dfml)[colnames(dfml)=="ionomicGroup"] <- "group_i"
 dfml$group_i <- factor(dfml$group_i)
