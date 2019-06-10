@@ -12,6 +12,7 @@ df = read_csv('output/dfml.csv')
 ```{r}
 colnames(df)[colnames(df)=="ionomicGroup"] <- "group_i" # make simplier
 df$group_i = factor(df$group_i)
+df$yieldClass = factor(df$yieldClass)
 
 clr_no <- c("clr_N", "clr_P", "clr_K", "clr_Mg", "clr_Ca", "clr_Fv")
 clrNo <- c("clrN", "clrP", "clrK", "clrMg", "clrCa", "clrFv")
@@ -206,12 +207,12 @@ tests_acc <- data.frame(Model = summary(results)$models,
 tests_acc[order(tests_acc[,"Accuracy_on_test"], decreasing = TRUE), ]
 ```
 
-Yield Class Prediction with kknn algorithm on test set
+Yield Class Prediction with rf algorithm on test set
 
-Order prediction quality metric by cultivar with `kknn` combining clr values and new clustered variable (`kknn_clr_and_ionomicgroup`).
+Order prediction quality metric by cultivar with `rf` combining clr values and new clustered variable (`rf_clr_and_ionomicgroup`).
 
 ```{r}
-test$ypred = predicted_kknn_grp # adds predictions to test set
+test$ypred = predicted_rf_grp # adds predictions to test set
 
 cultivar_acc <- test %>%
     group_by(Cultivar) %>%
@@ -275,7 +276,7 @@ The null hypothesis for a non-informative classification is rejected after the c
 The train data set with predicted yield classes `train_df` backup will be used to test perturbation vector theory in the next file.
 
 ```{r}
-pred_yield <- predict(kknn_grp, train_grp)
+pred_yield <- predict(rf_grp, train_grp)
 train_df = data.frame(cbind(df[split_index, ], pred_yield))
 write_csv(train_df, "output/train_df.csv")
 nrow(train_df)

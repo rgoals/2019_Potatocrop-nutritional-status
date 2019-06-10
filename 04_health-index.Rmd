@@ -4,10 +4,9 @@ The first step is to compute a dissimilarity index according to the distance fro
 
 ```{r, warning=FALSE, message=FALSE}
 library("tidyverse")     # dplyr and ggplot2
-library(extrafont)        # Changing Fonts for Graphs
+library(extrafont)       # Changing Fonts for Graphs
 
 train_df = read_csv("output/train_df.csv")
-train_df <- train_df %>% select(-X.1, -X) # to discard extra columns
 train_df$group_i = factor(train_df$group_i)
 ```
 
@@ -39,7 +38,7 @@ debal <- c()
 debal_index <- c()
 for (i in 1:nrow(train_df)) {
     clr_i <- as.numeric(train_df[i, clrNo])
-    eucl_dist <- apply(TNs %>% filter(group_i == train_df[i, 'group_i']) %>% select(clrNo), 
+    eucl_dist <- apply(TNs %>% filter(group_i == train_df$group_i[i]) %>% select(clrNo), 
                        1, function(x) eucl_dist_f(x=x, y=clr_i))
     debal_index[i] <- which.min(eucl_dist)
     debal[i] <- eucl_dist[debal_index[i]]
@@ -95,7 +94,7 @@ closest
 Note that Ionomics groups of the misbalanced and the closest composition are the same ... most of the times ! You need package `compositions` for further clr back-transformation de compositional space.
 
 ```{r, warning=FALSE, message=FALSE}
-require('compositions')
+library('compositions')
 ```
 
 Perturbation in compositional space plays the same role as translation plays in real space. Some natural processes in nature can be interpreted as a change from one composition `C1` to another `C2` through the application of a perturbation:
@@ -164,7 +163,7 @@ d
 This data frame must be reshape for ggplot.
 
 ```{r, warning=FALSE, message=FALSE}
-require("reshape") # function melt() 
+library("reshape") # function melt() 
 dreshape = melt(d)
 dreshape
 ```

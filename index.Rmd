@@ -116,7 +116,7 @@ if (perform_imputation) {
 }
 ```
 
-With the next cell I append imputed columns to the data frame. The nutrients diagnosis will be performed with imputed compositions.
+With the next cell I append imputed columns to the data frame. The nutrients diagnosis will be done with imputed compositions.
 
 ```{r}
 leaf_df <- bind_cols(leaf_df, leaf_complete)

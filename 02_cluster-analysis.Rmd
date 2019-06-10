@@ -205,7 +205,7 @@ highYieldersCentroids <- highYielders_df %>%
   summarise_all(list(median))
 set.seed(5773)
 highYieldersKmeans <- cascadeKM(highYieldersCentroids[, -1], 
-                                inf.gr = 3, sup.gr = 6, criterion = "Calinski")
+                                inf.gr = 3, sup.gr = 8, criterion = "ssi")
 options(repr.plot.width = 6, repr.plot.height = 4)
 plot(highYieldersKmeans) 
 ```
@@ -216,10 +216,10 @@ The red dot of the right hand side graph shows 3 optimal clustering partitions w
 highYieldersKmeans$partition %>% head()
 ```
 
-I consider `4 groups` established from clustering (`...`) corresponding to the second column. I can use the reference of the column or its name `4 groups` directly. I add it up to the centroids data frame.
+I consider `6 groups` established from clustering (`...`) corresponding to the second column. I can use the reference of the column or its name `6 groups` directly. I add it up to the centroids data frame.
 
 ```{r}
-highYieldersCentroids$kgroup <- highYieldersKmeans$partition[, "4 groups"]
+highYieldersCentroids$kgroup <- highYieldersKmeans$partition[, "6 groups"]
 ```
 
 I compute discriminant scores centroïdes for cultivars.
@@ -244,7 +244,7 @@ plot_lda(score=lda_leaf_score[n_filter, ],
          level=0.95,
          legend=FALSE,
          label=TRUE,
-         transparency=0.4, xlim = c(-2.5, 2), ylim = c(-3.5, 3.5),
+         transparency=0.4, xlim = c(-2.5, 2), ylim = c(-3, 4),
          points=F)
 # colour dots for groups (or clusters)
 col = factor(highYieldersCentroids[highYieldersCentroids$Cultivar %in% filter_cultivars, 'kgroup'][[1]])
@@ -253,7 +253,7 @@ col = factor(highYieldersCentroids[highYieldersCentroids$Cultivar %in% filter_cu
 points(lda_centroids[lda_centroids$group %in% filter_cultivars, c('DS1', 'DS2')], 
        pch = 19, col = col, cex = 0.9)
 
-legend(-2.5, 3, 
+legend(1.3, 4, 
        legend = paste(rep('cluster', nlevels(col)), as.numeric(levels(col))), 
        pch = 19, col = unique(col), cex = 0.9)
 ```
@@ -287,7 +287,7 @@ g <- ggplot(centroids, aes(DS1, DS2, label = Cultivar, col=i_group)) +
   geom_text_repel() +
   geom_point(alpha = 0.5) +
   theme_classic(base_size = 12) +
-  scale_color_manual(values=c("red", "magenta", "blue", "black")) + 
+  #scale_color_manual(values=c("red", "magenta", "blue", "black")) + 
   theme(axis.text=element_text(size=12)) +
   theme(text=element_text(family="Arial", face="bold", size=12))
 
@@ -307,7 +307,7 @@ I push cultivars yield cut-off and ionomics groups in the initial data frame.
 
 ```{r, warning=FALSE, message=FALSE}
 ionomicGroup <- data.frame(lda_centroids[, 1], 
-                           ionomicGroup = factor(highYieldersKmeans$partition[, "4 groups"]))
+                           ionomicGroup = factor(highYieldersKmeans$partition[, "6 groups"]))
 colnames(ionomicGroup)[colnames(ionomicGroup)=="group"] <- "Cultivar"
 cutQ <- cutQ[-1, ] # to discard missing cultivar names
 colnames(cutQ)[which(names(cutQ) == "rv_cut")] <- "yieldCutoff"
@@ -344,7 +344,7 @@ I use a linear mixed effect model to assess the effect of clr coordinates on tub
 
 ```{r}
 dfml$Cultivar <- factor(dfml$Cultivar)
-dfml$Maturity5 <- relevel(dfml$Maturity5, ref = "late")
+#dfml$Maturity5 <- relevel(dfml$Maturity5, ref = "late")
 dfml$NoEssai <- factor(dfml$NoEssai)
 colnames(dfml)[colnames(dfml)=="ionomicGroup"] <- "group_i"
 dfml$group_i <- factor(dfml$group_i)
@@ -398,7 +398,7 @@ interval
 This cell plots the interaction coefficients and their confident intervals using ggplot2.
 
 ```{r coefficients, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Effect of ionome perturbation on marketable yield as illustrated by a linear mixed effect model."}
-options(repr.plot.width = 5, repr.plot.height = 5)
+options(repr.plot.width = 4, repr.plot.height = 8)
 gg <- ggplot(data = interval, mapping = aes(x = Estimate, y = used_clr, color=is_significant)) +
          facet_grid(ionomic_group ~ .) + #, scales = 'free', space = 'free') +
          geom_vline(xintercept = 0, lty = 2) +

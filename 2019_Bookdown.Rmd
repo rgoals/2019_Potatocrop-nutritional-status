@@ -116,7 +116,7 @@ if (perform_imputation) {
 }
 ```
 
-With the next cell I append imputed columns to the data frame. The nutrients diagnosis will be performed with imputed compositions.
+With the next cell I append imputed columns to the data frame. The nutrients diagnosis will be done with imputed compositions.
 
 ```{r}
 leaf_df <- bind_cols(leaf_df, leaf_complete)
@@ -390,7 +390,7 @@ highYieldersCentroids <- highYielders_df %>%
   summarise_all(list(median))
 set.seed(5773)
 highYieldersKmeans <- cascadeKM(highYieldersCentroids[, -1], 
-                                inf.gr = 3, sup.gr = 6, criterion = "Calinski")
+                                inf.gr = 3, sup.gr = 8, criterion = "ssi")
 options(repr.plot.width = 6, repr.plot.height = 4)
 plot(highYieldersKmeans) 
 ```
@@ -401,10 +401,10 @@ The red dot of the right hand side graph shows 3 optimal clustering partitions w
 highYieldersKmeans$partition %>% head()
 ```
 
-I consider `4 groups` established from clustering (`...`) corresponding to the second column. I can use the reference of the column or its name `4 groups` directly. I add it up to the centroids data frame.
+I consider `6 groups` established from clustering (`...`) corresponding to the second column. I can use the reference of the column or its name `6 groups` directly. I add it up to the centroids data frame.
 
 ```{r}
-highYieldersCentroids$kgroup <- highYieldersKmeans$partition[, "4 groups"]
+highYieldersCentroids$kgroup <- highYieldersKmeans$partition[, "6 groups"]
 ```
 
 I compute discriminant scores centroïdes for cultivars.
@@ -429,7 +429,7 @@ plot_lda(score=lda_leaf_score[n_filter, ],
          level=0.95,
          legend=FALSE,
          label=TRUE,
-         transparency=0.4, xlim = c(-2.5, 2), ylim = c(-3.5, 3.5),
+         transparency=0.4, xlim = c(-2.5, 2), ylim = c(-3, 4),
          points=F)
 # colour dots for groups (or clusters)
 col = factor(highYieldersCentroids[highYieldersCentroids$Cultivar %in% filter_cultivars, 'kgroup'][[1]])
@@ -438,7 +438,7 @@ col = factor(highYieldersCentroids[highYieldersCentroids$Cultivar %in% filter_cu
 points(lda_centroids[lda_centroids$group %in% filter_cultivars, c('DS1', 'DS2')], 
        pch = 19, col = col, cex = 0.9)
 
-legend(-2.5, 3, 
+legend(1.3, 4, 
        legend = paste(rep('cluster', nlevels(col)), as.numeric(levels(col))), 
        pch = 19, col = unique(col), cex = 0.9)
 ```
@@ -472,7 +472,7 @@ g <- ggplot(centroids, aes(DS1, DS2, label = Cultivar, col=i_group)) +
   geom_text_repel() +
   geom_point(alpha = 0.5) +
   theme_classic(base_size = 12) +
-  scale_color_manual(values=c("red", "magenta", "blue", "black")) + 
+  #scale_color_manual(values=c("red", "magenta", "blue", "black")) + 
   theme(axis.text=element_text(size=12)) +
   theme(text=element_text(family="Arial", face="bold", size=12))
 
@@ -492,7 +492,7 @@ I push cultivars yield cut-off and ionomics groups in the initial data frame.
 
 ```{r, warning=FALSE, message=FALSE}
 ionomicGroup <- data.frame(lda_centroids[, 1], 
-                           ionomicGroup = factor(highYieldersKmeans$partition[, "4 groups"]))
+                           ionomicGroup = factor(highYieldersKmeans$partition[, "6 groups"]))
 colnames(ionomicGroup)[colnames(ionomicGroup)=="group"] <- "Cultivar"
 cutQ <- cutQ[-1, ] # to discard missing cultivar names
 colnames(cutQ)[which(names(cutQ) == "rv_cut")] <- "yieldCutoff"
@@ -529,7 +529,7 @@ I use a linear mixed effect model to assess the effect of clr coordinates on tub
 
 ```{r}
 dfml$Cultivar <- factor(dfml$Cultivar)
-dfml$Maturity5 <- relevel(dfml$Maturity5, ref = "late")
+#dfml$Maturity5 <- relevel(dfml$Maturity5, ref = "late")
 dfml$NoEssai <- factor(dfml$NoEssai)
 colnames(dfml)[colnames(dfml)=="ionomicGroup"] <- "group_i"
 dfml$group_i <- factor(dfml$group_i)
@@ -583,7 +583,7 @@ interval
 This cell plots the interaction coefficients and their confident intervals using ggplot2.
 
 ```{r coefficients, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Effect of ionome perturbation on marketable yield as illustrated by a linear mixed effect model."}
-options(repr.plot.width = 5, repr.plot.height = 5)
+options(repr.plot.width = 4, repr.plot.height = 8)
 gg <- ggplot(data = interval, mapping = aes(x = Estimate, y = used_clr, color=is_significant)) +
          facet_grid(ionomic_group ~ .) + #, scales = 'free', space = 'free') +
          geom_vline(xintercept = 0, lty = 2) +
@@ -614,6 +614,7 @@ df = read_csv('output/dfml.csv')
 ```{r}
 colnames(df)[colnames(df)=="ionomicGroup"] <- "group_i" # make simplier
 df$group_i = factor(df$group_i)
+df$yieldClass = factor(df$yieldClass)
 
 clr_no <- c("clr_N", "clr_P", "clr_K", "clr_Mg", "clr_Ca", "clr_Fv")
 clrNo <- c("clrN", "clrP", "clrK", "clrMg", "clrCa", "clrFv")
@@ -808,12 +809,12 @@ tests_acc <- data.frame(Model = summary(results)$models,
 tests_acc[order(tests_acc[,"Accuracy_on_test"], decreasing = TRUE), ]
 ```
 
-Yield Class Prediction with kknn algorithm on test set
+Yield Class Prediction with rf algorithm on test set
 
-Order prediction quality metric by cultivar with `kknn` combining clr values and new clustered variable (`kknn_clr_and_ionomicgroup`).
+Order prediction quality metric by cultivar with `rf` combining clr values and new clustered variable (`rf_clr_and_ionomicgroup`).
 
 ```{r}
-test$ypred = predicted_kknn_grp # adds predictions to test set
+test$ypred = predicted_rf_grp # adds predictions to test set
 
 cultivar_acc <- test %>%
     group_by(Cultivar) %>%
@@ -877,7 +878,7 @@ The null hypothesis for a non-informative classification is rejected after the c
 The train data set with predicted yield classes `train_df` backup will be used to test perturbation vector theory in the next file.
 
 ```{r}
-pred_yield <- predict(kknn_grp, train_grp)
+pred_yield <- predict(rf_grp, train_grp)
 train_df = data.frame(cbind(df[split_index, ], pred_yield))
 write_csv(train_df, "output/train_df.csv")
 nrow(train_df)
@@ -909,10 +910,9 @@ The first step is to compute a dissimilarity index according to the distance fro
 
 ```{r, warning=FALSE, message=FALSE}
 library("tidyverse")     # dplyr and ggplot2
-library(extrafont)        # Changing Fonts for Graphs
+library(extrafont)       # Changing Fonts for Graphs
 
 train_df = read_csv("output/train_df.csv")
-train_df <- train_df %>% select(-X.1, -X) # to discard extra columns
 train_df$group_i = factor(train_df$group_i)
 ```
 
@@ -944,7 +944,7 @@ debal <- c()
 debal_index <- c()
 for (i in 1:nrow(train_df)) {
     clr_i <- as.numeric(train_df[i, clrNo])
-    eucl_dist <- apply(TNs %>% filter(group_i == train_df[i, 'group_i']) %>% select(clrNo), 
+    eucl_dist <- apply(TNs %>% filter(group_i == train_df$group_i[i]) %>% select(clrNo), 
                        1, function(x) eucl_dist_f(x=x, y=clr_i))
     debal_index[i] <- which.min(eucl_dist)
     debal[i] <- eucl_dist[debal_index[i]]
@@ -1000,7 +1000,7 @@ closest
 Note that Ionomics groups of the misbalanced and the closest composition are the same ... most of the times ! You need package `compositions` for further clr back-transformation de compositional space.
 
 ```{r, warning=FALSE, message=FALSE}
-require('compositions')
+library('compositions')
 ```
 
 Perturbation in compositional space plays the same role as translation plays in real space. Some natural processes in nature can be interpreted as a change from one composition `C1` to another `C2` through the application of a perturbation:
@@ -1069,7 +1069,7 @@ d
 This data frame must be reshape for ggplot.
 
 ```{r, warning=FALSE, message=FALSE}
-require("reshape") # function melt() 
+library("reshape") # function melt() 
 dreshape = melt(d)
 dreshape
 ```
