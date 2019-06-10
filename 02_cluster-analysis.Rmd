@@ -64,17 +64,13 @@ cutQ <- leaf_clust_df %>%
   select(RendVendable) %>%
   summarise_if(is.numeric, quantile, probs=0.65, na.rm = TRUE) %>%
   rename(rv_cut = RendVendable)
+```
+
+```{r}
 leaf_clust_df <- leaf_clust_df %>%
   left_join(cutQ, by = "Cultivar") %>%
   mutate(yieldClass = forcats::fct_relevel(ifelse(RendVendable >= rv_cut, "HY", "LY"), "LY"))
 ```
-
-
-```{r}
-glimpse(leaf_clust_df)
-```
-
-
 
 For sake of verification, I compute average yield per yieldClass.
 

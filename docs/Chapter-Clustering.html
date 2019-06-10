@@ -236,28 +236,6 @@ qc_leaf &lt;-<span class="st"> </span><span class="kw">get_stamenmap</span>(<spa
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">leaf_clust_df &lt;-<span class="st"> </span>leaf_clust_df <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">left_join</span>(cutQ, <span class="dt">by =</span> <span class="st">&quot;Cultivar&quot;</span>) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">mutate</span>(<span class="dt">yieldClass =</span> forcats<span class="op">::</span><span class="kw">fct_relevel</span>(<span class="kw">ifelse</span>(RendVendable <span class="op">&gt;=</span><span class="st"> </span>rv_cut, <span class="st">&quot;HY&quot;</span>, <span class="st">&quot;LY&quot;</span>), <span class="st">&quot;LY&quot;</span>))</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glimpse</span>(leaf_clust_df)</code></pre></div>
-<pre><code>## Observations: 8,131
-## Variables: 19
-## $ NoEssai              &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,...
-## $ NoBloc               &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2,...
-## $ NoTraitement         &lt;dbl&gt; 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6,...
-## $ Annee                &lt;dbl&gt; 2003, 2003, 2003, 2003, 2003, 2003, 2003,...
-## $ LatDD                &lt;dbl&gt; 46.75306, 46.75306, 46.75306, 46.75306, 4...
-## $ LonDD                &lt;dbl&gt; -72.33861, -72.33861, -72.33861, -72.3386...
-## $ AnalyseFoliaireStade &lt;chr&gt; &quot;10% fleur&quot;, &quot;10% fleur&quot;, &quot;10% fleur&quot;, &quot;1...
-## $ Cultivar             &lt;chr&gt; &quot;Goldrush&quot;, &quot;Goldrush&quot;, &quot;Goldrush&quot;, &quot;Gold...
-## $ Maturity5            &lt;chr&gt; &quot;mid-season&quot;, &quot;mid-season&quot;, &quot;mid-season&quot;,...
-## $ RendVendable         &lt;dbl&gt; 18.9442, 40.3518, 33.0379, 37.5505, 46.00...
-## $ leaf_countNA         &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,...
-## $ clr_N                &lt;dbl&gt; 0.3321186, 0.4252302, 0.4453417, 0.399326...
-## $ clr_P                &lt;dbl&gt; -2.518325, -2.394957, -2.365429, -2.59918...
-## $ clr_K                &lt;dbl&gt; 0.83793831, 1.13872910, 1.01122715, 0.794...
-## $ clr_Ca               &lt;dbl&gt; -0.4794688, -0.5154924, -0.7290838, -0.62...
-## $ clr_Mg               &lt;dbl&gt; -1.639076, -2.346167, -1.990736, -1.57752...
-## $ clr_Fv               &lt;dbl&gt; 3.466813, 3.692658, 3.628680, 3.604817, 3...
-## $ rv_cut               &lt;dbl&gt; 41.33053, 41.33053, 41.33053, 41.33053, 4...
-## $ yieldClass           &lt;fct&gt; LY, LY, LY, LY, HY, LY, HY, HY, LY, LY, H...</code></pre>
 <p>For sake of verification, I compute average yield per yieldClass.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">meanYield =<span class="st"> </span>leaf_clust_df <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw">group_by</span>(yieldClass) <span class="op">%&gt;%</span>
@@ -460,13 +438,13 @@ df &lt;-<span class="st"> </span>df <span class="op">%&gt;%</span><span class="s
 <pre><code>## Warning: Column `Cultivar` joining factors with different levels, coercing
 ## to character vector</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>()</code></pre></div>
-<pre><code>##   score.DS1  score.DS2 loadings.DS1 loadings.DS2   Cultivar i_group
-## 1 1.0429585 -1.0222524    2.0083978    0.1877953 AC Belmont       1
-## 2 0.6075317 -1.5138835   -0.1476953   -0.7188404 AC Belmont       1
-## 3 0.7296306 -1.3385042    2.0326780   -2.3681983 AC Belmont       1
-## 4 0.5341272 -0.7657073   -2.3129315   -1.3651320 AC Belmont       1
-## 5 0.4269388 -1.1073114    0.3006409   -1.3922328 AC Belmont       1
-## 6 0.3528173 -1.1509198   -1.8810900    5.6566082 AC Belmont       1</code></pre>
+<pre><code>##   score.DS1 score.DS2 loadings.DS1 loadings.DS2   Cultivar i_group
+## 1 1.0366780 1.0148643    1.9989657   -0.1477988 AC Belmont       1
+## 2 0.5973192 1.5106837   -0.1794520    0.7415188 AC Belmont       1
+## 3 0.7195584 1.3363729    2.0112615    2.4201235 AC Belmont       1
+## 4 0.5343385 0.7486986   -2.3193130    1.3696071 AC Belmont       1
+## 5 0.4140698 1.1521065    0.2748907    1.3266327 AC Belmont       1
+## 6 0.3382326 1.1899525   -1.7863528   -5.7100833 AC Belmont       1</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">centroids =<span class="st"> </span>lda_centroids[lda_centroids<span class="op">$</span>group <span class="op">%in%</span><span class="st"> </span>filter_cultivars, ]
 <span class="kw">names</span>(centroids)[<span class="kw">match</span>(<span class="st">&quot;group&quot;</span>, <span class="kw">names</span>(centroids))] &lt;-<span class="st"> &quot;Cultivar&quot;</span>
 centroids &lt;-<span class="st"> </span>centroids <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">left_join</span>(cultivars_filtre, <span class="dt">by=</span><span class="st">&quot;Cultivar&quot;</span>)
@@ -474,12 +452,12 @@ centroids <span class="op">%&gt;%</span><span class="st"> </span><span class="kw
 <pre><code>## # A tibble: 6 x 4
 ##   Cultivar      DS1     DS2 i_group
 ##   &lt;chr&gt;       &lt;dbl&gt;   &lt;dbl&gt; &lt;fct&gt;  
-## 1 AC Belmont  0.130 -1.01   1      
-## 2 AC Chaleur -0.540 -0.115  4      
-## 3 Andover     1.93   0.0467 6      
-## 4 Aquilon     0.249 -0.245  1      
-## 5 Argos       0.171 -0.822  2      
-## 6 Atlantic   -1.23   0.405  4</code></pre>
+## 1 AC Belmont  0.122  1.02   1      
+## 2 AC Chaleur -0.543  0.124  4      
+## 3 Andover     1.93  -0.0478 6      
+## 4 Aquilon     0.238  0.240  1      
+## 5 Argos       0.157  0.859  2      
+## 6 Atlantic   -1.22  -0.413  4</code></pre>
 <p>The chunk below plots discriminant biplot with colours corresponding to ionomics groups.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">options</span>(<span class="dt">repr.plot.width =</span> <span class="dv">9</span>, <span class="dt">repr.plot.height =</span> <span class="dv">9</span>)
 g &lt;-<span class="st"> </span><span class="kw">ggplot</span>(centroids, <span class="kw">aes</span>(DS1, DS2, <span class="dt">label =</span> Cultivar, <span class="dt">col=</span>i_group)) <span class="op">+</span>
@@ -558,41 +536,41 @@ lmm &lt;-<span class="st"> </span><span class="kw">lme</span>(RendVendable <span
 
 pseudoR2 =<span class="st"> </span><span class="kw">rsq</span>(dfml.sc<span class="op">$</span>RendVendable, <span class="kw">predict</span>(lmm))
 pseudoR2</code></pre></div>
-<pre><code>## [1] 0.7364863</code></pre>
+<pre><code>## [1] 0.7369405</code></pre>
 <p>The next code extracts the interactions coefficients of the model and their p-values (pv) matrix.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pv &lt;-<span class="st"> </span><span class="kw">summary</span>(lmm)<span class="op">$</span>tTable[<span class="op">-</span><span class="dv">1</span>,]
 pv</code></pre></div>
-<pre><code>##                     Value  Std.Error   DF     t-value      p-value
-## clrN:group_i1   5.3933833  0.5389478 3151 10.00724555 3.135945e-23
-## clrN:group_i2   4.2021244  0.7172997 3151  5.85825466 5.159835e-09
-## clrN:group_i3   1.2119832  5.5667558 3151  0.21771805 8.276629e-01
-## clrN:group_i4   8.3461345  0.6718082 3151 12.42338882 1.246209e-34
-## clrN:group_i5   6.1861820  2.2442539 3151  2.75645378 5.876828e-03
-## clrN:group_i6  -0.1294606  0.9959042 3151 -0.12999303 8.965802e-01
-## clrP:group_i1   4.1971990  0.5815802 3151  7.21688810 6.634669e-13
-## clrP:group_i2   4.5098052  1.1683933 3151  3.85983475 1.157399e-04
-## clrP:group_i3   1.1852349  8.6400878 3151  0.13717857 8.908984e-01
-## clrP:group_i4   8.6397679  0.9105687 3151  9.48832116 4.475315e-21
-## clrP:group_i5   7.2422511  3.0573772 3151  2.36877908 1.790689e-02
-## clrP:group_i6  -0.2334311  1.5708848 3151 -0.14859846 8.818800e-01
-## clrK:group_i1   4.6342810  0.7945301 3151  5.83273222 6.004987e-09
-## clrK:group_i2   3.1938560  1.2446162 3151  2.56613737 1.032964e-02
-## clrK:group_i3   5.1043849  8.1914423 3151  0.62313628 5.332401e-01
-## clrK:group_i4   8.7525831  0.9499339 3151  9.21388679 5.589392e-20
-## clrK:group_i5   7.9748672  3.3775008 3151  2.36117406 1.827772e-02
-## clrK:group_i6  -1.7072640  2.0562420 3151 -0.83028359 4.064414e-01
-## clrCa:group_i1  6.2723620  0.7259704 3151  8.63996880 8.791023e-18
-## clrCa:group_i2  4.0265051  1.1985246 3151  3.35955145 7.899779e-04
-## clrCa:group_i3  4.1851995 14.6818169 3151  0.28506006 7.756169e-01
-## clrCa:group_i4  9.8682808  0.9569556 3151 10.31216141 1.518061e-24
-## clrCa:group_i5  9.2844210  2.7933048 3151  3.32381241 8.981094e-04
-## clrCa:group_i6 -0.1379925  1.8419373 3151 -0.07491704 9.402855e-01
-## clrMg:group_i1  3.8278647  0.5819178 3151  6.57801625 5.561189e-11
-## clrMg:group_i2  1.7023925  1.0971841 3151  1.55160147 1.208580e-01
-## clrMg:group_i3 -1.6469431  7.2522446 3151 -0.22709425 8.203652e-01
-## clrMg:group_i4  7.5107056  0.8956168 3151  8.38607073 7.480994e-17
-## clrMg:group_i5  7.9422630  3.0104999 3151  2.63818747 8.376047e-03
-## clrMg:group_i6 -0.5952666  1.6845395 3151 -0.35337051 7.238343e-01</code></pre>
+<pre><code>##                      Value  Std.Error   DF     t-value      p-value
+## clrN:group_i1   5.60218758  0.5496386 3151 10.19249231 5.031902e-24
+## clrN:group_i2   4.30397894  0.7336432 3151  5.86658313 4.909999e-09
+## clrN:group_i3   1.21367104  5.7005996 3151  0.21290235 8.314169e-01
+## clrN:group_i4   8.54331361  0.6871694 3151 12.43261589 1.116381e-34
+## clrN:group_i5   6.34147974  2.2943571 3151  2.76394630 5.743895e-03
+## clrN:group_i6   0.29174441  1.0533480 3151  0.27696868 7.818223e-01
+## clrP:group_i1   4.28649269  0.5866128 3151  7.30719260 3.440135e-13
+## clrP:group_i2   4.51000950  1.1678025 3151  3.86196270 1.147409e-04
+## clrP:group_i3   1.16001050  8.6354916 3151  0.13433057 8.931498e-01
+## clrP:group_i4   8.64313859  0.9100128 3151  9.49782120 4.095742e-21
+## clrP:group_i5   7.23955939  3.0563011 3151  2.36873239 1.790915e-02
+## clrP:group_i6  -0.24376218  1.5811871 3151 -0.15416404 8.774903e-01
+## clrK:group_i1   4.75027835  0.7993461 3151  5.94270558 3.109982e-09
+## clrK:group_i2   3.20803689  1.2493573 3151  2.56774983 1.028182e-02
+## clrK:group_i3   5.08994127  8.2298083 3151  0.61847629 5.363061e-01
+## clrK:group_i4   8.79256304  0.9535030 3151  9.22132688 5.224314e-20
+## clrK:group_i5   8.01431075  3.3899685 3151  2.36412542 1.813302e-02
+## clrK:group_i6  -1.27526027  2.1219199 3151 -0.60099360 5.478875e-01
+## clrCa:group_i1  6.39980521  0.7295692 3151  8.77203264 2.819484e-18
+## clrCa:group_i2  4.01681887  1.1949631 3151  3.36145847 7.845625e-04
+## clrCa:group_i3  4.19209068 14.6386227 3151  0.28637193 7.746121e-01
+## clrCa:group_i4  9.84671173  0.9540141 3151 10.32134813 1.383904e-24
+## clrCa:group_i5  9.26754687  2.7848346 3151  3.32786259 8.851996e-04
+## clrCa:group_i6  0.06304187  1.8499322 3151  0.03407794 9.728172e-01
+## clrMg:group_i1  3.89799879  0.5854246 3151  6.65841358 3.252874e-11
+## clrMg:group_i2  1.70676455  1.0999128 3151  1.55172717 1.208279e-01
+## clrMg:group_i3 -1.70032991  7.2872569 3151 -0.23332921 8.155209e-01
+## clrMg:group_i4  7.53469298  0.8977348 3151  8.39300553 7.061592e-17
+## clrMg:group_i5  7.96978108  3.0177230 3151  2.64099158 8.307192e-03
+## clrMg:group_i6 -0.41568533  1.7171650 3151 -0.24207652 8.087366e-01</code></pre>
 <p>Then, I extract their confident intervals, and process data for the plot.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">interval &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">Estimate =</span> <span class="kw">intervals</span>(lmm)<span class="op">$</span>fixed[<span class="op">-</span><span class="dv">1</span>, <span class="dv">2</span>],
                     <span class="dt">LL =</span> <span class="kw">intervals</span>(lmm)<span class="op">$</span>fixed[<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>], 
@@ -611,16 +589,16 @@ interval</code></pre></div>
 <pre><code>## # A tibble: 30 x 8
 ##    Estimate     LL    UL variable ionomic_group used_clr   pvalue
 ##       &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;         &lt;chr&gt;       &lt;dbl&gt;
-##  1    5.39    4.34  6.45 clrN:gr~ group 1       clrN     3.14e-23
-##  2    4.20    2.80  5.61 clrN:gr~ group 2       clrN     5.16e- 9
-##  3    1.21   -9.70 12.1  clrN:gr~ group 3       clrN     8.28e- 1
-##  4    8.35    7.03  9.66 clrN:gr~ group 4       clrN     1.25e-34
-##  5    6.19    1.79 10.6  clrN:gr~ group 5       clrN     5.88e- 3
-##  6   -0.129  -2.08  1.82 clrN:gr~ group 6       clrN     8.97e- 1
-##  7    4.20    3.06  5.34 clrP:gr~ group 1       clrP     6.63e-13
-##  8    4.51    2.22  6.80 clrP:gr~ group 2       clrP     1.16e- 4
-##  9    1.19  -15.8  18.1  clrP:gr~ group 3       clrP     8.91e- 1
-## 10    8.64    6.85 10.4  clrP:gr~ group 4       clrP     4.48e-21
+##  1    5.60    4.52  6.68 clrN:gr~ group 1       clrN     5.03e-24
+##  2    4.30    2.87  5.74 clrN:gr~ group 2       clrN     4.91e- 9
+##  3    1.21   -9.96 12.4  clrN:gr~ group 3       clrN     8.31e- 1
+##  4    8.54    7.20  9.89 clrN:gr~ group 4       clrN     1.12e-34
+##  5    6.34    1.84 10.8  clrN:gr~ group 5       clrN     5.74e- 3
+##  6    0.292  -1.77  2.36 clrN:gr~ group 6       clrN     7.82e- 1
+##  7    4.29    3.14  5.44 clrP:gr~ group 1       clrP     3.44e-13
+##  8    4.51    2.22  6.80 clrP:gr~ group 2       clrP     1.15e- 4
+##  9    1.16  -15.8  18.1  clrP:gr~ group 3       clrP     8.93e- 1
+## 10    8.64    6.86 10.4  clrP:gr~ group 4       clrP     4.10e-21
 ## # ... with 20 more rows, and 1 more variable: is_significant &lt;chr&gt;</code></pre>
 <p>This cell plots the interaction coefficients and their confident intervals using ggplot2.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">options</span>(<span class="dt">repr.plot.width =</span> <span class="dv">4</span>, <span class="dt">repr.plot.height =</span> <span class="dv">8</span>)
