@@ -251,7 +251,7 @@ cutQ <- leaf_clust_df %>%
   rename(rv_cut = RendVendable)
 leaf_clust_df <- leaf_clust_df %>%
   left_join(cutQ, by = "Cultivar") %>%
-  mutate(yieldClass = fct_relevel(ifelse(RendVendable >= rv_cut, "HY", "LY"), "LY"))
+  mutate(yieldClass = forcats::fct_relevel(ifelse(RendVendable >= rv_cut, "HY", "LY"), "LY"))
 ```
 
 For sake of verification, I compute average yield per yieldClass.
@@ -330,7 +330,7 @@ lda_df <- highYielders_df_IO %>%
 nrow(lda_df)
 ```
 
-Hence, `r nrow(highYielders_df)-nrow(lda_df)` outliers have been discarded from the analysis. The remaining data frame contains `r n_distinct(lda_df$Cultivar, na.rm = TRUE)` cultivars from `r n_distinct(lda_df$NoEssai, na.rm = TRUE)` trials.
+Hence, `\r nrow(highYielders_df)-nrow(lda_df)` outliers have been discarded from the analysis. The remaining data frame contains `\r n_distinct(lda_df$Cultivar, na.rm = TRUE)` cultivars from `\r n_distinct(lda_df$NoEssai, na.rm = TRUE)` trials.
 
 ## Axis reduction
 
