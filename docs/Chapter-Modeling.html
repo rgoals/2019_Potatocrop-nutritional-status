@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 3 Predicting marketable tuber yield | Nutrient Diagnosis Of Potato</title>
+  <title>Chapter 3 Predicting tuber yield category | Nutrient Diagnosis Of Potato</title>
   <meta name="description" content="This is a example of using the bookdown package to write a book that describ the statistical computations of my PhD Project, for publication on Github. The output format choosed is bookdown::gitbook. Next features are set out for after (bibliography and links)." />
   <meta name="generator" content="bookdown 0.10 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 3 Predicting marketable tuber yield | Nutrient Diagnosis Of Potato" />
+  <meta property="og:title" content="Chapter 3 Predicting tuber yield category | Nutrient Diagnosis Of Potato" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 3 Predicting marketable tuber yield | Nutrient Diagnosis Of Potato" />
+  <meta name="twitter:title" content="Chapter 3 Predicting tuber yield category | Nutrient Diagnosis Of Potato" />
   
   <meta name="twitter:description" content="This is a example of using the bookdown package to write a book that describ the statistical computations of my PhD Project, for publication on Github. The output format choosed is bookdown::gitbook. Next features are set out for after (bibliography and links)." />
   
@@ -24,7 +24,7 @@
 <meta name="author" content="zcoulibali" />
 
 
-<meta name="date" content="2019-06-10" />
+<meta name="date" content="2019-06-18" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -121,16 +121,27 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="2.6" data-path="Chapter-Clustering.html"><a href="Chapter-Clustering.html#axis-reduction"><i class="fa fa-check"></i><b>2.6</b> Axis reduction</a></li>
 <li class="chapter" data-level="2.7" data-path="Chapter-Clustering.html"><a href="Chapter-Clustering.html#cascade-k-means-clustering"><i class="fa fa-check"></i><b>2.7</b> Cascade K Means clustering</a></li>
 <li class="chapter" data-level="2.8" data-path="Chapter-Clustering.html"><a href="Chapter-Clustering.html#arranging-data-for-machine-learning"><i class="fa fa-check"></i><b>2.8</b> Arranging data for Machine Learning</a></li>
-<li class="chapter" data-level="2.9" data-path="Chapter-Clustering.html"><a href="Chapter-Clustering.html#clr-x-ionomics-groups-interactions-effects"><i class="fa fa-check"></i><b>2.9</b> clr X ionomics groups interactions effects</a></li>
+<li class="chapter" data-level="2.9" data-path="Chapter-Clustering.html"><a href="Chapter-Clustering.html#clr-x-ionomics-groups-interactions-effects"><i class="fa fa-check"></i><b>2.9</b> clr x ionomics groups interactions effects</a></li>
 </ul></li>
-<li class="chapter" data-level="3" data-path="Chapter-Modeling.html"><a href="Chapter-Modeling.html"><i class="fa fa-check"></i><b>3</b> Predicting marketable tuber yield</a><ul>
-<li class="chapter" data-level="3.1" data-path="Chapter-Modeling.html"><a href="Chapter-Modeling.html#load-data-file"><i class="fa fa-check"></i><b>3.1</b> Load data file</a></li>
-<li class="chapter" data-level="3.2" data-path="Chapter-Modeling.html"><a href="Chapter-Modeling.html#machine-learning"><i class="fa fa-check"></i><b>3.2</b> Machine learning</a></li>
-<li class="chapter" data-level="3.3" data-path="Chapter-Modeling.html"><a href="Chapter-Modeling.html#assessing-goodness-of-fit"><i class="fa fa-check"></i><b>3.3</b> Assessing goodness of fit</a></li>
+<li class="chapter" data-level="3" data-path="Chapter-Modeling.html"><a href="Chapter-Modeling.html"><i class="fa fa-check"></i><b>3</b> Predicting tuber yield category</a><ul>
+<li class="chapter" data-level="3.1" data-path="Chapter-Modeling.html"><a href="Chapter-Modeling.html#objective-1"><i class="fa fa-check"></i><b>3.1</b> Objective</a></li>
+<li class="chapter" data-level="3.2" data-path="Chapter-Modeling.html"><a href="Chapter-Modeling.html#useful-libraries"><i class="fa fa-check"></i><b>3.2</b> Useful libraries</a></li>
+<li class="chapter" data-level="3.3" data-path="Chapter-Modeling.html"><a href="Chapter-Modeling.html#machine-learning-data-set"><i class="fa fa-check"></i><b>3.3</b> Machine learning data set</a></li>
+<li class="chapter" data-level="3.4" data-path="Chapter-Modeling.html"><a href="Chapter-Modeling.html#processing-machine-learning"><i class="fa fa-check"></i><b>3.4</b> Processing Machine learning</a><ul>
+<li class="chapter" data-level="3.4.1" data-path="Chapter-Modeling.html"><a href="Chapter-Modeling.html#train-and-test-splits"><i class="fa fa-check"></i><b>3.4.1</b> Train and Test splits</a></li>
+<li class="chapter" data-level="3.4.2" data-path="Chapter-Modeling.html"><a href="Chapter-Modeling.html#building-the-models"><i class="fa fa-check"></i><b>3.4.2</b> Building the Models</a></li>
+<li class="chapter" data-level="3.4.3" data-path="Chapter-Modeling.html"><a href="Chapter-Modeling.html#goodness-of-fit-on-training-set"><i class="fa fa-check"></i><b>3.4.3</b> Goodness of fit on training set</a></li>
+<li class="chapter" data-level="3.4.4" data-path="Chapter-Modeling.html"><a href="Chapter-Modeling.html#models-evaluation-test-set"><i class="fa fa-check"></i><b>3.4.4</b> Models evaluation (Test set)</a></li>
+</ul></li>
+<li class="chapter" data-level="3.5" data-path="Chapter-Modeling.html"><a href="Chapter-Modeling.html#yield-class-prediction-with-rf-algorithm-on-test-set"><i class="fa fa-check"></i><b>3.5</b> Yield Class Prediction with rf algorithm on test set</a></li>
+<li class="chapter" data-level="3.6" data-path="Chapter-Modeling.html"><a href="Chapter-Modeling.html#comparison-with-non-informative-classification"><i class="fa fa-check"></i><b>3.6</b> Comparison with non-informative classification</a></li>
+<li class="chapter" data-level="3.7" data-path="Chapter-Modeling.html"><a href="Chapter-Modeling.html#train-data-set-backup-for-true-negatives-specimens-extraction"><i class="fa fa-check"></i><b>3.7</b> Train data set backup for true negatives specimens extraction</a></li>
 </ul></li>
 <li class="chapter" data-level="4" data-path="Chapter-Perturbation-vector.html"><a href="Chapter-Perturbation-vector.html"><i class="fa fa-check"></i><b>4</b> Perturbation vector theory</a><ul>
-<li class="chapter" data-level="4.1" data-path="Chapter-Perturbation-vector.html"><a href="Chapter-Perturbation-vector.html#dissimilarity-index-between-compositions"><i class="fa fa-check"></i><b>4.1</b> Dissimilarity index between compositions</a></li>
-<li class="chapter" data-level="4.2" data-path="Chapter-Perturbation-vector.html"><a href="Chapter-Perturbation-vector.html#rebalancing-a-misbalanced-sample-by-perturbation"><i class="fa fa-check"></i><b>4.2</b> Rebalancing a misbalanced sample by perturbation</a></li>
+<li class="chapter" data-level="4.1" data-path="Chapter-Perturbation-vector.html"><a href="Chapter-Perturbation-vector.html#objective-2"><i class="fa fa-check"></i><b>4.1</b> Objective</a></li>
+<li class="chapter" data-level="4.2" data-path="Chapter-Perturbation-vector.html"><a href="Chapter-Perturbation-vector.html#useful-libraries-1"><i class="fa fa-check"></i><b>4.2</b> Useful libraries</a></li>
+<li class="chapter" data-level="4.3" data-path="Chapter-Perturbation-vector.html"><a href="Chapter-Perturbation-vector.html#dissimilarity-index-between-compositions"><i class="fa fa-check"></i><b>4.3</b> Dissimilarity index between compositions</a></li>
+<li class="chapter" data-level="4.4" data-path="Chapter-Perturbation-vector.html"><a href="Chapter-Perturbation-vector.html#rebalancing-a-misbalanced-sample-by-perturbation"><i class="fa fa-check"></i><b>4.4</b> Rebalancing a misbalanced sample by perturbation</a></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
 <li class="divider"></li>
@@ -154,15 +165,46 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
             <section class="normal" id="section-">
 <div id="Chapter-Modeling" class="section level1">
-<h1><span class="header-section-number">Chapter 3</span> Predicting marketable tuber yield</h1>
-<div id="load-data-file" class="section level2">
-<h2><span class="header-section-number">3.1</span> Load data file</h2>
-<p>Load data file <code>data_ionome.csv</code> saved from previous cluster analysis.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(<span class="st">&quot;tidyverse&quot;</span>)    <span class="co"># &#39;diplyr&#39; and &#39;ggplot2&#39;</span>
-<span class="kw">library</span>(<span class="st">&#39;extrafont&#39;</span>)    <span class="co"># Changing Fonts for Graphs</span>
-df =<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&#39;output/dfml.csv&#39;</span>)</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">colnames</span>(df)[<span class="kw">colnames</span>(df)<span class="op">==</span><span class="st">&quot;ionomicGroup&quot;</span>] &lt;-<span class="st"> &quot;group_i&quot;</span> <span class="co"># make simplier</span>
+<h1><span class="header-section-number">Chapter 3</span> Predicting tuber yield category</h1>
+<div id="objective-1" class="section level2">
+<h2><span class="header-section-number">3.1</span> Objective</h2>
+<hr />
+<p>The objective of this chapter is to develop, evaluate and compare the performance of some machine learning algorithms (k-nearest neighbors, random forest and support vector machine - <a href="https://topepo.github.io/caret/index.html">package caret</a>) for the prediction of a potato yield category using both its leaf ionome and its ionomics group. I use the previous chapter (chapter <a href="Chapter-Clustering.html#Chapter-Clustering">2</a>) handeled data file <code>dfml.csv</code> which contains clr coordinates, maturity classes, ionomics groups and the yield two categorical variable created using the 65^th percentile for each cultivar. I use <code>accuracy</code> as models quality metric. I run the Chi-square homogenity test to compare prediction with a non-informative classification consisting of an equal distribution of 50% successful and 50% unsuccessful cases, using the best model. Then, I filter only true negative specimens i.e., correctely predicted high yielders of training data set in a new data frame for leaf health index purpose (Chapter <a href="Chapter-Perturbation-vector.html#Chapter-Perturbation-vector">4</a>).</p>
+<hr />
+</div>
+<div id="useful-libraries" class="section level2">
+<h2><span class="header-section-number">3.2</span> Useful libraries</h2>
+<p>The <code>tidyverse</code> package is always needed for data handling and visualization, and then <code>extrafont</code> to make changes in graphs as demanded for the article. The particularly useful packages are <code>caret</code> and <a href="https://www.rdocumentation.org/packages/kknn/versions/1.3.1">kknn</a> needed for machine leraning functions.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(<span class="st">&quot;tidyverse&quot;</span>)
+<span class="kw">library</span>(<span class="st">&#39;extrafont&#39;</span>)
+<span class="kw">library</span>(<span class="st">&#39;caret&#39;</span>)
+<span class="kw">library</span>(<span class="st">&#39;kknn&#39;</span>)</code></pre></div>
+</div>
+<div id="machine-learning-data-set" class="section level2">
+<h2><span class="header-section-number">3.3</span> Machine learning data set</h2>
+<p>I load the <code>dfml.csv</code> data set and named it <code>df</code>. The clr coordinates are scaled to zero mean and unity variance.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">df =<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&#39;output/dfml.csv&#39;</span>)</code></pre></div>
+<pre><code>## Parsed with column specification:
+## cols(
+##   NoEssai = col_double(),
+##   NoBloc = col_double(),
+##   NoTraitement = col_double(),
+##   clr_N = col_double(),
+##   clr_P = col_double(),
+##   clr_K = col_double(),
+##   clr_Mg = col_double(),
+##   clr_Ca = col_double(),
+##   clr_Fv = col_double(),
+##   Cultivar = col_character(),
+##   Maturity5 = col_character(),
+##   RendVendable = col_double(),
+##   yieldCutoff = col_double(),
+##   yieldClass = col_character(),
+##   ionomicGroup = col_double()
+## )</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">colnames</span>(df)[<span class="kw">colnames</span>(df)<span class="op">==</span><span class="st">&quot;ionomicGroup&quot;</span>] &lt;-<span class="st"> &quot;group_i&quot;</span> <span class="co"># makes it simplier !</span>
 df<span class="op">$</span>group_i =<span class="st"> </span><span class="kw">factor</span>(df<span class="op">$</span>group_i)
+df<span class="op">$</span>Maturity5 =<span class="st"> </span><span class="kw">factor</span>(df<span class="op">$</span>Maturity5)
 df<span class="op">$</span>yieldClass =<span class="st"> </span><span class="kw">factor</span>(df<span class="op">$</span>yieldClass)
 
 clr_no &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;clr_N&quot;</span>, <span class="st">&quot;clr_P&quot;</span>, <span class="st">&quot;clr_K&quot;</span>, <span class="st">&quot;clr_Mg&quot;</span>, <span class="st">&quot;clr_Ca&quot;</span>, <span class="st">&quot;clr_Fv&quot;</span>)
@@ -171,21 +213,13 @@ clrNo &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&
 
 df.sc =<span class="st"> </span>df <span class="co"># copy</span>
 df.sc[, clrNo] &lt;-<span class="st"> </span><span class="kw">apply</span>(df.sc[, clrNo], <span class="dv">2</span>, scale) <span class="co"># scale clr coordinates</span></code></pre></div>
-<p>Dummy code maturity order and ionomic group.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="cf">if</span>(<span class="st">&quot;Maturity5&quot;</span> <span class="op">%in%</span><span class="st"> </span><span class="kw">colnames</span>(df.sc)) {
-  df.sc<span class="op">$</span>Maturity5 &lt;-<span class="st"> </span><span class="kw">model.matrix</span>(<span class="op">~</span><span class="kw">ordered</span>(<span class="kw">factor</span>(df.sc<span class="op">$</span>Maturity5)))[, <span class="dv">2</span>]
-}
-
-<span class="cf">if</span>(<span class="st">&quot;group_i&quot;</span> <span class="op">%in%</span><span class="st"> </span><span class="kw">colnames</span>(df.sc)) {
-  df.sc<span class="op">$</span>group_i &lt;-<span class="st"> </span><span class="kw">model.matrix</span>(<span class="op">~</span><span class="kw">ordered</span>(<span class="kw">factor</span>(df.sc<span class="op">$</span>group_i)))[, <span class="dv">2</span>]
-}</code></pre></div>
-<p>Check the data frame structure.</p>
+<p>I check the data frame to see cultivars abundance. Cultivar <code>Goldrush</code> overcomes the others.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pc &lt;-<span class="st"> </span><span class="kw">round</span>(<span class="kw">with</span>(df.sc, <span class="kw">prop.table</span>(<span class="kw">table</span>(Cultivar)) <span class="op">*</span><span class="st"> </span><span class="dv">100</span>), <span class="dv">2</span>)
 dist &lt;-<span class="st"> </span><span class="kw">with</span>(df.sc, <span class="kw">cbind</span>(<span class="dt">freq =</span> <span class="kw">table</span>(Cultivar), <span class="dt">percentage =</span> pc))
 dist &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">cbind</span>(dist, <span class="kw">rownames</span>(dist)))
 <span class="kw">colnames</span>(dist)[<span class="dv">3</span>] &lt;-<span class="st"> &quot;Cultivar&quot;</span>
 dist<span class="op">$</span>freq &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="kw">as.character</span>(dist<span class="op">$</span>freq))
-dist <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">arrange</span>(<span class="kw">desc</span>(freq)) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>(<span class="dv">10</span>) <span class="co"># or discard the last part to see all.</span></code></pre></div>
+dist <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">arrange</span>(<span class="kw">desc</span>(freq)) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>(<span class="dv">10</span>) <span class="co"># or discard the last pipe to see all.</span></code></pre></div>
 <pre><code>##    freq percentage       Cultivar
 ## 1   560      16.56       Goldrush
 ## 2   367      10.85       Superior
@@ -198,53 +232,68 @@ dist <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">arr
 ## 9   165       4.88 Coastal Russet
 ## 10  112       3.31        Shepody</code></pre>
 </div>
-<div id="machine-learning" class="section level2">
-<h2><span class="header-section-number">3.2</span> Machine learning</h2>
-<p>Partioning data in Train and Test (evaluation) sets.</p>
-<p>Load libraries for machine learning functions.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(<span class="st">&#39;caret&#39;</span>)
-<span class="kw">library</span>(<span class="st">&#39;kknn&#39;</span>)</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">853739</span>) <span class="co"># random.org</span>
-split_index &lt;-<span class="st"> </span><span class="kw">createDataPartition</span>(df.sc<span class="op">$</span>yieldClass,
-                                   <span class="dt">group =</span> <span class="st">&quot;Cultivar&quot;</span>,
-                                   <span class="dt">p =</span> <span class="fl">0.75</span>,
-                                   <span class="dt">list =</span> <span class="ot">FALSE</span>,
-                                   <span class="dt">times =</span> <span class="dv">1</span>)
+<div id="processing-machine-learning" class="section level2">
+<h2><span class="header-section-number">3.4</span> Processing Machine learning</h2>
+<div id="train-and-test-splits" class="section level3">
+<h3><span class="header-section-number">3.4.1</span> Train and Test splits</h3>
+<p>I randomly split the data into a training set (75 % of the data) used to fit the models, and a testing set (remaining 25 %) I use for models’ evaluation. The next chunk splits data and groups predictors using three schemes.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">853739</span>)
+split_index &lt;-<span class="st"> </span><span class="kw">createDataPartition</span>(df.sc<span class="op">$</span>yieldClass, <span class="dt">group =</span> <span class="st">&quot;Cultivar&quot;</span>,
+                                   <span class="dt">p =</span> <span class="fl">0.75</span>, <span class="dt">list =</span> <span class="ot">FALSE</span>, <span class="dt">times =</span> <span class="dv">1</span>)
 train &lt;-<span class="st"> </span>df.sc[split_index, ]
 test &lt;-<span class="st"> </span>df.sc[<span class="op">-</span>split_index, ]
 
-## With clr coordinates
+## With only clr coordinates as predictors
 ml_clr &lt;-<span class="st"> </span><span class="kw">c</span>(clrNo, <span class="st">&#39;yieldClass&#39;</span>)
 train_clr =<span class="st"> </span>train[, ml_clr]
 test_clr =<span class="st"> </span>test[, ml_clr]
 
-## With clr and maturity classes
+## With clr and maturity classes as predictors
 ml_mc &lt;-<span class="st"> </span><span class="kw">c</span>(clrNo, <span class="st">&#39;Maturity5&#39;</span>, <span class="st">&#39;yieldClass&#39;</span>)
 train_mc =<span class="st"> </span>train[, ml_mc]
 test_mc =<span class="st"> </span>test[, ml_mc]
 
-## With clr and ionomic groups
+## With clr and ionomic groups as predictors
 ml_grp &lt;-<span class="st"> </span><span class="kw">c</span>(clrNo, <span class="st">&#39;group_i&#39;</span>, <span class="st">&#39;yieldClass&#39;</span>)
 train_grp =<span class="st"> </span>train[, ml_grp]
 test_grp =<span class="st"> </span>test[, ml_grp]</code></pre></div>
-<p>The knn model will be trained on a grid.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">grid &lt;-<span class="st">  </span><span class="kw">expand.grid</span>(<span class="dt">kmax =</span> <span class="kw">c</span>(<span class="dv">7</span>,<span class="dv">9</span>,<span class="dv">12</span>,<span class="dv">15</span>),    <span class="co"># neighborhood</span>
-                     <span class="dt">distance =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>,         <span class="co"># 1 for euclidean distance, 2 for Mahalannobis</span>
-                     <span class="dt">kernel =</span> <span class="st">&quot;optimal&quot;</span>)
+<p>With the <code>kknn</code> package, we must specify three parameters: <code>kmax</code> which is the number of neighbors to consider, <code>distance</code> a distance parameter to specify (1 for the Mahattan distance and 2 for the Euclidean distance), and a <code>kernel</code> which is a function to measure the distance. A best method currently used to choose the right parameters consists in creating a parameter grid.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">grid &lt;-<span class="st">  </span><span class="kw">expand.grid</span>(<span class="dt">kmax =</span> <span class="kw">c</span>(<span class="dv">7</span>,<span class="dv">9</span>,<span class="dv">12</span>,<span class="dv">15</span>), <span class="dt">distance =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>,
+                     <span class="dt">kernel =</span> <span class="kw">c</span>(<span class="st">&quot;rectangular&quot;</span>, <span class="st">&quot;gaussian&quot;</span>, <span class="st">&quot;optimal&quot;</span>))
 grid</code></pre></div>
-<pre><code>##   kmax distance  kernel
-## 1    7        1 optimal
-## 2    9        1 optimal
-## 3   12        1 optimal
-## 4   15        1 optimal
-## 5    7        2 optimal
-## 6    9        2 optimal
-## 7   12        2 optimal
-## 8   15        2 optimal</code></pre>
-<p>The models will be train with a <code>10-fold cross-validation (cv)</code> based on <code>accuracy</code> as loss function.</p>
+<pre><code>##    kmax distance      kernel
+## 1     7        1 rectangular
+## 2     9        1 rectangular
+## 3    12        1 rectangular
+## 4    15        1 rectangular
+## 5     7        2 rectangular
+## 6     9        2 rectangular
+## 7    12        2 rectangular
+## 8    15        2 rectangular
+## 9     7        1    gaussian
+## 10    9        1    gaussian
+## 11   12        1    gaussian
+## 12   15        1    gaussian
+## 13    7        2    gaussian
+## 14    9        2    gaussian
+## 15   12        2    gaussian
+## 16   15        2    gaussian
+## 17    7        1     optimal
+## 18    9        1     optimal
+## 19   12        1     optimal
+## 20   15        1     optimal
+## 21    7        2     optimal
+## 22    9        2     optimal
+## 23   12        2     optimal
+## 24   15        2     optimal</code></pre>
+<p>I use the metric of “Accuracy” to evaluate models. This is a ratio of the number of correctly predicted instances divided by the total number of instances in the dataset (e.g. 95% accurate).</p>
+<p>The accuracy of the models will be estimated using a <code>10-fold cross-validation (cv)</code> scheme. This will split the data set into 10 subsets of equal size. The models are built 10 times, each time leaving out one of the subsets from training and use it as the test set.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">control &lt;-<span class="st"> </span><span class="kw">trainControl</span>(<span class="dt">method =</span> <span class="st">&quot;cv&quot;</span>, <span class="dt">number =</span> <span class="dv">10</span>)
 metric &lt;-<span class="st"> &quot;Accuracy&quot;</span></code></pre></div>
-<p>Train Models:</p>
+</div>
+<div id="building-the-models" class="section level3">
+<h3><span class="header-section-number">3.4.2</span> Building the Models</h3>
+<p>I reset the random number seed before reach run to ensure that the evaluation of each algorithm is performed using exactly the same data splits. It ensures the results are directly comparable as explained by <a href="https://machinelearningmastery.com/machine-learning-in-r-step-by-step/">Jason Brownlee</a>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># a) Non-linear algorithm</span>
 ## kNN
 <span class="kw">set.seed</span>(<span class="dv">7</span>)
@@ -265,13 +314,16 @@ svm_grp &lt;-<span class="st"> </span><span class="kw">train</span>(yieldClass <
                  <span class="dt">metric =</span> metric, <span class="dt">trControl =</span> control)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## Random Forest
 <span class="kw">set.seed</span>(<span class="dv">7</span>)
-rf_clr &lt;-<span class="st"> </span><span class="kw">train</span>(yieldClass <span class="op">~</span>., <span class="dt">data =</span> train_clr, <span class="dt">method =</span> <span class="st">&quot;rf&quot;</span>, <span class="dt">metric =</span> metric, <span class="dt">trControl =</span> control)
-rf_mc &lt;-<span class="st"> </span><span class="kw">train</span>(yieldClass <span class="op">~</span>., <span class="dt">data =</span> train_mc, <span class="dt">method =</span> <span class="st">&quot;rf&quot;</span>, <span class="dt">metric =</span> metric, <span class="dt">trControl =</span> control)
-rf_grp &lt;-<span class="st"> </span><span class="kw">train</span>(yieldClass <span class="op">~</span>., <span class="dt">data =</span> train_grp, <span class="dt">method =</span> <span class="st">&quot;rf&quot;</span>, <span class="dt">metric =</span> metric, <span class="dt">trControl =</span> control)</code></pre></div>
+rf_clr &lt;-<span class="st"> </span><span class="kw">train</span>(yieldClass <span class="op">~</span>., <span class="dt">data =</span> train_clr, <span class="dt">method =</span> <span class="st">&quot;rf&quot;</span>, 
+                <span class="dt">metric =</span> metric, <span class="dt">trControl =</span> control)
+rf_mc &lt;-<span class="st"> </span><span class="kw">train</span>(yieldClass <span class="op">~</span>., <span class="dt">data =</span> train_mc, <span class="dt">method =</span> <span class="st">&quot;rf&quot;</span>, 
+               <span class="dt">metric =</span> metric, <span class="dt">trControl =</span> control)
+rf_grp &lt;-<span class="st"> </span><span class="kw">train</span>(yieldClass <span class="op">~</span>., <span class="dt">data =</span> train_grp, <span class="dt">method =</span> <span class="st">&quot;rf&quot;</span>, 
+                <span class="dt">metric =</span> metric, <span class="dt">trControl =</span> control)</code></pre></div>
 </div>
-<div id="assessing-goodness-of-fit" class="section level2">
-<h2><span class="header-section-number">3.3</span> Assessing goodness of fit</h2>
-<p>Models results, to select the best model.</p>
+<div id="goodness-of-fit-on-training-set" class="section level3">
+<h3><span class="header-section-number">3.4.3</span> Goodness of fit on training set</h3>
+<p>I assess the accuracy metric also when building the models (training set) but the target metric is for the evaluation set. This chart sorts models.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Summary results</span>
 results &lt;-<span class="st"> </span><span class="kw">resamples</span>(<span class="kw">list</span>(<span class="dt">kknn_clr_solely =</span> kknn_clr, 
                           <span class="dt">kknn_clr_and_ionomicgroup =</span> kknn_grp, 
@@ -294,7 +346,7 @@ results &lt;-<span class="st"> </span><span class="kw">resamples</span>(<span cl
 Figure 3.1: Comparison of models accuracies at training.
 </p>
 </div>
-<p>Check the best model at training, but only accuracies with test sets are used as models quality metric.</p>
+<p>This chunk also sorts models in a descending order using accuracies only, in a table.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">models_acc &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">Model =</span> <span class="kw">summary</span>(results)<span class="op">$</span>models,
                        <span class="dt">Accuracy =</span> <span class="kw">c</span>(<span class="kw">confusionMatrix</span>(train_clr<span class="op">$</span>yieldClass, <span class="kw">predict</span>(kknn_clr))<span class="op">$</span>overall[<span class="dv">1</span>],
                                     <span class="kw">confusionMatrix</span>(train_grp<span class="op">$</span>yieldClass, <span class="kw">predict</span>(kknn_grp))<span class="op">$</span>overall[<span class="dv">1</span>],
@@ -312,14 +364,17 @@ models_acc[<span class="kw">order</span>(models_acc[,<span class="st">&quot;Accu
 <pre><code>##                        Model  Accuracy
 ## 7              rf_clr_solely 0.9795034
 ## 8    rf_clr_and_ionomicgroup 0.9795034
-## 9   rf_clr_and_maturityclass 0.9795034
-## 2  kknn_clr_and_ionomicgroup 0.8876626
-## 3 kknn_clr_and_maturityclass 0.8683484
+## 9   rf_clr_and_maturityclass 0.9444225
+## 2  kknn_clr_and_ionomicgroup 0.8600709
 ## 1            kknn_clr_solely 0.8588885
-## 6  svm_clr_and_maturityclass 0.6980686
-## 5   svm_clr_and_ionomicgroup 0.6838786
-## 4             svm_clr_solely 0.6637761</code></pre>
-<p>Quality metrics with test (evaluation) set.</p>
+## 3 kknn_clr_and_maturityclass 0.8454868
+## 6  svm_clr_and_maturityclass 0.6929444
+## 5   svm_clr_and_ionomicgroup 0.6901853
+## 4             svm_clr_solely 0.6618053</code></pre>
+</div>
+<div id="models-evaluation-test-set" class="section level3">
+<h3><span class="header-section-number">3.4.4</span> Models evaluation (Test set)</h3>
+<p>Model Evaluation is an integral part of the model development process. It helps to find the best model that represents our data and how well the chosen model will work in the future. Th e next chunk performs this computations and gives the sorted accuracy metrics.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">predicted_kknn_clr &lt;-<span class="st"> </span><span class="kw">predict</span>(kknn_clr, test_clr)
 predicted_kknn_mc &lt;-<span class="st"> </span><span class="kw">predict</span>(kknn_mc, test_mc)
 predicted_kknn_grp &lt;-<span class="st"> </span><span class="kw">predict</span>(kknn_grp, test_grp)
@@ -349,73 +404,79 @@ tests_acc &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span
                                     <span class="kw">confusionMatrix</span>(test_mc<span class="op">$</span>yieldClass, predicted_rf_mc)<span class="op">$</span>overall[<span class="dv">1</span>]))
 tests_acc[<span class="kw">order</span>(tests_acc[,<span class="st">&quot;Accuracy_on_test&quot;</span>], <span class="dt">decreasing =</span> <span class="ot">TRUE</span>), ]</code></pre></div>
 <pre><code>##                        Model Accuracy_on_test
-## 9   rf_clr_and_maturityclass        0.7254438
-## 8    rf_clr_and_ionomicgroup        0.7183432
-## 3 kknn_clr_and_maturityclass        0.7053254
-## 7              rf_clr_solely        0.7029586
-## 1            kknn_clr_solely        0.6828402
-## 2  kknn_clr_and_ionomicgroup        0.6816568
-## 6  svm_clr_and_maturityclass        0.6721893
-## 5   svm_clr_and_ionomicgroup        0.6639053
-## 4             svm_clr_solely        0.6568047</code></pre>
-<p>Yield Class Prediction with rf algorithm on test set</p>
-<p>Order prediction quality metric by cultivar with <code>rf</code> combining clr values and new clustered variable (<code>rf_clr_and_ionomicgroup</code>).</p>
+## 8    rf_clr_and_ionomicgroup        0.7242604
+## 9   rf_clr_and_maturityclass        0.7242604
+## 7              rf_clr_solely        0.7088757
+## 3 kknn_clr_and_maturityclass        0.7065089
+## 2  kknn_clr_and_ionomicgroup        0.6863905
+## 6  svm_clr_and_maturityclass        0.6828402
+## 1            kknn_clr_solely        0.6769231
+## 5   svm_clr_and_ionomicgroup        0.6674556
+## 4             svm_clr_solely        0.6579882</code></pre>
+<p>The k-nearest neighbours, the random forest and the support vector machine models returned similar predictive accuracies although slightly higher for the random forest (73%) and the k-nearest neighbours (71%) algorithms. Using maturity classes or ionomics groups also returned similar predictive accuracies for all the models on test set.</p>
+</div>
+</div>
+<div id="yield-class-prediction-with-rf-algorithm-on-test-set" class="section level2">
+<h2><span class="header-section-number">3.5</span> Yield Class Prediction with rf algorithm on test set</h2>
+<p>I sort the predictive quality metrics by cultivar with <code>random forest</code> algorithm combining clr coordinates and new clusters variable: model <code>rf_clr_and_ionomicgroup</code>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">test<span class="op">$</span>ypred =<span class="st"> </span>predicted_rf_grp <span class="co"># adds predictions to test set</span>
 
 cultivar_acc &lt;-<span class="st"> </span>test <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw">group_by</span>(Cultivar) <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw">do</span>(<span class="dt">Accuracy =</span> <span class="kw">as.numeric</span>(<span class="kw">confusionMatrix</span>(.<span class="op">$</span>yieldClass, .<span class="op">$</span>ypred)<span class="op">$</span>overall[<span class="dv">1</span>]),
-       <span class="dt">N_obs =</span> <span class="kw">as.numeric</span>(<span class="kw">nrow</span>(.)))
+       <span class="dt">numb_samples =</span> <span class="kw">as.numeric</span>(<span class="kw">nrow</span>(.)))
 
 cultivar_acc<span class="op">$</span>Accuracy &lt;-<span class="st"> </span><span class="kw">unlist</span>(cultivar_acc<span class="op">$</span>Accuracy)
-cultivar_acc<span class="op">$</span>N_obs &lt;-<span class="st"> </span><span class="kw">unlist</span>(cultivar_acc<span class="op">$</span>N_obs)
+cultivar_acc<span class="op">$</span>numb_samples &lt;-<span class="st"> </span><span class="kw">unlist</span>(cultivar_acc<span class="op">$</span>numb_samples)
 
 data =<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">subset</span>(cultivar_acc, Accuracy<span class="op">&gt;</span><span class="dv">0</span>))
 data[<span class="kw">order</span>(data[,<span class="st">&quot;Accuracy&quot;</span>], <span class="dt">decreasing=</span>T), ]</code></pre></div>
-<pre><code>##              Cultivar  Accuracy N_obs
-## 12 Dark Red Chieftain 1.0000000     2
-## 18            Harmony 1.0000000     1
-## 19             Kanona 1.0000000     1
-## 21         Keuka Gold 1.0000000     1
-## 22             Lamoka 1.0000000     2
-## 25            Norland 1.0000000    12
-## 26          Peribonka 1.0000000     2
-## 29          Red Cloud 1.0000000     4
-## 35              Sifra 1.0000000     2
-## 40             W 1386 1.0000000     4
-## 41             Waneta 1.0000000     3
-## 10          Chieftain 0.8260870    69
-## 34            Shepody 0.8214286    28
-## 24            Mystere 0.8125000    16
-## 6               Argos 0.8000000     5
-## 33     Russet Norkota 0.8000000     5
-## 14            FL 1207 0.7872340    94
-## 17           Goldrush 0.7746479   142
-## 20           Kennebec 0.7727273    44
-## 2          AC Chaleur 0.7500000     4
-## 4             Andover 0.7500000     8
-## 31               Roko 0.7500000     4
-## 32     Russet Burbank 0.7500000     8
-## 11     Coastal Russet 0.7352941    34
-## 27         Pommerelle 0.7142857     7
-## 36            Snowden 0.6923077    39
-## 9            Carolina 0.6666667     3
-## 30          Red Maria 0.6666667     3
-## 15            FL 1533 0.6607143    56
-## 37           Superior 0.6288660    97
-## 1          AC Belmont 0.6250000    16
-## 39            Vivaldi 0.6000000     5
-## 7            Atlantic 0.5769231    52
-## 42         Yukon Gold 0.5555556    18
-## 5             Aquilon 0.5263158    19
-## 3               Ambra 0.5000000     2
-## 8         Bijou Rouge 0.5000000     2
-## 13             Estima 0.5000000    12
-## 16    Frontier Russet 0.5000000     4
-## 28               Reba 0.5000000     4
-## 23            Lanorma 0.3333333     3
-## 38             Viking 0.3333333     3</code></pre>
-<p>Check it with <code>geom_segment()</code>:</p>
+<pre><code>##              Cultivar  Accuracy numb_samples
+## 2          AC Chaleur 1.0000000            4
+## 12 Dark Red Chieftain 1.0000000            2
+## 18            Harmony 1.0000000            1
+## 19             Kanona 1.0000000            1
+## 21         Keuka Gold 1.0000000            1
+## 22             Krantz 1.0000000            1
+## 23             Lamoka 1.0000000            2
+## 26            Norland 1.0000000           12
+## 27          Peribonka 1.0000000            2
+## 30          Red Cloud 1.0000000            4
+## 41             W 1386 1.0000000            4
+## 42             Waneta 1.0000000            3
+## 10          Chieftain 0.8695652           69
+## 20           Kennebec 0.8181818           44
+## 25            Mystere 0.8125000           16
+## 17           Goldrush 0.8028169          142
+## 6               Argos 0.8000000            5
+## 14            FL 1207 0.7978723           94
+## 4             Andover 0.7500000            8
+## 16    Frontier Russet 0.7500000            4
+## 32               Roko 0.7500000            4
+## 33     Russet Burbank 0.7500000            8
+## 35            Shepody 0.7500000           28
+## 28         Pommerelle 0.7142857            7
+## 11     Coastal Russet 0.7058824           34
+## 9            Carolina 0.6666667            3
+## 31          Red Maria 0.6666667            3
+## 38           Superior 0.6494845           97
+## 15            FL 1533 0.6428571           56
+## 37            Snowden 0.6410256           39
+## 34     Russet Norkota 0.6000000            5
+## 40            Vivaldi 0.6000000            5
+## 5             Aquilon 0.5789474           19
+## 7            Atlantic 0.5576923           52
+## 43         Yukon Gold 0.5555556           18
+## 1          AC Belmont 0.5000000           16
+## 3               Ambra 0.5000000            2
+## 8         Bijou Rouge 0.5000000            2
+## 13             Estima 0.5000000           12
+## 29               Reba 0.5000000            4
+## 36              Sifra 0.5000000            2
+## 24            Lanorma 0.3333333            3
+## 39             Viking 0.3333333            3</code></pre>
+<p>The predictive accuracy is very high for some cultivars, but this result must be taken with care due to small size of samples often available.</p>
+<p>The next chunk plots accuracies for cultivars using ggplot2 functions and categorising low, high and very high predictive accuracies.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">options</span>(<span class="dt">repr.plot.width =</span> <span class="dv">8</span>, <span class="dt">repr.plot.height =</span> <span class="dv">4</span>)
 <span class="kw">ggplot</span>(data, <span class="kw">aes</span>(<span class="kw">reorder</span>(Cultivar, Accuracy), Accuracy)) <span class="op">+</span>
 <span class="st">    </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">color=</span><span class="kw">cut</span>(Accuracy, <span class="dt">breaks =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="fl">0.70</span>, <span class="fl">0.90</span>, <span class="dv">1</span>)))) <span class="op">+</span>
@@ -433,20 +494,23 @@ data[<span class="kw">order</span>(data[,<span class="st">&quot;Accuracy&quot;</
 </p>
 </div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#ggsave(&quot;images/cultivAcc.tiff&quot;, width=8, height=3)</span></code></pre></div>
-<p>Run the Chi-square homogenity test to compare prediction with a non-informative classification consisting of an equal distribution of 50% successful and 50% unsuccessful cases, using kknn.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cm &lt;-<span class="st"> </span><span class="kw">confusionMatrix</span>(predicted_kknn_grp, test_grp<span class="op">$</span>yieldClass) <span class="co"># confusion matrix</span>
-cm<span class="op">$</span>table</code></pre></div>
+</div>
+<div id="comparison-with-non-informative-classification" class="section level2">
+<h2><span class="header-section-number">3.6</span> Comparison with non-informative classification</h2>
+<p>The non-informative classification consists of an equal distribution of 50% successful and 50% unsuccessful classification cases <a href="https://science.sciencemag.org/content/240/4857/1285">(Swets J. A., 1988)</a>. I run the Chi-square homogenity test to compare predictive accuracy of the random frest model with this non-informative classification model.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cm &lt;-<span class="st"> </span><span class="kw">confusionMatrix</span>(predicted_rf_grp, test_grp<span class="op">$</span>yieldClass) 
+cm<span class="op">$</span>table <span class="co"># confusion matrix</span></code></pre></div>
 <pre><code>##           Reference
 ## Prediction  HY  LY
-##         HY 206 142
-##         LY 127 370</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Model&#39;s classification</span>
+##         HY 197  97
+##         LY 136 415</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># rf_clr_and_ionomicgroup model&#39;s classification</span>
 good_class &lt;-<span class="st"> </span>cm<span class="op">$</span>table[<span class="dv">1</span>,<span class="dv">1</span>]<span class="op">+</span>cm<span class="op">$</span>table[<span class="dv">2</span>,<span class="dv">2</span>] <span class="co"># HY or LY and correctly predicted</span>
 misclass &lt;-<span class="st"> </span>cm<span class="op">$</span>table[<span class="dv">1</span>,<span class="dv">2</span>]<span class="op">+</span>cm<span class="op">$</span>table[<span class="dv">2</span>,<span class="dv">1</span>]   <span class="co"># wrong classification</span>
 ml_class &lt;-<span class="st"> </span><span class="kw">c</span>(good_class, misclass)
 
-<span class="co"># Non-informative model</span>
-total &lt;-<span class="st"> </span><span class="kw">sum</span>(cm<span class="op">$</span>table)                    <span class="co"># number of samples</span>
+<span class="co"># Non-informative model (nim)</span>
+total &lt;-<span class="st"> </span><span class="kw">sum</span>(cm<span class="op">$</span>table) <span class="co"># total number of samples</span>
 good_nim &lt;-<span class="st"> </span><span class="fl">0.50</span> <span class="op">*</span><span class="st"> </span>total
 misclass_nim &lt;-<span class="st"> </span><span class="fl">0.50</span> <span class="op">*</span><span class="st"> </span>total
 non_inf_model &lt;-<span class="st"> </span><span class="kw">c</span>(good_nim, misclass_nim)
@@ -455,7 +519,7 @@ non_inf_model &lt;-<span class="st"> </span><span class="kw">c</span>(good_nim, 
 m &lt;-<span class="st"> </span><span class="kw">rbind</span>(ml_class, non_inf_model)
 m</code></pre></div>
 <pre><code>##                [,1]  [,2]
-## ml_class      576.0 269.0
+## ml_class      612.0 233.0
 ## non_inf_model 422.5 422.5</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># chisq.test</span>
 khi2_test &lt;-<span class="st"> </span><span class="kw">chisq.test</span>(m)
@@ -464,20 +528,20 @@ khi2_test</code></pre></div>
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
 ## data:  m
-## X-squared = 56.923, df = 1, p-value = 4.533e-14</code></pre>
-<p>The null hypothesis for a non-informative classification is rejected after the chi-square homogeneity test.</p>
-<p>The train data set with predicted yield classes <code>train_df</code> backup will be used to test perturbation vector theory in the next file.</p>
+## X-squared = 88.554, df = 1, p-value &lt; 2.2e-16</code></pre>
+<p>The null hypothesis for a non-informative classification is rejected after the chi-square homogeneity test, the p-value is too low (&lt;&lt; 0.05).</p>
+</div>
+<div id="train-data-set-backup-for-true-negatives-specimens-extraction" class="section level2">
+<h2><span class="header-section-number">3.7</span> Train data set backup for true negatives specimens extraction</h2>
+<p>The train data set with predicted yield classes <code>train_df</code> backup will be used to test perturbation vector theory in the next file. I use the <code>rf</code> model.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pred_yield &lt;-<span class="st"> </span><span class="kw">predict</span>(rf_grp, train_grp)
 train_df =<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">cbind</span>(df[split_index, ], pred_yield))
 <span class="kw">write_csv</span>(train_df, <span class="st">&quot;output/train_df.csv&quot;</span>)
 <span class="kw">nrow</span>(train_df)</code></pre></div>
 <pre><code>## [1] 2537</code></pre>
-<p>True Negatives (TN) specimens in this study are observations of the training data set with high yield (HY) and correctly predicted. Compute clr centroids for True Negatives <code>with original</code> clr values; use original data frame <code>df</code>.</p>
+<p>I consider as True Negatives (TN) specimens for this study, observations of the training data set having a high yield (HY) and correctly predicted with the <code>rf</code> model. Then, I compute clr centroids for cultivars using True Negatives original (not scaled) clr values. Thes centroids could be used as <code>clr norms</code> for ionomics groups.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">TNs =<span class="st"> </span>train_df[train_df<span class="op">$</span>yieldClass <span class="op">==</span><span class="st"> &#39;HY&#39;</span> <span class="op">&amp;</span><span class="st"> </span>pred_yield <span class="op">==</span><span class="st"> &#39;HY&#39;</span>, ]
-<span class="kw">nrow</span>(TNs)</code></pre></div>
-<pre><code>## [1] 988</code></pre>
-<p>The next cell computes clr balances Centroids for ionomic groups.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">TNmedianNorms &lt;-<span class="st"> </span>TNs <span class="op">%&gt;%</span>
+TNmedianNorms &lt;-<span class="st"> </span>TNs <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">group_by</span>(group_i) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">select</span>(clrNo) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">summarise_all</span>(<span class="kw">list</span>(median))</code></pre></div>
@@ -486,12 +550,12 @@ train_df =<span class="st"> </span><span class="kw">data.frame</span>(<span clas
 <pre><code>## # A tibble: 6 x 7
 ##   group_i  clrN  clrP  clrK clrMg  clrCa clrFv
 ##   &lt;fct&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;
-## 1 1       0.727 -1.98 0.512 -1.82 -0.979  3.56
+## 1 1       0.731 -1.98 0.512 -1.83 -0.978  3.56
 ## 2 2       0.910 -1.93 0.532 -1.92 -1.14   3.57
 ## 3 3       0.894 -2.22 0.359 -1.60 -1.20   3.83
 ## 4 4       0.747 -1.97 0.219 -1.48 -1.04   3.50
 ## 5 5       0.601 -2.20 0.507 -1.60 -0.823  3.40
-## 6 6       0.712 -2.02 0.640 -2.13 -0.837  3.61</code></pre>
+## 6 6       0.700 -2.04 0.640 -2.12 -0.827  3.61</code></pre>
 
 </div>
 </div>

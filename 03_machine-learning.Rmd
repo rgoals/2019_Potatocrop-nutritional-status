@@ -175,9 +175,9 @@ models_acc <- data.frame(Model = summary(results)$models,
 models_acc[order(models_acc[,"Accuracy"], decreasing = TRUE), ]
 ```
 
-### Models evaluation (Test set)
+### Models' evaluation (on testing set)
 
-Model Evaluation is an integral part of the model development process. It helps to find the best model that represents our data and how well the chosen model will work in the future. Th e next chunk performs this computations and gives the sorted accuracy metrics.
+Model evaluation is an integral part of the model development process. It helps to find the best model that represents our data and how well the chosen model will work in the future. Th e next chunk performs this computations and gives the sorted accuracy metrics.
 
 ```{r}
 predicted_kknn_clr <- predict(kknn_clr, test_clr)
