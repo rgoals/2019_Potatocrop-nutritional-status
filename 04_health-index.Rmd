@@ -1,5 +1,15 @@
 # Perturbation vector theory {#Chapter-Perturbation-vector}
 
+## Objective
+
+***
+The objective of this chapter is to develop a mathematical workflow useful to adjust the ionome of potato crops for diagnostic purpose.
+
+***
+
+## Useful libraries
+
+
 The first step is to compute a dissimilarity index according to the distance from the closest healthy point (the closest TN). Let's load data set.
 
 ```{r, warning=FALSE, message=FALSE}

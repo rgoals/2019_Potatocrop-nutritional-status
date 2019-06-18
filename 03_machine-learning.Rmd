@@ -1,17 +1,32 @@
-# Predicting marketable tuber yield {#Chapter-Modeling}
-## Load data file
+# Predicting tuber yield category {#Chapter-Modeling}
 
-Load data file `data_ionome.csv` saved from previous cluster analysis.
+## Objective
+
+***
+The objective of this chapter is to develop, evaluate and compare the performance of some machine learning algorithms (k-nearest neighbors, random forest and support vector machine - [package caret](https://topepo.github.io/caret/index.html)) for the prediction of a potato yield category using both its leaf ionome and its ionomics group. I use the previous chapter (chapter \@ref(Chapter-Clustering)) handeled data file `dfml.csv` which contains clr coordinates, maturity classes, ionomics groups and the yield two categorical variable created using the 65^th percentile for each cultivar. I use `accuracy` as models quality metric. I run the Chi-square homogenity test to compare prediction with a non-informative classification consisting of an equal distribution of 50% successful and 50% unsuccessful cases, using the best model. Then, I filter only true negative specimens i.e., correctely predicted high yielders of training data set in a new data frame for leaf health index purpose (Chapter \@ref(Chapter-Perturbation-vector)). 
+
+***
+
+## Useful libraries
+
+The `tidyverse` package is always needed for data handling and visualization, and then `extrafont` to make changes in graphs as demanded for the article. The particularly useful packages are `caret` and [kknn](https://www.rdocumentation.org/packages/kknn/versions/1.3.1) needed for machine leraning functions.
 
 ```{r, warning=FALSE, message=FALSE}
-library("tidyverse")    # 'diplyr' and 'ggplot2'
-library('extrafont')    # Changing Fonts for Graphs
-df = read_csv('output/dfml.csv')
+library("tidyverse")
+library('extrafont')
+library('caret')
+library('kknn')
 ```
 
+## Machine learning data set
+
+I load the `dfml.csv` data set and named it `df`. The clr coordinates are scaled to zero mean and unity variance.
+
 ```{r}
-colnames(df)[colnames(df)=="ionomicGroup"] <- "group_i" # make simplier
+df = read_csv('output/dfml.csv')
+colnames(df)[colnames(df)=="ionomicGroup"] <- "group_i" # makes it simplier !
 df$group_i = factor(df$group_i)
+df$Maturity5 = factor(df$Maturity5)
 df$yieldClass = factor(df$yieldClass)
 
 clr_no <- c("clr_N", "clr_P", "clr_K", "clr_Mg", "clr_Ca", "clr_Fv")
@@ -22,19 +37,7 @@ df.sc = df # copy
 df.sc[, clrNo] <- apply(df.sc[, clrNo], 2, scale) # scale clr coordinates
 ```
 
-Dummy code maturity order and ionomic group.
-
-```{r}
-if("Maturity5" %in% colnames(df.sc)) {
-  df.sc$Maturity5 <- model.matrix(~ordered(factor(df.sc$Maturity5)))[, 2]
-}
-
-if("group_i" %in% colnames(df.sc)) {
-  df.sc$group_i <- model.matrix(~ordered(factor(df.sc$group_i)))[, 2]
-}
-```
-
-Check the data frame structure.
+I check the data frame to see cultivars abundance. Cultivar `Goldrush` overcomes the others.
 
 ```{r}
 pc <- round(with(df.sc, prop.table(table(Cultivar)) * 100), 2)
@@ -42,63 +45,58 @@ dist <- with(df.sc, cbind(freq = table(Cultivar), percentage = pc))
 dist <- data.frame(cbind(dist, rownames(dist)))
 colnames(dist)[3] <- "Cultivar"
 dist$freq <- as.numeric(as.character(dist$freq))
-dist %>% arrange(desc(freq)) %>% head(10) # or discard the last part to see all.
+dist %>% arrange(desc(freq)) %>% head(10) # or discard the last pipe to see all.
 ```
 
-## Machine learning
+## Processing Machine learning
 
-Partioning data in Train and Test (evaluation) sets.
+### Train and Test splits
 
-Load libraries for machine learning functions.
-
-```{r, warning=FALSE, message=FALSE}
-library('caret')
-library('kknn')
-```
+I randomly split the data into a training set (75 % of the data) used to fit the models, and a testing set (remaining 25 %) I use for models' evaluation. The next chunk splits data and groups predictors using three schemes.
 
 ```{r}
-set.seed(853739) # random.org
-split_index <- createDataPartition(df.sc$yieldClass,
-                                   group = "Cultivar",
-                                   p = 0.75,
-                                   list = FALSE,
-                                   times = 1)
+set.seed(853739)
+split_index <- createDataPartition(df.sc$yieldClass, group = "Cultivar",
+                                   p = 0.75, list = FALSE, times = 1)
 train <- df.sc[split_index, ]
 test <- df.sc[-split_index, ]
 
-## With clr coordinates
+## With only clr coordinates as predictors
 ml_clr <- c(clrNo, 'yieldClass')
 train_clr = train[, ml_clr]
 test_clr = test[, ml_clr]
 
-## With clr and maturity classes
+## With clr and maturity classes as predictors
 ml_mc <- c(clrNo, 'Maturity5', 'yieldClass')
 train_mc = train[, ml_mc]
 test_mc = test[, ml_mc]
 
-## With clr and ionomic groups
+## With clr and ionomic groups as predictors
 ml_grp <- c(clrNo, 'group_i', 'yieldClass')
 train_grp = train[, ml_grp]
 test_grp = test[, ml_grp]
 ```
 
-The knn model will be trained on a grid.
+With the `kknn` package, we must specify three parameters: `kmax` which is the number of neighbors to consider, `distance` a distance parameter to specify (1 for the Mahattan distance and 2 for the Euclidean distance), and a `kernel` which is a function to measure the distance. A best method currently used to choose the right parameters consists in creating a parameter grid.
 
 ```{r}
-grid <-  expand.grid(kmax = c(7,9,12,15),    # neighborhood
-                     distance = 1:2,         # 1 for euclidean distance, 2 for Mahalannobis
-                     kernel = "optimal")
+grid <-  expand.grid(kmax = c(7,9,12,15), distance = 1:2,
+                     kernel = c("rectangular", "gaussian", "optimal"))
 grid
 ```
 
-The models will be train with a `10-fold cross-validation (cv)` based on ` accuracy` as loss function.
+I use the metric of “Accuracy” to evaluate models. This is a ratio of the number of correctly predicted instances divided by the total number of instances in the dataset (e.g. 95% accurate). 
+
+The accuracy of the models will be estimated using a `10-fold cross-validation (cv)` scheme. This will split the data set into 10 subsets of equal size. The models are built 10 times, each time leaving out one of the subsets from training and use it as the test set.
 
 ```{r}
 control <- trainControl(method = "cv", number = 10)
 metric <- "Accuracy"
 ```
 
-Train Models:
+### Building the Models
+
+I reset the random number seed before reach run to ensure that the evaluation of each algorithm is performed using exactly the same data splits. It ensures the results are directly comparable as explained by [Jason Brownlee](https://machinelearningmastery.com/machine-learning-in-r-step-by-step/).
 
 ```{r}
 # a) Non-linear algorithm
@@ -127,14 +125,17 @@ svm_grp <- train(yieldClass ~., data = train_grp, method = "svmRadial",
 ```{r}
 ## Random Forest
 set.seed(7)
-rf_clr <- train(yieldClass ~., data = train_clr, method = "rf", metric = metric, trControl = control)
-rf_mc <- train(yieldClass ~., data = train_mc, method = "rf", metric = metric, trControl = control)
-rf_grp <- train(yieldClass ~., data = train_grp, method = "rf", metric = metric, trControl = control)
+rf_clr <- train(yieldClass ~., data = train_clr, method = "rf", 
+                metric = metric, trControl = control)
+rf_mc <- train(yieldClass ~., data = train_mc, method = "rf", 
+               metric = metric, trControl = control)
+rf_grp <- train(yieldClass ~., data = train_grp, method = "rf", 
+                metric = metric, trControl = control)
 ```
 
-## Assessing goodness of fit
+### Goodness of fit on training set
 
-Models results, to select the best model.
+I assess the accuracy metric also when building the models (training set) but the target metric is for the evaluation set. This chart sorts models.
 
 ```{r ml-traindotplot, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Comparison of models accuracies at training."}
 # Summary results
@@ -155,7 +156,7 @@ options(repr.plot.width = 5, repr.plot.height = 4)
 dotplot(results)
 ```
 
-Check the best model at training, but only accuracies with test sets are used as models quality metric.
+This chunk also sorts models in a descending order using accuracies only, in a table.
 
 ```{r}
 models_acc <- data.frame(Model = summary(results)$models,
@@ -174,7 +175,9 @@ models_acc <- data.frame(Model = summary(results)$models,
 models_acc[order(models_acc[,"Accuracy"], decreasing = TRUE), ]
 ```
 
-Quality metrics with test (evaluation) set.
+### Models evaluation (Test set)
+
+Model Evaluation is an integral part of the model development process. It helps to find the best model that represents our data and how well the chosen model will work in the future. Th e next chunk performs this computations and gives the sorted accuracy metrics.
 
 ```{r}
 predicted_kknn_clr <- predict(kknn_clr, test_clr)
@@ -207,9 +210,11 @@ tests_acc <- data.frame(Model = summary(results)$models,
 tests_acc[order(tests_acc[,"Accuracy_on_test"], decreasing = TRUE), ]
 ```
 
-Yield Class Prediction with rf algorithm on test set
+The k-nearest neighbours, the random forest and the support vector machine models returned similar predictive accuracies although slightly higher for the random forest (73%) and the k-nearest neighbours (71%) algorithms. Using maturity classes or ionomics groups also returned similar predictive accuracies for all the models on test set. 
 
-Order prediction quality metric by cultivar with `rf` combining clr values and new clustered variable (`rf_clr_and_ionomicgroup`).
+## Yield Class Prediction with rf algorithm on test set
+
+I sort the predictive quality metrics by cultivar with `random forest` algorithm combining clr coordinates and new clusters variable: model `rf_clr_and_ionomicgroup`.
 
 ```{r}
 test$ypred = predicted_rf_grp # adds predictions to test set
@@ -217,16 +222,18 @@ test$ypred = predicted_rf_grp # adds predictions to test set
 cultivar_acc <- test %>%
     group_by(Cultivar) %>%
     do(Accuracy = as.numeric(confusionMatrix(.$yieldClass, .$ypred)$overall[1]),
-       N_obs = as.numeric(nrow(.)))
+       numb_samples = as.numeric(nrow(.)))
 
 cultivar_acc$Accuracy <- unlist(cultivar_acc$Accuracy)
-cultivar_acc$N_obs <- unlist(cultivar_acc$N_obs)
+cultivar_acc$numb_samples <- unlist(cultivar_acc$numb_samples)
 
 data = data.frame(subset(cultivar_acc, Accuracy>0))
 data[order(data[,"Accuracy"], decreasing=T), ]
 ```
 
-Check it with `geom_segment()`:
+The predictive accuracy is very high for some cultivars, but this result must be taken with care due to small size of samples often available. 
+
+The next chunk plots accuracies for cultivars using ggplot2 functions and categorising low, high and very high predictive accuracies.
 
 ```{r accuracy_cultivar, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Predictive accuracy for cultivars."}
 options(repr.plot.width = 8, repr.plot.height = 4)
@@ -242,22 +249,24 @@ ggplot(data, aes(reorder(Cultivar, Accuracy), Accuracy)) +
 #ggsave("images/cultivAcc.tiff", width=8, height=3)
 ```
 
-Run the Chi-square homogenity test to compare prediction with a non-informative classification consisting of an equal distribution of 50% successful and 50% unsuccessful cases, using kknn.
+## Comparison with non-informative classification
+
+The non-informative classification consists of an equal distribution of 50% successful and 50% unsuccessful classification cases [(Swets J. A., 1988)](https://science.sciencemag.org/content/240/4857/1285). I run the Chi-square homogenity test to compare predictive accuracy of the random frest model with this non-informative classification model. 
 
 ```{r}
-cm <- confusionMatrix(predicted_kknn_grp, test_grp$yieldClass) # confusion matrix
-cm$table
+cm <- confusionMatrix(predicted_rf_grp, test_grp$yieldClass) 
+cm$table # confusion matrix
 ```
 
 
 ```{r}
-# Model's classification
+# rf_clr_and_ionomicgroup model's classification
 good_class <- cm$table[1,1]+cm$table[2,2] # HY or LY and correctly predicted
 misclass <- cm$table[1,2]+cm$table[2,1]   # wrong classification
 ml_class <- c(good_class, misclass)
 
-# Non-informative model
-total <- sum(cm$table)                    # number of samples
+# Non-informative model (nim)
+total <- sum(cm$table) # total number of samples
 good_nim <- 0.50 * total
 misclass_nim <- 0.50 * total
 non_inf_model <- c(good_nim, misclass_nim)
@@ -271,9 +280,11 @@ khi2_test <- chisq.test(m)
 khi2_test
 ```
 
-The null hypothesis for a non-informative classification is rejected after the chi-square homogeneity test.
+The null hypothesis for a non-informative classification is rejected after the chi-square homogeneity test, the p-value is too low (<< 0.05).
 
-The train data set with predicted yield classes `train_df` backup will be used to test perturbation vector theory in the next file.
+## Train data set backup for true negatives specimens extraction
+
+The train data set with predicted yield classes `train_df` backup will be used to test perturbation vector theory in the next file. I use the `rf` model. 
 
 ```{r}
 pred_yield <- predict(rf_grp, train_grp)
@@ -282,16 +293,10 @@ write_csv(train_df, "output/train_df.csv")
 nrow(train_df)
 ```
 
-True Negatives (TN) specimens in this study are observations of the training data set with high yield (HY) and correctly predicted. Compute clr centroids for True Negatives `with original` clr values; use original data frame `df`. 
+I consider as True Negatives (TN) specimens for this study, observations of the training data set having a high yield (HY) and correctly predicted with the `rf` model. Then, I compute clr centroids for cultivars using True Negatives original (not scaled) clr values. Thes centroids could be used as `clr norms` for ionomics groups.
 
 ```{r}
 TNs = train_df[train_df$yieldClass == 'HY' & pred_yield == 'HY', ]
-nrow(TNs)
-```
-
-The next cell computes clr balances Centroids for ionomic groups.
-
-```{r}
 TNmedianNorms <- TNs %>%
   group_by(group_i) %>%
   select(clrNo) %>%
