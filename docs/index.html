@@ -24,7 +24,7 @@
 <meta name="author" content="zcoulibali" />
 
 
-<meta name="date" content="2019-06-19" />
+<meta name="date" content="2019-06-21" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -133,9 +133,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="3.4.3" data-path="Chapter-Modeling.html"><a href="Chapter-Modeling.html#goodness-of-fit-on-training-set"><i class="fa fa-check"></i><b>3.4.3</b> Goodness of fit on training set</a></li>
 <li class="chapter" data-level="3.4.4" data-path="Chapter-Modeling.html"><a href="Chapter-Modeling.html#models-evaluation-on-testing-set"><i class="fa fa-check"></i><b>3.4.4</b> Models’ evaluation (on testing set)</a></li>
 </ul></li>
-<li class="chapter" data-level="3.5" data-path="Chapter-Modeling.html"><a href="Chapter-Modeling.html#yield-class-prediction-with-rf-algorithm-on-test-set"><i class="fa fa-check"></i><b>3.5</b> Yield Class Prediction with rf algorithm on test set</a></li>
+<li class="chapter" data-level="3.5" data-path="Chapter-Modeling.html"><a href="Chapter-Modeling.html#yield-class-prediction-with-rf-algorithm"><i class="fa fa-check"></i><b>3.5</b> Yield class prediction with rf algorithm</a></li>
 <li class="chapter" data-level="3.6" data-path="Chapter-Modeling.html"><a href="Chapter-Modeling.html#comparison-with-non-informative-classification"><i class="fa fa-check"></i><b>3.6</b> Comparison with non-informative classification</a></li>
-<li class="chapter" data-level="3.7" data-path="Chapter-Modeling.html"><a href="Chapter-Modeling.html#train-data-set-backup-for-tn-specimens-extraction"><i class="fa fa-check"></i><b>3.7</b> Train data set backup for TN specimens extraction</a></li>
+<li class="chapter" data-level="3.7" data-path="Chapter-Modeling.html"><a href="Chapter-Modeling.html#train-data-set-backup-for-tn-specimens-selection"><i class="fa fa-check"></i><b>3.7</b> Train data set backup for TN specimens selection</a></li>
 </ul></li>
 <li class="chapter" data-level="4" data-path="Chapter-Perturbation-vector.html"><a href="Chapter-Perturbation-vector.html"><i class="fa fa-check"></i><b>4</b> Perturbation vector theory</a><ul>
 <li class="chapter" data-level="4.1" data-path="Chapter-Perturbation-vector.html"><a href="Chapter-Perturbation-vector.html#objective-2"><i class="fa fa-check"></i><b>4.1</b> Objective</a></li>
@@ -167,7 +167,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="header">
 <h1 class="title">Nutrient Diagnosis Of Potato</h1>
 <p class="author"><em>zcoulibali</em></p>
-<p class="date"><em>2019-06-19</em></p>
+<p class="date"><em>2019-06-21</em></p>
 </div>
 <div id="Chapter-Data-Processing" class="section level1">
 <h1><span class="header-section-number">Chapter 1</span> Data processing</h1>
@@ -259,7 +259,7 @@ leaf_df<span class="op">$</span>leaf_anyNA &lt;-<span class="st"> </span><span c
 leaf_df<span class="op">$</span>leaf_countNA &lt;-<span class="st"> </span><span class="kw">apply</span>(leaf_df[macroElements], <span class="dv">1</span>, <span class="cf">function</span>(X) <span class="kw">sum</span>(<span class="kw">is.na</span>(X)))</code></pre></div>
 <p>The next cell performs the imputation. Since the imputation is a time-consuming process, we saved it in a <code>csv</code> stored in the subfolder <code>output</code> and have put a switch to put on if one wants to perform the computation again. The imputation is made by KNNs in the Aitchison (compositions-friendly) metric for rows where there are 1 or 2 missing values, i.e. <code>filter(leaf_countNA &lt;= 3)</code>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Warning: could be a long process</span>
-perform_imputation &lt;-<span class="st"> </span><span class="ot">TRUE</span> <span class="co"># set to FALSE if you want to load the saved file</span>
+perform_imputation &lt;-<span class="st"> </span><span class="ot">FALSE</span> <span class="co"># set to FALSE if you want to load the saved file</span>
 <span class="cf">if</span> (perform_imputation) {
   <span class="kw">set.seed</span>(<span class="dv">628125</span>)
   leaf_imp &lt;-<span class="st"> </span>leaf_df <span class="op">%&gt;%</span>
@@ -279,6 +279,14 @@ perform_imputation &lt;-<span class="st"> </span><span class="ot">TRUE</span> <s
 } <span class="cf">else</span> {
   leaf_complete &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;output/leaf_complete.csv&quot;</span>)
 }</code></pre></div>
+<pre><code>## Parsed with column specification:
+## cols(
+##   N_imp = col_double(),
+##   P_imp = col_double(),
+##   K_imp = col_double(),
+##   Ca_imp = col_double(),
+##   Mg_imp = col_double()
+## )</code></pre>
 <p>With the next cell I append imputed columns to the data frame. The nutrients diagnosis will be done with imputed compositions.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">leaf_df &lt;-<span class="st"> </span><span class="kw">bind_cols</span>(leaf_df, leaf_complete)
 leaf_df &lt;-<span class="st"> </span>leaf_df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(<span class="op">-</span><span class="kw">c</span>(<span class="st">&quot;leaf_allNA&quot;</span>, <span class="st">&quot;leaf_anyNA&quot;</span>))</code></pre></div>

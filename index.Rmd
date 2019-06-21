@@ -73,8 +73,7 @@ distribution$numbOfsamples <- as.numeric(as.character(distribution$numbOfsamples
 distribution$percentage <- as.numeric(as.character(distribution$percentage))
 ```
 
-```{r, cultivar-abundance, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Repported cultivars abundance in the potato data frame.", echo = FALSE}
-options(repr.plot.width = 6, repr.plot.height = 20)
+```{r, cultivar-abundance, fig.height = 10, fig.width = 5, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Repported cultivars abundance in the potato data frame.", echo = FALSE}
 distribution %>%
   ggplot(aes(x = reorder(Cultivar, numbOfsamples), y = numbOfsamples)) +
   geom_col() +
