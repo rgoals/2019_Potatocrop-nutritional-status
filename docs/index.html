@@ -24,7 +24,7 @@
 <meta name="author" content="zcoulibali" />
 
 
-<meta name="date" content="2019-06-18" />
+<meta name="date" content="2019-06-19" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -109,7 +109,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="1.3" data-path="index.html"><a href="index.html#quebec-potato-data-set"><i class="fa fa-check"></i><b>1.3</b> Québec potato data set</a></li>
 <li class="chapter" data-level="1.4" data-path="index.html"><a href="index.html#selection-of-useful-variables"><i class="fa fa-check"></i><b>1.4</b> Selection of useful variables</a></li>
 <li class="chapter" data-level="1.5" data-path="index.html"><a href="index.html#arranging-the-data-frame"><i class="fa fa-check"></i><b>1.5</b> Arranging the data frame</a></li>
-<li class="chapter" data-level="1.6" data-path="index.html"><a href="index.html#cultivars-classes-correction"><i class="fa fa-check"></i><b>1.6</b> Cultivars classes correction</a></li>
+<li class="chapter" data-level="1.6" data-path="index.html"><a href="index.html#cultivar-classes-correction"><i class="fa fa-check"></i><b>1.6</b> Cultivar classes correction</a></li>
 <li class="chapter" data-level="1.7" data-path="index.html"><a href="index.html#summarise-and-backup"><i class="fa fa-check"></i><b>1.7</b> Summarise and backup</a></li>
 </ul></li>
 <li class="chapter" data-level="2" data-path="Chapter-Clustering.html"><a href="Chapter-Clustering.html"><i class="fa fa-check"></i><b>2</b> Cluster analysis of potato cultivars</a><ul>
@@ -117,7 +117,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="2.2" data-path="Chapter-Clustering.html"><a href="Chapter-Clustering.html#useful-libraries-and-custom-functions"><i class="fa fa-check"></i><b>2.2</b> Useful libraries and custom functions</a></li>
 <li class="chapter" data-level="2.3" data-path="Chapter-Clustering.html"><a href="Chapter-Clustering.html#leaves-processed-compositions-data-set"><i class="fa fa-check"></i><b>2.3</b> Leaves processed compositions data set</a></li>
 <li class="chapter" data-level="2.4" data-path="Chapter-Clustering.html"><a href="Chapter-Clustering.html#high-yielders-delimiter"><i class="fa fa-check"></i><b>2.4</b> High yielders delimiter</a></li>
-<li class="chapter" data-level="2.5" data-path="Chapter-Clustering.html"><a href="Chapter-Clustering.html#clr-centroids-computation"><i class="fa fa-check"></i><b>2.5</b> <code>clr</code> centroids computation</a></li>
+<li class="chapter" data-level="2.5" data-path="Chapter-Clustering.html"><a href="Chapter-Clustering.html#centered-log-ratio-clr-centroids-computation"><i class="fa fa-check"></i><b>2.5</b> Centered log-ratio (clr) centroids computation</a></li>
 <li class="chapter" data-level="2.6" data-path="Chapter-Clustering.html"><a href="Chapter-Clustering.html#axis-reduction"><i class="fa fa-check"></i><b>2.6</b> Axis reduction</a></li>
 <li class="chapter" data-level="2.7" data-path="Chapter-Clustering.html"><a href="Chapter-Clustering.html#cascade-k-means-clustering"><i class="fa fa-check"></i><b>2.7</b> Cascade K Means clustering</a></li>
 <li class="chapter" data-level="2.8" data-path="Chapter-Clustering.html"><a href="Chapter-Clustering.html#arranging-data-for-machine-learning"><i class="fa fa-check"></i><b>2.8</b> Arranging data for Machine Learning</a></li>
@@ -167,22 +167,22 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="header">
 <h1 class="title">Nutrient Diagnosis Of Potato</h1>
 <p class="author"><em>zcoulibali</em></p>
-<p class="date"><em>2019-06-18</em></p>
+<p class="date"><em>2019-06-19</em></p>
 </div>
 <div id="Chapter-Data-Processing" class="section level1">
 <h1><span class="header-section-number">Chapter 1</span> Data processing</h1>
 <div id="Objective" class="section level2">
 <h2><span class="header-section-number">1.1</span> Objective</h2>
 <hr />
-<p>This chapter is the first of a series of R markdown codes aiming to describe computations methodology used to derive the results and conclusions of potato nutrient diagnosis article. The data set is a collection of potato surveys and nitrogen (N), phosphorous (P) and potassium (K) fertilizer trials conducted in Quebec from 1970 to 2017 between the US border at the 45^th parallel and the Northern limit of cultivation at the 49^th parallel. The useful variables are the first mature leaf (4^th from top, sampled at the beginning of blossom stage) nitrogen, phosphorus, potassium, calcium and magnesium compositions, cultivars used in experiments, cultivar maturity classes and tuber marketable yield. These variables are extracted from the Québec potato raw data table (<code>raw_potato_df</code>) and handled to obtain useful variables for cluster analysis and tuber yield class prediction. A previous exploration has shown that oligoelements contained too many missing values, for this reason these elements were excluded from analysis. The chapter ends with the backup of a processed data frame useful for next chapters.</p>
+<p>This chapter is the first of a series of R markdown codes aiming to describe computations methodology used to derive the results and conclusions of potato nutrient diagnosis article. The data set is a collection of potato surveys and nitrogen (N), phosphorous (P) and potassium (K) fertilizer trials conducted in Quebec from 1970 to 2017 between the US border at the 45^th parallel and the Northern limit of cultivation at the 49^th parallel. The useful variables are the first mature leaf (4^th from top, sampled at the beginning of blossom stage) nitrogen, phosphorus, potassium, calcium and magnesium compositions, cultivars used in experiments, cultivar maturity classes and tuber marketable yield. These variables are extracted from the Québec potato raw data table (<code>raw_potato_df.csv</code>) and handled to obtain useful variables for cluster analysis and tuber yield class prediction. A previous exploration has shown that oligoelements contained too many missing values, for this reason these elements were excluded from analysis. The chapter ends with the backup of a processed data frame useful for next chapters.</p>
 <hr />
 </div>
 <div id="useful-libraries-for-data-handling" class="section level2">
 <h2><span class="header-section-number">1.2</span> Useful libraries for data handling</h2>
-<p>I need package <a href="https://www.tidyverse.org/">tidyverse</a> which loads a set of packages for data handling and vizualisation. I used <a href="https://www.rdocumentation.org/packages/Amelia/versions/1.7.5">Amelia</a> for missing data vizualisation, <a href="http://stefvanbuuren.github.io/mice/">mice</a> for missing data imputation and <a href="http://www.stat.boogaart.de/compositions">compositions</a> to transforme compositions into compositionnal space.</p>
+<p>I need package <a href="https://www.tidyverse.org/">tidyverse</a> which loads a set of packages for data handling and vizualisation. I used <a href="https://www.rdocumentation.org/packages/Amelia/versions/1.7.5">Amelia</a> for missing data vizualisation, <a href="https://www.rdocumentation.org/packages/robCompositions/versions/2.1.0">robCompositions</a> to robustely impute missing values in compositional data using knn methods, <a href="http://www.stat.boogaart.de/compositions">compositions</a> to transforme compositions into compositionnal space.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(<span class="st">&quot;tidyverse&quot;</span>)
 <span class="kw">library</span>(<span class="st">&#39;Amelia&#39;</span>)
-<span class="kw">library</span>(<span class="st">&quot;mice&quot;</span>)
+<span class="kw">library</span>(<span class="st">&quot;robCompositions&quot;</span>)
 <span class="kw">library</span>(<span class="st">&quot;compositions&quot;</span>)</code></pre></div>
 </div>
 <div id="quebec-potato-data-set" class="section level2">
@@ -223,32 +223,31 @@ macroElements &lt;-<span class="st"> </span><span class="kw">c</span>(<span clas
 </div>
 <div id="arranging-the-data-frame" class="section level2">
 <h2><span class="header-section-number">1.5</span> Arranging the data frame</h2>
-<p>I set trial number <code>NoEssai</code> as factor, relevel categorical <code>maturity</code> order variable and choose cultivar <code>Superior</code> as reference as it has the maximum number of observations in the data frame.</p>
+<p>I set trial number <code>NoEssai</code> as factor, relevel categorical <code>maturity order</code> variable and choose cultivar <code>Superior</code> as reference as it has the maximum number of observations. Then, abundance of cultivars is ploted.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">percentage &lt;-<span class="st"> </span><span class="kw">round</span>(<span class="kw">with</span>(leaf_df, <span class="kw">prop.table</span>(<span class="kw">table</span>(Cultivar)) <span class="op">*</span><span class="st"> </span><span class="dv">100</span>), <span class="dv">2</span>)
 distribution &lt;-<span class="st"> </span><span class="kw">with</span>(leaf_df, <span class="kw">cbind</span>(<span class="dt">numbOfsamples =</span> <span class="kw">table</span>(Cultivar), <span class="dt">percentage =</span> percentage))
 distribution &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">cbind</span>(distribution, <span class="kw">rownames</span>(distribution)))
 <span class="kw">colnames</span>(distribution)[<span class="dv">3</span>] &lt;-<span class="st"> &quot;Cultivar&quot;</span>
 distribution<span class="op">$</span>numbOfsamples &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="kw">as.character</span>(distribution<span class="op">$</span>numbOfsamples))
-distribution<span class="op">$</span>percentage &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="kw">as.character</span>(distribution<span class="op">$</span>percentage))
-distribution <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">arrange</span>(<span class="kw">desc</span>(numbOfsamples)) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>(<span class="dv">5</span>)</code></pre></div>
-<pre><code>##   numbOfsamples percentage  Cultivar
-## 1          3108      24.03  Superior
-## 2          1544      11.94  Kennebec
-## 3          1420      10.98  Goldrush
-## 4          1145       8.85   Shepody
-## 5           989       7.65 Chieftain</code></pre>
+distribution<span class="op">$</span>percentage &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="kw">as.character</span>(distribution<span class="op">$</span>percentage))</code></pre></div>
+<div class="figure" style="text-align: center"><span id="fig:cultivar-abundance"></span>
+<img src="2019_Bookdown_files/figure-html/cultivar-abundance-1.png" alt="Repported cultivars abundance in the potato data frame." width="100%" />
+<p class="caption">
+Figure 1.1: Repported cultivars abundance in the potato data frame.
+</p>
+</div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">leaf_df<span class="op">$</span>NoEssai &lt;-<span class="st"> </span><span class="kw">as.factor</span>(leaf_df<span class="op">$</span>NoEssai)
 leaf_df<span class="op">$</span>Cultivar &lt;-<span class="st">  </span><span class="kw">relevel</span>(<span class="kw">factor</span>(leaf_df<span class="op">$</span>Cultivar), <span class="dt">ref =</span> <span class="st">&quot;Superior&quot;</span>)
 leaf_df<span class="op">$</span>Maturity5 &lt;-<span class="st"> </span><span class="kw">ordered</span>(leaf_df<span class="op">$</span>Maturity5, 
                             <span class="dt">levels =</span> <span class="kw">c</span>(<span class="st">&quot;early&quot;</span>,<span class="st">&quot;early mid-season&quot;</span>,
                                        <span class="st">&quot;mid-season&quot;</span>,<span class="st">&quot;mid-season late&quot;</span>,<span class="st">&quot;late&quot;</span>))</code></pre></div>
-<p>I portrait missing values for the sake of imputation. As explained in the <a href="index.html#Objective">1.1</a> section, I will retain after this processing only reasonably imputable data i.e., missing data of a sample less than half the number of studied attributes. The next cell maps the portrait of missing values.</p>
+<p>I portrait missing values for the sake of imputation. As explained in the section <a href="index.html#Objective">1.1</a>, I will retain after this processing only reasonably imputable data i.e., missing data of a sample less than half the number of studied attributes. The next cell maps the portrait of missing values.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">leafIonome &lt;-<span class="st"> </span>leaf_df[macroElements]
 <span class="kw">missmap</span>(leafIonome)</code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:matrix-missing-comp"></span>
 <img src="2019_Bookdown_files/figure-html/matrix-missing-comp-1.png" alt="Portrait of missing macroelements." width="100%" />
 <p class="caption">
-Figure 1.1: Portrait of missing macroelements.
+Figure 1.2: Portrait of missing macroelements.
 </p>
 </div>
 <p>This figure compiles the samples identifiers on the Y axis and macroelements on the X axis. A complete horizontal unique color band indicates wether the 5 elements are totally observed (blue band) or totally missing (red band). Only N and P have missing values that will be imputed and retained at the end. The totally missing compositions will be removed. The next cell initializes this process.</p>
@@ -258,36 +257,28 @@ leaf_df<span class="op">$</span>leaf_allNA &lt;-<span class="st"> </span><span c
 leaf_df<span class="op">$</span>leaf_anyNA &lt;-<span class="st"> </span><span class="kw">apply</span>(leaf_df[macroElements], <span class="dv">1</span>, <span class="cf">function</span>(X) <span class="kw">any</span>(<span class="kw">is.na</span>(X)))
 <span class="co"># number of NAs (missing values):</span>
 leaf_df<span class="op">$</span>leaf_countNA &lt;-<span class="st"> </span><span class="kw">apply</span>(leaf_df[macroElements], <span class="dv">1</span>, <span class="cf">function</span>(X) <span class="kw">sum</span>(<span class="kw">is.na</span>(X)))</code></pre></div>
-<p>The next cell performs three times imputation and compiles the mean (average) for each sample and for each element in a new table stored in a subfolder <code>output</code>. At this step imputation is made for all the missing values of the complete table. Too many missing data rows will be discarded later.</p>
+<p>The next cell performs the imputation. Since the imputation is a time-consuming process, we saved it in a <code>csv</code> stored in the subfolder <code>output</code> and have put a switch to put on if one wants to perform the computation again. The imputation is made by KNNs in the Aitchison (compositions-friendly) metric for rows where there are 1 or 2 missing values, i.e. <code>filter(leaf_countNA &lt;= 3)</code>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Warning: could be a long process</span>
-perform_imputation &lt;-<span class="st"> </span><span class="ot">TRUE</span>
+perform_imputation &lt;-<span class="st"> </span><span class="ot">TRUE</span> <span class="co"># set to FALSE if you want to load the saved file</span>
 <span class="cf">if</span> (perform_imputation) {
-  leaf_mice &lt;-<span class="st"> </span>leaf_df <span class="op">%&gt;%</span>
+  <span class="kw">set.seed</span>(<span class="dv">628125</span>)
+  leaf_imp &lt;-<span class="st"> </span>leaf_df <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">filter</span>(leaf_countNA <span class="op">&lt;=</span><span class="st"> </span><span class="dv">3</span>) <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw">select</span>(macroElements) <span class="op">%&gt;%</span>
-<span class="st">    </span><span class="kw">mice</span>(<span class="dt">data =</span> ., <span class="dt">m =</span> <span class="dv">3</span>, <span class="dt">method =</span> <span class="st">&quot;rf&quot;</span>)
-  leaf_complete &lt;-<span class="st"> </span><span class="kw">Reduce</span>(<span class="st">&quot;+&quot;</span>, <span class="kw">complete</span>(leaf_mice, <span class="dt">action =</span> <span class="st">&quot;all&quot;</span>))<span class="op">/</span><span class="st"> </span>leaf_mice<span class="op">$</span>m
+<span class="st">    </span><span class="kw">impKNNa</span>(<span class="kw">as.matrix</span>(.),
+            <span class="dt">metric =</span> <span class="st">&quot;Aitchison&quot;</span>, 
+            <span class="dt">k =</span> <span class="dv">6</span>, 
+            <span class="dt">primitive =</span> <span class="ot">TRUE</span>,
+            <span class="dt">normknn =</span> <span class="ot">TRUE</span>, 
+            <span class="dt">adj =</span> <span class="st">&#39;median&#39;</span>)
+  leaf_complete &lt;-<span class="st"> </span>leaf_df <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">select</span>(macroElements)
+  leaf_complete[leaf_df<span class="op">$</span>leaf_countNA <span class="op">&lt;=</span><span class="st"> </span><span class="dv">3</span>, ] &lt;-<span class="st"> </span>leaf_imp<span class="op">$</span>xImp
   <span class="kw">names</span>(leaf_complete) &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="kw">names</span>(leaf_complete), <span class="st">&quot;_imp&quot;</span>)
   <span class="kw">write_csv</span>(leaf_complete, <span class="st">&quot;output/leaf_complete.csv&quot;</span>)
 } <span class="cf">else</span> {
   leaf_complete &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;output/leaf_complete.csv&quot;</span>)
 }</code></pre></div>
-<pre><code>## 
-##  iter imp variable
-##   1   1  N  P  K  Ca  Mg
-##   1   2  N  P  K  Ca  Mg
-##   1   3  N  P  K  Ca  Mg
-##   2   1  N  P  K  Ca  Mg
-##   2   2  N  P  K  Ca  Mg
-##   2   3  N  P  K  Ca  Mg
-##   3   1  N  P  K  Ca  Mg
-##   3   2  N  P  K  Ca  Mg
-##   3   3  N  P  K  Ca  Mg
-##   4   1  N  P  K  Ca  Mg
-##   4   2  N  P  K  Ca  Mg
-##   4   3  N  P  K  Ca  Mg
-##   5   1  N  P  K  Ca  Mg
-##   5   2  N  P  K  Ca  Mg
-##   5   3  N  P  K  Ca  Mg</code></pre>
 <p>With the next cell I append imputed columns to the data frame. The nutrients diagnosis will be done with imputed compositions.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">leaf_df &lt;-<span class="st"> </span><span class="kw">bind_cols</span>(leaf_df, leaf_complete)
 leaf_df &lt;-<span class="st"> </span>leaf_df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(<span class="op">-</span><span class="kw">c</span>(<span class="st">&quot;leaf_allNA&quot;</span>, <span class="st">&quot;leaf_anyNA&quot;</span>))</code></pre></div>
@@ -297,7 +288,7 @@ leaf_df &lt;-<span class="st"> </span>leaf_df <span class="op">%&gt;%</span><spa
          <span class="dt">Fv_imp =</span> <span class="dv">100</span> <span class="op">-</span><span class="st"> </span>sum_imp) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">select</span>(<span class="op">-</span>sum_imp)
 <span class="cf">if</span> (<span class="op">!</span><span class="st">&quot;Fv&quot;</span> <span class="op">%in%</span><span class="st"> </span>macroElements) macroElements &lt;-<span class="st"> </span><span class="kw">c</span>(macroElements, <span class="st">&quot;Fv&quot;</span>)</code></pre></div>
-<p>I use centered log-ratio (<code>clr</code>) transformation for discriminant analysis and perturbation vector concept assessment.The next cell perform this calculation. The <code>clr</code> coordinates are computed in an external (intermediate) data table.</p>
+<p>I use centered log-ratio (<code>clr</code>) transformation for discriminant analysis and perturbation vector concept assessment.The next cell performs this calculation. The <code>clr</code> coordinates are computed in an external (intermediate) data table.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">leaf_composition &lt;-<span class="st"> </span>leaf_df <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">select</span>(<span class="kw">paste0</span>(macroElements, <span class="st">&quot;_imp&quot;</span>)) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">acomp</span>(.)
@@ -306,14 +297,14 @@ leaf_clr &lt;-<span class="st"> </span><span class="kw">clr</span>(leaf_composit
 <span class="st">  </span><span class="kw">as_tibble</span>()
 <span class="kw">names</span>(leaf_clr) &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;clr_&quot;</span>, macroElements)
 <span class="kw">write_csv</span>(leaf_clr, <span class="st">&quot;output/leaf_clr.csv&quot;</span>)</code></pre></div>
-<p>The next cell binds these clr-transformed compositions to the raw composition data frame and retains useful columns. I also used this cell to discard all the samples with too many missing composition.</p>
+<p>The next cell binds these clr-transformed compositions to the raw composition data frame and retains useful columns. I also used this cell to discard all the samples with too many missing compositions.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">leaf_df &lt;-<span class="st"> </span><span class="kw">bind_cols</span>(leaf_df, leaf_clr)
 leaf_df &lt;-<span class="st"> </span>leaf_df <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">select</span>(keys_col, extra_col, cultivarAndyield, <span class="st">&quot;leaf_countNA&quot;</span>, <span class="kw">starts_with</span>(<span class="st">&quot;clr&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">filter</span>(leaf_countNA <span class="op">&lt;=</span><span class="st"> </span><span class="dv">3</span>)</code></pre></div>
 </div>
-<div id="cultivars-classes-correction" class="section level2">
-<h2><span class="header-section-number">1.6</span> Cultivars classes correction</h2>
+<div id="cultivar-classes-correction" class="section level2">
+<h2><span class="header-section-number">1.6</span> Cultivar classes correction</h2>
 <p>From a previous checking, I noticed that cultivars <code>Mystere</code> and <code>Vivaldi</code> have different repported maturity classes in the data set, <code>mid-season late</code> and <code>late</code> for <code>Mystere</code>, then <code>early mid-season</code> and <code>mid-season</code> for <code>Vivaldi</code> respectively. Their new maturity classes names are based on a majority vote for this study. The next cell perform this correction. I also make missing values explicit for this categorical variable.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">leaf_df<span class="op">$</span>Maturity5[leaf_df<span class="op">$</span>Cultivar <span class="op">==</span><span class="st"> &quot;Mystere&quot;</span>] &lt;-<span class="st"> &quot;late&quot;</span>
 leaf_df<span class="op">$</span>Maturity5[leaf_df<span class="op">$</span>Cultivar <span class="op">==</span><span class="st"> &quot;Vivaldi&quot;</span>] &lt;-<span class="st"> &quot;early mid-season&quot;</span>
@@ -327,8 +318,7 @@ leaf_df<span class="op">$</span>Cultivar &lt;-<span class="st"> </span>forcats<s
             <span class="dt">end_year =</span> <span class="kw">max</span>(Annee, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>),
             <span class="dt">numb_trials =</span> <span class="kw">n_distinct</span>(NoEssai, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>),
             <span class="dt">numb_cultivars =</span> <span class="kw">n_distinct</span>(Cultivar, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>),
-            <span class="dt">numb_maturityClasses =</span> <span class="kw">n_distinct</span>(Maturity5, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
-            )</code></pre></div>
+            <span class="dt">numb_maturityClasses =</span> <span class="kw">n_distinct</span>(Maturity5, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>))</code></pre></div>
 <pre><code>## # A tibble: 1 x 5
 ##   start_year end_year numb_trials numb_cultivars numb_maturityClasses
 ##        &lt;dbl&gt;    &lt;dbl&gt;       &lt;int&gt;          &lt;int&gt;                &lt;int&gt;

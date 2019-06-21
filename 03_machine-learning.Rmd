@@ -33,7 +33,7 @@ clr_no <- c("clr_N", "clr_P", "clr_K", "clr_Mg", "clr_Ca", "clr_Fv")
 clrNo <- c("clrN", "clrP", "clrK", "clrMg", "clrCa", "clrFv")
 colnames(df)[which(names(df) %in% clr_no)] <- clrNo
 
-df.sc = df # copy
+df.sc <- df # copy
 df.sc[, clrNo] <- apply(df.sc[, clrNo], 2, scale) # scale clr coordinates
 ```
 
@@ -45,7 +45,16 @@ dist <- with(df.sc, cbind(freq = table(Cultivar), percentage = pc))
 dist <- data.frame(cbind(dist, rownames(dist)))
 colnames(dist)[3] <- "Cultivar"
 dist$freq <- as.numeric(as.character(dist$freq))
-dist %>% arrange(desc(freq)) %>% head(10) # or discard the last pipe to see all.
+```
+
+```{r, ml-cultivar-abundance, fig.height = 10, fig.width = 5, out.width = "100%", fig.align = "center", warning = FALSE, message = FALSE, fig.cap = "Cultivars abundance in the machine learning data frame.", echo = FALSE}
+dist %>%
+  ggplot(aes(x = reorder(Cultivar, freq), y = freq)) +
+  geom_col() +
+  geom_text(aes(label = freq), hjust = -0.1) +
+  ylim(c(0, 650)) +
+  labs(x = 'Cultivar', y = 'Number of samples') +
+  coord_flip()
 ```
 
 ## Processing Machine learning
@@ -58,23 +67,23 @@ I randomly split the data into a training set (75 % of the data) used to fit the
 set.seed(853739)
 split_index <- createDataPartition(df.sc$yieldClass, group = "Cultivar",
                                    p = 0.75, list = FALSE, times = 1)
-train <- df.sc[split_index, ]
-test <- df.sc[-split_index, ]
+train_df <- df.sc[split_index, ]
+test_df <- df.sc[-split_index, ]
 
 ## With only clr coordinates as predictors
 ml_clr <- c(clrNo, 'yieldClass')
-train_clr = train[, ml_clr]
-test_clr = test[, ml_clr]
+train_clr = train_df[, ml_clr]
+test_clr = test_df[, ml_clr]
 
 ## With clr and maturity classes as predictors
 ml_mc <- c(clrNo, 'Maturity5', 'yieldClass')
-train_mc = train[, ml_mc]
-test_mc = test[, ml_mc]
+train_mc = train_df[, ml_mc]
+test_mc = test_df[, ml_mc]
 
 ## With clr and ionomic groups as predictors
 ml_grp <- c(clrNo, 'group_i', 'yieldClass')
-train_grp = train[, ml_grp]
-test_grp = test[, ml_grp]
+train_grp = train_df[, ml_grp]
+test_grp = test_df[, ml_grp]
 ```
 
 With the `kknn` package, we must specify three parameters: `kmax` which is the number of neighbors to consider, `distance` a distance parameter to specify (1 for the Mahattan distance and 2 for the Euclidean distance), and a `kernel` which is a function to measure the distance. A best method currently used to choose the right parameters consists in creating a parameter grid.
@@ -152,7 +161,6 @@ results <- resamples(list(kknn_clr_solely = kknn_clr,
                           rf_clr_and_maturityclass = rf_mc))
 
 #summary(results) with dotplot()
-options(repr.plot.width = 5, repr.plot.height = 4)
 dotplot(results)
 ```
 
@@ -193,65 +201,60 @@ predicted_rf_mc <- predict(rf_mc, test_mc)
 predicted_rf_grp <- predict(rf_grp, test_grp)
 
 #The best model
-
 tests_acc <- data.frame(Model = summary(results)$models,
                         Accuracy_on_test = c(
-                                    confusionMatrix(test_clr$yieldClass, predicted_kknn_clr)$overall[1],
-                                    confusionMatrix(test_grp$yieldClass, predicted_kknn_grp)$overall[1],
-                                    confusionMatrix(test_mc$yieldClass, predicted_kknn_mc)$overall[1],
+                          confusionMatrix(test_clr$yieldClass, predicted_kknn_clr)$overall[1],
+                          confusionMatrix(test_grp$yieldClass, predicted_kknn_grp)$overall[1],
+                          confusionMatrix(test_mc$yieldClass, predicted_kknn_mc)$overall[1],
                         
-                                    confusionMatrix(test_clr$yieldClass, predicted_svm_clr)$overall[1],
-                                    confusionMatrix(test_grp$yieldClass, predicted_svm_grp)$overall[1],
-                                    confusionMatrix(test_mc$yieldClass, predicted_svm_mc)$overall[1],
+                          confusionMatrix(test_clr$yieldClass, predicted_svm_clr)$overall[1],
+                          confusionMatrix(test_grp$yieldClass, predicted_svm_grp)$overall[1],
+                          confusionMatrix(test_mc$yieldClass, predicted_svm_mc)$overall[1],
                                 
-                                    confusionMatrix(test_clr$yieldClass, predicted_rf_clr)$overall[1],
-                                    confusionMatrix(test_grp$yieldClass, predicted_rf_grp)$overall[1],
-                                    confusionMatrix(test_mc$yieldClass, predicted_rf_mc)$overall[1]))
+                          confusionMatrix(test_clr$yieldClass, predicted_rf_clr)$overall[1],
+                          confusionMatrix(test_grp$yieldClass, predicted_rf_grp)$overall[1],
+                          confusionMatrix(test_mc$yieldClass, predicted_rf_mc)$overall[1]))
 tests_acc[order(tests_acc[,"Accuracy_on_test"], decreasing = TRUE), ]
 ```
 
-The k-nearest neighbours, the random forest and the support vector machine models returned similar predictive accuracies although slightly higher for the random forest (73%) and the k-nearest neighbours (71%) algorithms. Using maturity classes or ionomics groups also returned similar predictive accuracies for all the models on test set. 
+The k-nearest neighbours, the random forest and the support vector machine models returned similar predictive accuracies although slightly higher for the random forest (72%) and the k-nearest neighbours (70%) algorithms. Using maturity classes or ionomics groups, the predictive accuracies for all the models on test set are also similar. 
 
-## Yield Class Prediction with rf algorithm on test set
+## Yield class prediction with rf algorithm
 
 I sort the predictive quality metrics by cultivar with `random forest` algorithm combining clr coordinates and new clusters variable: model `rf_clr_and_ionomicgroup`.
 
 ```{r}
-test$ypred = predicted_rf_grp # adds predictions to test set
+test_df$ypred = predicted_rf_grp # adds predictions to test set
 
-cultivar_acc <- test %>%
+cultivar_acc <- test_df %>%
     group_by(Cultivar) %>%
     do(Accuracy = as.numeric(confusionMatrix(.$yieldClass, .$ypred)$overall[1]),
        numb_samples = as.numeric(nrow(.)))
 
-cultivar_acc$Accuracy <- unlist(cultivar_acc$Accuracy)
+cultivar_acc$Accuracy <- round(unlist(cultivar_acc$Accuracy), 2)
 cultivar_acc$numb_samples <- unlist(cultivar_acc$numb_samples)
 
 data = data.frame(subset(cultivar_acc, Accuracy>0))
 data[order(data[,"Accuracy"], decreasing=T), ]
 ```
 
-The predictive accuracy is very high for some cultivars, but this result must be taken with care due to small size of samples often available. 
+The predictive accuracy is very high for some cultivars, but this result must be taken with care due to small size of samples often available. The next chunk plots accuracies for cultivars using ggplot2 functions.
 
-The next chunk plots accuracies for cultivars using ggplot2 functions and categorising low, high and very high predictive accuracies.
-
-```{r accuracy_cultivar, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Predictive accuracy for cultivars."}
-options(repr.plot.width = 8, repr.plot.height = 4)
-ggplot(data, aes(reorder(Cultivar, Accuracy), Accuracy)) +
-    geom_point(aes(color=cut(Accuracy, breaks = c(0, 0.70, 0.90, 1)))) +
-    geom_segment(aes(x=Cultivar, xend=Cultivar, y=0, yend=Accuracy, 
-                     color=cut(Accuracy, breaks = c(0, 0.70, 0.90, 1))), size=1) +
-    xlab("Cultivar") +
-    theme_bw() + 
-    theme(legend.title=element_blank(),
-          axis.text.x=element_text(angle=90, hjust=1))+
-    theme(text=element_text(family="Arial", face="bold", size=12))
-#ggsave("images/cultivAcc.tiff", width=8, height=3)
+```{r accuracy_cultivar, fig.height = 8, fig.width = 5, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Predictive accuracy for cultivars."}
+ggplot(data, aes(x = reorder(Cultivar, Accuracy), y = Accuracy, fill = Accuracy)) +
+  geom_col() +
+  scale_fill_gradient(low = "lightgrey", high = "black") + 
+  geom_text(aes(label = Accuracy), hjust = -0.1) +
+  ylim(c(0, 1.1)) +
+  labs(x = 'Cultivar', y = 'Accuracy') +
+  coord_flip() +
+  theme(text=element_text(family = "Arial", face = "bold", size = 12))
+#ggsave("images/cultivarAcc.tiff", width=5, height=8)
 ```
 
 ## Comparison with non-informative classification
 
-The non-informative classification consists of an equal distribution of 50% successful and 50% unsuccessful classification cases [(Swets J. A., 1988)](https://science.sciencemag.org/content/240/4857/1285). I run the Chi-square homogenity test to compare predictive accuracy of the random frest model with this non-informative classification model. 
+The non-informative classification consists of an equal distribution of 50% successful and 50% unsuccessful classification cases [(Swets J. A., 1988)](https://science.sciencemag.org/content/240/4857/1285). I run the Chi-square homogenity test to compare predictive accuracy of the random forest model with this non-informative classification model. 
 
 ```{r}
 cm <- confusionMatrix(predicted_rf_grp, test_grp$yieldClass) 
@@ -282,9 +285,9 @@ khi2_test
 
 The null hypothesis for a non-informative classification is rejected after the chi-square homogeneity test, the p-value is too low (<< 0.05).
 
-## Train data set backup for TN specimens extraction
+## Train data set backup for TN specimens selection
 
-The train data set with predicted yield classes `train_df` backup will be used to test perturbation vector theory in the next file. I use the `rf` model. 
+The train data set with predicted yield classes `train_df` backup will be used to test perturbation vector theory in the next chapter.
 
 ```{r}
 pred_yield <- predict(rf_grp, train_grp)
@@ -293,7 +296,7 @@ write_csv(train_df, "output/train_df.csv")
 nrow(train_df)
 ```
 
-I consider as True Negatives (TN) specimens for this study, observations of the training data set having a high yield (HY) and correctly predicted with the `rf` model. Then, I compute clr centroids for cultivars using True Negatives original (not scaled) clr values. Thes centroids could be used as `clr norms` for ionomics groups.
+I consider as True Negatives (TN) specimens for this study, observations of the training data set having a high yield (HY) and correctly predicted with the `random forest` model. Then, I compute clr centroids for cultivars using True Negatives original (not scaled) clr values. These centroids could be used as `clr norms` for ionomics groups.
 
 ```{r}
 TNs = train_df[train_df$yieldClass == 'HY' & pred_yield == 'HY', ]

@@ -24,7 +24,7 @@
 <meta name="author" content="zcoulibali" />
 
 
-<meta name="date" content="2019-06-18" />
+<meta name="date" content="2019-06-20" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -109,7 +109,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="1.3" data-path="index.html"><a href="index.html#quebec-potato-data-set"><i class="fa fa-check"></i><b>1.3</b> Québec potato data set</a></li>
 <li class="chapter" data-level="1.4" data-path="index.html"><a href="index.html#selection-of-useful-variables"><i class="fa fa-check"></i><b>1.4</b> Selection of useful variables</a></li>
 <li class="chapter" data-level="1.5" data-path="index.html"><a href="index.html#arranging-the-data-frame"><i class="fa fa-check"></i><b>1.5</b> Arranging the data frame</a></li>
-<li class="chapter" data-level="1.6" data-path="index.html"><a href="index.html#cultivars-classes-correction"><i class="fa fa-check"></i><b>1.6</b> Cultivars classes correction</a></li>
+<li class="chapter" data-level="1.6" data-path="index.html"><a href="index.html#cultivar-classes-correction"><i class="fa fa-check"></i><b>1.6</b> Cultivar classes correction</a></li>
 <li class="chapter" data-level="1.7" data-path="index.html"><a href="index.html#summarise-and-backup"><i class="fa fa-check"></i><b>1.7</b> Summarise and backup</a></li>
 </ul></li>
 <li class="chapter" data-level="2" data-path="Chapter-Clustering.html"><a href="Chapter-Clustering.html"><i class="fa fa-check"></i><b>2</b> Cluster analysis of potato cultivars</a><ul>
@@ -117,7 +117,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="2.2" data-path="Chapter-Clustering.html"><a href="Chapter-Clustering.html#useful-libraries-and-custom-functions"><i class="fa fa-check"></i><b>2.2</b> Useful libraries and custom functions</a></li>
 <li class="chapter" data-level="2.3" data-path="Chapter-Clustering.html"><a href="Chapter-Clustering.html#leaves-processed-compositions-data-set"><i class="fa fa-check"></i><b>2.3</b> Leaves processed compositions data set</a></li>
 <li class="chapter" data-level="2.4" data-path="Chapter-Clustering.html"><a href="Chapter-Clustering.html#high-yielders-delimiter"><i class="fa fa-check"></i><b>2.4</b> High yielders delimiter</a></li>
-<li class="chapter" data-level="2.5" data-path="Chapter-Clustering.html"><a href="Chapter-Clustering.html#clr-centroids-computation"><i class="fa fa-check"></i><b>2.5</b> <code>clr</code> centroids computation</a></li>
+<li class="chapter" data-level="2.5" data-path="Chapter-Clustering.html"><a href="Chapter-Clustering.html#centered-log-ratio-clr-centroids-computation"><i class="fa fa-check"></i><b>2.5</b> Centered log-ratio (clr) centroids computation</a></li>
 <li class="chapter" data-level="2.6" data-path="Chapter-Clustering.html"><a href="Chapter-Clustering.html#axis-reduction"><i class="fa fa-check"></i><b>2.6</b> Axis reduction</a></li>
 <li class="chapter" data-level="2.7" data-path="Chapter-Clustering.html"><a href="Chapter-Clustering.html#cascade-k-means-clustering"><i class="fa fa-check"></i><b>2.7</b> Cascade K Means clustering</a></li>
 <li class="chapter" data-level="2.8" data-path="Chapter-Clustering.html"><a href="Chapter-Clustering.html#arranging-data-for-machine-learning"><i class="fa fa-check"></i><b>2.8</b> Arranging data for Machine Learning</a></li>
@@ -169,7 +169,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="objective" class="section level2">
 <h2><span class="header-section-number">2.1</span> Objective</h2>
 <hr />
-<p>The objective of this chapter is to assign cultivars to groups based on their leaf ionome. Although plant health is a continuous domain rather than a categorical status, yield thresholds are useful for decision-making. Because yield potential varies widely among cultivars, I split experimental data into low- and high-productivity categories using a marketable yield delimiter at the 65^th percentile for each cultivar. Hence, I use high yielders subpopulation (samples which marketable yield is larger than the yield cut-off) to perform a cascade k-means clustering aiming to discriminate Groups of similar multivariate compositions (<code>ionomics groups</code>). I combine a discriminant analysis to check the macroelements that best discriminate cultivars. I also check the performence of Groups discrimination by computing the <code>Groups x clr-coordinates</code> interaction effect coefficients in a linear mixed effect model. I finally append the new variable <code>ionomicGroup</code>to the leaves clr data frame and discard all the rows with any missing data. I map the experimental sites locations in the third sudsection of this chapter. The output data file is called <code>leaf_ml_df.csv</code> i.e., the data frame for machine learning chapter (Chapter <a href="Chapter-Modeling.html#Chapter-Modeling">3</a>).</p>
+<p>The objective of this chapter is to assign cultivars to groups based on their leaf ionome. Although plant health is a continuous domain rather than a categorical status, yield thresholds are useful for decision-making. Because yield potential varies widely among cultivars, I split experimental data into low- and high-productivity categories using a marketable yield delimiter at the <span class="math inline">\(65^th\)</span> percentile for each cultivar. Hence, I use high yielders subpopulation (samples which marketable yield is larger than the yield cut-off) to perform a cascade k-means clustering aiming to discriminate Groups of similar multivariate compositions (<code>ionomics groups</code>). I combine a discriminant analysis to check the macroelements that best discriminate cultivars. I also check the performence of Groups discrimination by computing the <code>Groups x clr-coordinates</code> interaction effect coefficients in a linear mixed effect model. I finally append the new variable <code>ionomicGroup</code>to the leaves clr data frame and discard all the rows with any missing data. I map the experimental sites locations in the third sudsection of this chapter. The output data file is called <code>leaf_ml_df.csv</code> i.e., the data frame for machine learning chapter (Chapter <a href="Chapter-Modeling.html#Chapter-Modeling">3</a>).</p>
 <hr />
 </div>
 <div id="useful-libraries-and-custom-functions" class="section level2">
@@ -189,7 +189,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </div>
 <div id="leaves-processed-compositions-data-set" class="section level2">
 <h2><span class="header-section-number">2.3</span> Leaves processed compositions data set</h2>
-<p>For this chapter, the initial data set is the outcome of the prvious chapter (<a href="index.html#Chapter-Data-Processing">1</a>) <code>leaf_clust_df</code>. I load the data frame and create vectors of columns I will use in this chapter.</p>
+<p>For this chapter, the initial data set is the outcome of the previous chapter (Chapter <a href="index.html#Chapter-Data-Processing">1</a>) <code>leaf_clust_df.csv</code>. I load the data frame and create vectors for useful columns selection.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">leaf_clust_df &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;output/leaf_clust_df.csv&quot;</span>)</code></pre></div>
 <pre><code>## Parsed with column specification:
 ## cols(
@@ -216,8 +216,7 @@ clr_no &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">
 cultivarAndyield &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;Cultivar&#39;</span>, <span class="st">&#39;Maturity5&#39;</span>, <span class="st">&#39;RendVendable&#39;</span>)
 extra_col &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;LatDD&#39;</span>, <span class="st">&#39;LonDD&#39;</span>, <span class="st">&#39;AnalyseFoliaireStade&#39;</span>)</code></pre></div>
 <p>The next cell maps experimental sites locations.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#library(&quot;ggmap&quot;)</span>
-qc_leaf &lt;-<span class="st"> </span><span class="kw">get_stamenmap</span>(<span class="dt">bbox =</span> <span class="kw">c</span>(<span class="dt">left =</span> <span class="op">-</span><span class="dv">76</span>, <span class="dt">right =</span> <span class="op">-</span><span class="dv">68</span>, <span class="dt">bottom =</span> <span class="dv">45</span>, <span class="dt">top =</span> <span class="dv">50</span>), 
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">qc_leaf &lt;-<span class="st"> </span><span class="kw">get_stamenmap</span>(<span class="dt">bbox =</span> <span class="kw">c</span>(<span class="dt">left =</span> <span class="op">-</span><span class="dv">76</span>, <span class="dt">right =</span> <span class="op">-</span><span class="dv">68</span>, <span class="dt">bottom =</span> <span class="dv">45</span>, <span class="dt">top =</span> <span class="dv">50</span>), 
                         <span class="dt">zoom =</span> <span class="dv">7</span>, <span class="dt">maptype =</span> <span class="st">&#39;toner-lite&#39;</span>)
 <span class="kw">ggmap</span>(qc_leaf) <span class="op">+</span>
 <span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">data =</span> leaf_clust_df <span class="op">%&gt;%</span>
@@ -260,10 +259,10 @@ qc_leaf &lt;-<span class="st"> </span><span class="kw">get_stamenmap</span>(<spa
 ## 1 LY                 25.8
 ## 2 HY                 40.5
 ## 3 &lt;NA&gt;              NaN</code></pre>
-<p>Average marketable yield is 40.48 Mg ha-1 for high yielders and 24.78 Mg ha^-1 for low yielders. In comparison, average potato tuber yields in 2017 in Canada and in Québec were respectively 40 Mg ha^-1 and 38.4 Mg ha^-1.</p>
+<p>So, the average marketable yield is 40.48 Mg <span class="math inline">\(ha^-1\)</span> for high yielders and 24.78 Mg <span class="math inline">\(ha^-1\)</span> for low yielders. In comparison, average potato tuber yields in 2017 in Canada and in Québec were respectively 40 Mg <span class="math inline">\(ha^-1\)</span> and 38.4 Mg <span class="math inline">\(ha^-1\)</span>.</p>
 </div>
-<div id="clr-centroids-computation" class="section level2">
-<h2><span class="header-section-number">2.5</span> <code>clr</code> centroids computation</h2>
+<div id="centered-log-ratio-clr-centroids-computation" class="section level2">
+<h2><span class="header-section-number">2.5</span> Centered log-ratio (clr) centroids computation</h2>
 <p>Compositional data transformation is done in the loaded file. I keep only clr-transformed coordinates for high yielders, at 10 % blossom (AnalyseFoliaireStade = 10% fleur) in the next chunk.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">highYielders_df &lt;-<span class="st"> </span>leaf_clust_df <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">mutate</span>(<span class="dt">isNA =</span> <span class="kw">apply</span>(.[<span class="kw">c</span>(clr_no, cultivarAndyield)], <span class="dv">1</span>, anyNA)) <span class="op">%&gt;%</span>
@@ -273,7 +272,7 @@ qc_leaf &lt;-<span class="st"> </span><span class="kw">get_stamenmap</span>(<spa
 <span class="st">  </span><span class="kw">droplevels</span>()
 <span class="kw">nrow</span>(highYielders_df)</code></pre></div>
 <pre><code>## [1] 1334</code></pre>
-<p>So, 1334 lines of observations (samples) will be used for potato cultivars clustering. I Check how many rows of data are they for each cultivar.</p>
+<p>So, 1334 lines of observations (samples) will be used to cluster potato cultivars. I check the number of samples per cultivar in this high yielders data set.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">percentage &lt;-<span class="st"> </span><span class="kw">round</span>(<span class="kw">with</span>(highYielders_df, <span class="kw">prop.table</span>(<span class="kw">table</span>(Cultivar)) <span class="op">*</span><span class="st"> </span><span class="dv">100</span>), <span class="dv">2</span>)
 distribution &lt;-<span class="st"> </span><span class="kw">with</span>(highYielders_df, <span class="kw">cbind</span>(<span class="dt">numHY =</span> <span class="kw">table</span>(Cultivar), <span class="dt">percentage =</span> percentage))
 distribution &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">cbind</span>(distribution, <span class="kw">rownames</span>(distribution)))
@@ -287,12 +286,18 @@ distribution <span class="op">%&gt;%</span><span class="st"> </span><span class=
 ## 3   127       9.52   FL 1207
 ## 4   119       8.92 Chieftain
 ## 5    88       6.60  Atlantic</code></pre>
+<div class="figure" style="text-align: center"><span id="fig:HY-cultivar-abundance"></span>
+<img src="2019_Bookdown_files/figure-html/HY-cultivar-abundance-1.png" alt="High yielders cultivars abundance." width="100%" />
+<p class="caption">
+Figure 2.1: High yielders cultivars abundance.
+</p>
+</div>
 <p>Some cultivars are well represented, like Superior and Goldrush. Let’s compute number of cultivars and trials in the data frame.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data.frame</span>(<span class="dt">numb_cultivars =</span> <span class="kw">n_distinct</span>(highYielders_df<span class="op">$</span>Cultivar, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>),
            <span class="dt">numb_trials =</span> <span class="kw">n_distinct</span>(highYielders_df<span class="op">$</span>NoEssai, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>))</code></pre></div>
 <pre><code>##   numb_cultivars numb_trials
 ## 1             47         151</code></pre>
-<p>I create a table with cultivars, maturity classes and computed median clr values i.e., clr centroids.</p>
+<p>I create a table with cultivars, maturity classes and compute median clr values i.e., clr centroids.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">highYielders_clr &lt;-<span class="st"> </span>highYielders_df <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">group_by</span>(Cultivar, Maturity5) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">select</span>(Cultivar, Maturity5, <span class="kw">starts_with</span>(<span class="st">&quot;clr&quot;</span>)) <span class="op">%&gt;%</span>
@@ -330,12 +335,12 @@ lda_df &lt;-<span class="st"> </span>highYielders_df_IO <span class="op">%&gt;%<
 <span class="st">              </span><span class="kw">filter</span>(IO <span class="op">==</span><span class="st"> </span><span class="dv">1</span>) <span class="op">%&gt;%</span>
 <span class="st">              </span><span class="kw">droplevels</span>()
 <span class="kw">nrow</span>(lda_df)</code></pre></div>
-<pre><code>## [1] 1197</code></pre>
-<p>Hence, <code>\r nrow(highYielders_df)-nrow(lda_df)</code> outliers have been discarded from the analysis. The remaining data frame contains <code>\r n_distinct(lda_df$Cultivar, na.rm = TRUE)</code> cultivars from <code>\r n_distinct(lda_df$NoEssai, na.rm = TRUE)</code> trials.</p>
+<pre><code>## [1] 1190</code></pre>
+<p>So, 144 outliers have been discarded from the analysis.</p>
 </div>
 <div id="axis-reduction" class="section level2">
 <h2><span class="header-section-number">2.6</span> Axis reduction</h2>
-<p>Leaves composition data are compositionnal data (non-negative and summing to unity) so are multivariate. As argued by <a href="https://www.elsevier.com/books/numerical-ecology/legendre/978-0-444-53868-0">Legendre et Legendre, 2012</a> It is not possible to draw such a diagram on paper with more than two or eventually three dimensions, however, even though it is a perfectly valid mathematical construct. For the purpose of analysis, I will project the multidimensional scatter diagram onto bivariate graphs whose axes are known to be of particular interest. The axes of these graphs are chosen to represent a large fraction of the variability of the multidimensional <code>N-P-K-Mg-Ca-Fv</code> data matrix, in a space with reduced (i.e. lower) dimensionality relative to the original data set. With the next chunks, I perform a duality diagram (or <a href="http://pbil.univ-lyon1.fr/ade4/ade4-html/dudi.html">dudi</a>) PCA (priciple component analysis) and store scores and loadings. I also filter the data frame so that cultivars with less than 5 occurences will be masked on the resulting biplot.</p>
+<p>Leaves composition data are compositionnal data (non-negative and summing to unity) so are multivariate. As argued by <a href="https://www.elsevier.com/books/numerical-ecology/legendre/978-0-444-53868-0">Legendre et Legendre, 2012</a> it is not possible to draw such a diagram on paper with more than two or eventually three dimensions, however, even though it is a perfectly valid mathematical construct. For the purpose of analysis, I will project the multidimensional scatter diagram onto bivariate graph which axes are known to be of particular interest. The axes of this graph are chosen to represent a large fraction of the variability of the multidimensional <code>N-P-K-Mg-Ca-Fv</code> data matrix, in a space with reduced (i.e. lower) dimensionality relative to the original data set. With the next chunks, I perform a duality diagram (or <a href="http://pbil.univ-lyon1.fr/ade4/ade4-html/dudi.html">dudi</a>) PCA (priciple component analysis) and store scores and loadings. I also filter the data frame so that cultivars with less than 5 occurences will be masked on the resulting biplot.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pca_leaf &lt;-<span class="st"> </span><span class="kw">dudi.pca</span>(lda_df[clr_no], <span class="dt">scannf =</span> <span class="ot">FALSE</span>, <span class="dt">scale =</span> <span class="ot">FALSE</span>)
 lda_leaf &lt;-<span class="st"> </span><span class="kw">discrimin</span>(<span class="dt">dudi =</span> pca_leaf, <span class="dt">fac =</span> <span class="kw">factor</span>(lda_df<span class="op">$</span>Cultivar), <span class="dt">scannf =</span> <span class="ot">FALSE</span>)
 lda_leaf_score =<span class="st"> </span>lda_leaf<span class="op">$</span>li
@@ -347,9 +352,8 @@ n_cultivar &lt;-<span class="st"> </span><span class="kw">table</span>(lda_df<sp
 n_filter &lt;-<span class="st"> </span>lda_leaf_group <span class="op">%in%</span><span class="st"> </span><span class="kw">names</span>(n_cultivar[n_cultivar <span class="op">&gt;=</span><span class="st"> </span><span class="dv">5</span>])
 filter_cultivars &lt;-<span class="st"> </span><span class="kw">names</span>(n_cultivar[n_cultivar <span class="op">&gt;=</span><span class="st"> </span><span class="dv">5</span>])
 lda_df_filter &lt;-<span class="st"> </span>lda_df[n_filter, ]</code></pre></div>
-<p>I can plot the tThe distance biplot as result of discriminant analysis. I use a custom function.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">options</span>(<span class="dt">repr.plot.width =</span> <span class="dv">6</span>, <span class="dt">repr.plot.height =</span> <span class="dv">6</span>)
-<span class="kw">plot_lda</span>(<span class="dt">score =</span> lda_leaf_score[n_filter, ],
+<p>I plot the the distance biplot as result of discriminant analysis. I use a custom function.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot_lda</span>(<span class="dt">score =</span> lda_leaf_score[n_filter, ],
          <span class="dt">loading =</span> lda_leaf_loading[n_filter, ],
          <span class="dt">group =</span> lda_leaf_group[n_filter],
          <span class="dt">ell_dev =</span> <span class="ot">FALSE</span>, 
@@ -363,54 +367,59 @@ lda_df_filter &lt;-<span class="st"> </span>lda_df[n_filter, ]</code></pre></div
 <div class="figure" style="text-align: center"><span id="fig:distance-biplot"></span>
 <img src="2019_Bookdown_files/figure-html/distance-biplot-1.png" alt="Discriminant distance biplot of potato cultivars." width="100%" />
 <p class="caption">
-Figure 2.1: Discriminant distance biplot of potato cultivars.
+Figure 2.2: Discriminant distance biplot of potato cultivars.
 </p>
 </div>
-<p>The first discriminant axis (<code>DS1</code>) is formed mainly by Mg, K and N. The second discriminant axis (<code>DS2</code>) is driven mainly by the Fv, K and weakely by Ca. I perform cluster analysis in next subsection.</p>
+<p>The first discriminant axis (<code>DS1</code>) is formed mainly by <code>Mg</code>, <code>K</code> and <code>N</code>. The second discriminant axis (<code>DS2</code>) is driven mainly by <code>Fv</code>, <code>K</code> and weakely <code>Ca</code>. The next subsection performs cluster analysis.</p>
 </div>
 <div id="cascade-k-means-clustering" class="section level2">
 <h2><span class="header-section-number">2.7</span> Cascade K Means clustering</h2>
-<p>What is cascade K Means Clustering? It is an an unsupervised learning algorithm inspired by its similar <a href="https://www.r-bloggers.com/k-means-clustering-in-r/">K Means clustering</a> both trying to cluster data based on their similarity. There is no outcome to be predicted. The algorithm just tries to find patterns in the data. In k means clustering, we have to specify the number of clusters we want the data to be grouped into. In cascade K means method, we give a minimum and a maximum number of cluster wanted. The algorithm randomly assigns each observation to a cluster, and finds the centroid of each cluster. Then, the algorithm iterates through two steps:</p>
+<p>What is cascade K Means Clustering? It is an <em>unsupervised learning algorithm</em> inspired by its similar <a href="https://www.r-bloggers.com/k-means-clustering-in-r/">K Means clustering</a>, both trying to cluster data based on their similarity. There is no outcome to be predicted. The algorithm just tries to find patterns in the data. In k means clustering, we have to specify the number of clusters we want the data to be grouped into. In cascade K means method, we give a minimum and a maximum number of cluster wanted. The algorithm randomly assigns each observation to a cluster, and finds the centroid of each cluster. Then, the algorithm iterates through two steps:</p>
 <ol style="list-style-type: decimal">
 <li>reassign data points to the cluster whose centroid is closest,</li>
 <li>Calculate new centroid of each cluster.</li>
 </ol>
 <p>These two steps are repeated till the within cluster variation cannot be reduced any further. The within cluster variation is calculated as the sum of the euclidean distance between the data points and their respective cluster centroids.</p>
-<p>I use the high yielders clr centroids (medians) for cultivars in a next data frame which is the same as <code>highYielders_clr</code> without maturity classes, and <code>Calinski-Harabasz (1974) criterion (package vegan)</code> for clustering.The chunk also plots the process results.</p>
+<p>I use the high yielders clr centroids of cultivars in a new data frame which is the same as <code>highYielders_clr</code> without maturity classes.The chunk also plots the process results.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">highYieldersCentroids &lt;-<span class="st"> </span>highYielders_df <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">group_by</span>(Cultivar) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">select</span>(<span class="kw">starts_with</span>(<span class="st">&quot;clr&quot;</span>)) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">summarise_all</span>(<span class="kw">list</span>(median))
 <span class="kw">set.seed</span>(<span class="dv">5773</span>)
 highYieldersKmeans &lt;-<span class="st"> </span><span class="kw">cascadeKM</span>(highYieldersCentroids[, <span class="op">-</span><span class="dv">1</span>], 
-                                <span class="dt">inf.gr =</span> <span class="dv">3</span>, <span class="dt">sup.gr =</span> <span class="dv">8</span>, <span class="dt">criterion =</span> <span class="st">&quot;ssi&quot;</span>)
-<span class="kw">options</span>(<span class="dt">repr.plot.width =</span> <span class="dv">6</span>, <span class="dt">repr.plot.height =</span> <span class="dv">4</span>)
+                                <span class="dt">inf.gr =</span> <span class="dv">3</span>, <span class="dt">sup.gr =</span> <span class="dv">12</span>, <span class="dt">criterion =</span> <span class="st">&quot;ssi&quot;</span>)
 <span class="kw">plot</span>(highYieldersKmeans) </code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:clustering"></span>
 <img src="2019_Bookdown_files/figure-html/clustering-1.png" alt="K-means partitions comparison (calinski criterion)." width="100%" />
 <p class="caption">
-Figure 2.2: K-means partitions comparison (calinski criterion).
+Figure 2.3: K-means partitions comparison (calinski criterion).
 </p>
 </div>
-<p>The red dot of the right hand side graph shows 3 optimal clustering partitions which is the inferior limit I gave to the process. I check the partitions data frame.</p>
+<p>The red dot of the right hand side graph shows that 10 groups is the optimal clustering partition number. However, their is another optimum at <code>6 groups</code>, which is a more manageable number of clusters. The next chunk checks the partitions data frame.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">highYieldersKmeans<span class="op">$</span>partition <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>()</code></pre></div>
-<pre><code>##   3 groups 4 groups 5 groups 6 groups 7 groups 8 groups
-## 1        2        4        1        1        4        4
-## 2        1        1        3        4        6        3
-## 3        3        3        5        5        7        5
-## 4        1        1        3        4        6        8
-## 5        2        2        4        6        5        6
-## 6        2        2        1        1        4        4</code></pre>
-<p>I consider <code>6 groups</code> established from clustering (<code>...</code>) corresponding to the second column. I can use the reference of the column or its name <code>6 groups</code> directly. I add it up to the centroids data frame.</p>
+<pre><code>##   3 groups 4 groups 5 groups 6 groups 7 groups 8 groups 9 groups 10 groups
+## 1        2        4        1        1        6        6        8         8
+## 2        1        2        3        4        3        3        4         4
+## 3        3        1        5        5        4        6        3         5
+## 4        1        2        3        4        3        3        9         6
+## 5        2        4        4        6        7        1        1        10
+## 6        2        4        1        1        6        8        8         8
+##   11 groups 12 groups
+## 1         9        10
+## 2        10        11
+## 3         9        12
+## 4        10        11
+## 5         6         1
+## 6         7        10</code></pre>
+<p>I consider <code>6 groups</code> established from clustering corresponding to the fourth column. I can use the reference of the column or its name <code>6 groups</code> directly. I add it up to the centroids data frame.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">highYieldersCentroids<span class="op">$</span>kgroup &lt;-<span class="st"> </span>highYieldersKmeans<span class="op">$</span>partition[, <span class="st">&quot;6 groups&quot;</span>]</code></pre></div>
-<p>I compute discriminant scores centroïdes for cultivars.</p>
+<p>Then, I compute discriminant scores centroïdes for cultivar and plot cultivar groups in LDA space with a custom function.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lda_centroids &lt;-<span class="st"> </span>lda_leaf_score <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">mutate</span>(<span class="dt">group =</span> lda_leaf_group) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">group_by</span>(group) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">summarise_all</span>(<span class="kw">list</span>(mean))</code></pre></div>
-<p>Plot Cultivar groups in LDA with a custom function.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">options</span>(<span class="dt">repr.plot.width =</span> <span class="dv">6</span>, <span class="dt">repr.plot.height =</span> <span class="dv">6</span>)
-<span class="kw">plot_lda</span>(<span class="dt">score=</span>lda_leaf_score[n_filter, ],
+<p>The plot:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot_lda</span>(<span class="dt">score=</span>lda_leaf_score[n_filter, ],
          <span class="dt">loading=</span>lda_leaf_loading[n_filter, ],
          <span class="dt">group =</span> lda_leaf_group[n_filter],
          <span class="dt">ell_dev=</span><span class="ot">FALSE</span>, 
@@ -428,16 +437,16 @@ col =<span class="st"> </span><span class="kw">factor</span>(highYieldersCentroi
 <span class="kw">points</span>(lda_centroids[lda_centroids<span class="op">$</span>group <span class="op">%in%</span><span class="st"> </span>filter_cultivars, <span class="kw">c</span>(<span class="st">&#39;DS1&#39;</span>, <span class="st">&#39;DS2&#39;</span>)], 
        <span class="dt">pch =</span> <span class="dv">19</span>, <span class="dt">col =</span> col, <span class="dt">cex =</span> <span class="fl">0.9</span>)
 
-<span class="kw">legend</span>(<span class="fl">1.3</span>, <span class="dv">4</span>, 
+<span class="kw">legend</span>(<span class="fl">1.2</span>, <span class="dv">4</span>, 
        <span class="dt">legend =</span> <span class="kw">paste</span>(<span class="kw">rep</span>(<span class="st">&#39;cluster&#39;</span>, <span class="kw">nlevels</span>(col)), <span class="kw">as.numeric</span>(<span class="kw">levels</span>(col))), 
        <span class="dt">pch =</span> <span class="dv">19</span>, <span class="dt">col =</span> <span class="kw">unique</span>(col), <span class="dt">cex =</span> <span class="fl">0.9</span>)</code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:d-biplot-2"></span>
 <img src="2019_Bookdown_files/figure-html/d-biplot-2-1.png" alt="Discriminant distance biplot of potato cultivars showing ionomics groups." width="100%" />
 <p class="caption">
-Figure 2.3: Discriminant distance biplot of potato cultivars showing ionomics groups.
+Figure 2.4: Discriminant distance biplot of potato cultivars showing ionomics groups.
 </p>
 </div>
-<p>It’s a bit difficult to colour cultivar name in the plot with the custom function. I use functions from packages <code>ggplot2</code>, <code>ggrepel</code> and <code>plotly</code> instead. New intermediate data frames are created for this purpose.</p>
+<p>Only 5 clusters are ploted, the third one may be masked because its cultivars has been filtered out. It’s a bit difficult to colour cultivar name in the plot with the custom function. I use functions from package <code>ggrepel</code> instead. New intermediate data frames are created for this purpose.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cultivars_filtre &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">Cultivar =</span> filter_cultivars, <span class="dt">i_group=</span>col)
 
 df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(
@@ -449,13 +458,13 @@ df &lt;-<span class="st"> </span>df <span class="op">%&gt;%</span><span class="s
 <pre><code>## Warning: Column `Cultivar` joining factors with different levels, coercing
 ## to character vector</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>()</code></pre></div>
-<pre><code>##   score.DS1 score.DS2 loadings.DS1 loadings.DS2   Cultivar i_group
-## 1 1.0272596 1.0088709    2.0268407   -0.0116309 AC Belmont       1
-## 2 0.5902037 1.5179652   -0.1773448    0.6867559 AC Belmont       1
-## 3 0.7136828 1.3454008    2.0060695    2.4239378 AC Belmont       1
-## 4 0.5227759 0.7342256   -2.3145391    1.3942420 AC Belmont       1
-## 5 0.4205684 1.1698066    0.2550433    1.2728487 AC Belmont       1
-## 6 0.3447918 1.2100105   -1.7960695   -5.7661535 AC Belmont       1</code></pre>
+<pre><code>##   score.DS1  score.DS2 loadings.DS1 loadings.DS2   Cultivar i_group
+## 1 1.0195082 -1.0396310    1.8869686   -0.2708043 AC Belmont       1
+## 2 0.5628494 -1.5511832   -0.1703613   -0.6042699 AC Belmont       1
+## 3 0.6855382 -1.3872559    1.9812115   -2.4466775 AC Belmont       1
+## 4 0.5320794 -0.7359631   -2.3505801   -1.3418007 AC Belmont       1
+## 5 0.4012165 -1.1776198    0.2286922   -1.2752145 AC Belmont       1
+## 6 0.3170583 -1.2271324   -1.5759308    5.9387669 AC Belmont       1</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">centroids =<span class="st"> </span>lda_centroids[lda_centroids<span class="op">$</span>group <span class="op">%in%</span><span class="st"> </span>filter_cultivars, ]
 <span class="kw">names</span>(centroids)[<span class="kw">match</span>(<span class="st">&quot;group&quot;</span>, <span class="kw">names</span>(centroids))] &lt;-<span class="st"> &quot;Cultivar&quot;</span>
 centroids &lt;-<span class="st"> </span>centroids <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">left_join</span>(cultivars_filtre, <span class="dt">by=</span><span class="st">&quot;Cultivar&quot;</span>)
@@ -463,39 +472,70 @@ centroids <span class="op">%&gt;%</span><span class="st"> </span><span class="kw
 <pre><code>## # A tibble: 6 x 4
 ##   Cultivar      DS1     DS2 i_group
 ##   &lt;chr&gt;       &lt;dbl&gt;   &lt;dbl&gt; &lt;fct&gt;  
-## 1 AC Belmont  0.122  1.03   1      
-## 2 AC Chaleur -0.539  0.127  4      
-## 3 Andover     1.92  -0.0429 6      
-## 4 Aquilon     0.240  0.242  1      
-## 5 Argos       0.164  0.872  2      
-## 6 Atlantic   -1.22  -0.406  4</code></pre>
+## 1 AC Belmont  0.107 -1.04   1      
+## 2 AC Chaleur -0.538 -0.109  4      
+## 3 Andover     1.92  -0.0363 6      
+## 4 Aquilon     0.218 -0.275  1      
+## 5 Argos       0.145 -0.878  2      
+## 6 Atlantic   -1.21   0.427  4</code></pre>
 <p>The chunk below plots discriminant biplot with colours corresponding to ionomics groups.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">options</span>(<span class="dt">repr.plot.width =</span> <span class="dv">9</span>, <span class="dt">repr.plot.height =</span> <span class="dv">9</span>)
-g &lt;-<span class="st"> </span><span class="kw">ggplot</span>(centroids, <span class="kw">aes</span>(DS1, DS2, <span class="dt">label =</span> Cultivar, <span class="dt">col=</span>i_group)) <span class="op">+</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">g &lt;-<span class="st"> </span><span class="kw">ggplot</span>(centroids, <span class="kw">aes</span>(DS1, DS2, <span class="dt">label =</span> Cultivar, <span class="dt">col=</span>i_group)) <span class="op">+</span>
 <span class="st">  </span><span class="kw">geom_text_repel</span>() <span class="op">+</span>
 <span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">alpha =</span> <span class="fl">0.5</span>) <span class="op">+</span>
 <span class="st">  </span><span class="kw">theme_classic</span>(<span class="dt">base_size =</span> <span class="dv">12</span>) <span class="op">+</span>
-<span class="st">  </span><span class="co">#scale_color_manual(values=c(&quot;red&quot;, &quot;magenta&quot;, &quot;blue&quot;, &quot;black&quot;)) + </span>
-<span class="st">  </span><span class="kw">theme</span>(<span class="dt">axis.text=</span><span class="kw">element_text</span>(<span class="dt">size=</span><span class="dv">12</span>)) <span class="op">+</span>
-<span class="st">  </span><span class="kw">theme</span>(<span class="dt">text=</span><span class="kw">element_text</span>(<span class="dt">family=</span><span class="st">&quot;Arial&quot;</span>, <span class="dt">face=</span><span class="st">&quot;bold&quot;</span>, <span class="dt">size=</span><span class="dv">12</span>))
+<span class="st">  </span><span class="kw">theme</span>(<span class="dt">axis.text=</span><span class="kw">element_text</span>(<span class="dt">size =</span> <span class="dv">12</span>)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">theme</span>(<span class="dt">text=</span><span class="kw">element_text</span>(<span class="dt">family=</span><span class="st">&quot;Arial&quot;</span>, <span class="dt">face=</span><span class="st">&quot;bold&quot;</span>, <span class="dt">size =</span> <span class="dv">12</span>))
 
 <span class="co"># Add discriminant loadings using geom_segment() and arrow()</span>
 x=<span class="dv">0</span>; y=<span class="dv">0</span>; labels =<span class="st"> </span><span class="kw">c</span>(clr_no, <span class="kw">rep</span>(<span class="ot">NA</span>, <span class="kw">nrow</span>(df)<span class="op">-</span><span class="kw">length</span>(clr_no)))
-g <span class="op">+</span><span class="st"> </span><span class="kw">geom_segment</span>(<span class="dt">data=</span>df, <span class="dt">mapping=</span><span class="kw">aes</span>(<span class="dt">x=</span>x, <span class="dt">y=</span>y, <span class="dt">xend=</span>x<span class="op">+</span>loadings.DS1, <span class="dt">yend=</span>y<span class="op">+</span>loadings.DS2), 
-                 <span class="dt">arrow=</span><span class="kw">arrow</span>(), <span class="dt">size =</span> <span class="dv">1</span>, <span class="dt">color=</span><span class="st">&quot;grey80&quot;</span>) <span class="op">+</span><span class="st"> </span>
-<span class="st">    </span><span class="kw">geom_text</span>(<span class="dt">data=</span>df, <span class="dt">mapping=</span><span class="kw">aes</span>(<span class="dt">x=</span>loadings.DS1, <span class="dt">y=</span>loadings.DS2, <span class="dt">label=</span>labels), 
-              <span class="dt">size=</span><span class="dv">5</span>, <span class="dt">color=</span><span class="st">&quot;black&quot;</span>) <span class="op">+</span>
-<span class="st">    </span><span class="kw">geom_hline</span>(<span class="dt">yintercept=</span><span class="dv">0</span>, <span class="dt">color=</span><span class="st">&quot;black&quot;</span>, <span class="dt">linetype=</span><span class="dv">2</span>) <span class="op">+</span>
-<span class="st">    </span><span class="kw">geom_vline</span>(<span class="dt">mapping=</span><span class="kw">aes</span>(<span class="dt">xintercept=</span><span class="dv">0</span>), <span class="dt">color=</span><span class="st">&quot;black&quot;</span>, <span class="dt">linetype=</span><span class="dv">2</span>) <span class="op">+</span><span class="st"> </span>
-<span class="st">    </span><span class="kw">theme</span>(<span class="dt">axis.line=</span><span class="kw">element_blank</span>())</code></pre></div>
+g <span class="op">+</span><span class="st"> </span><span class="kw">geom_segment</span>(<span class="dt">data=</span>df, <span class="dt">mapping=</span><span class="kw">aes</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y, <span class="dt">xend =</span> x<span class="op">+</span>loadings.DS1, <span class="dt">yend =</span> y<span class="op">+</span>loadings.DS2), 
+                 <span class="dt">arrow =</span> <span class="kw">arrow</span>(), <span class="dt">size =</span> <span class="dv">1</span>, <span class="dt">color =</span> <span class="st">&quot;grey80&quot;</span>) <span class="op">+</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">geom_text</span>(<span class="dt">data =</span> df, <span class="dt">mapping =</span> <span class="kw">aes</span>(<span class="dt">x =</span> loadings.DS1, <span class="dt">y =</span> loadings.DS2, <span class="dt">label =</span> labels), 
+              <span class="dt">size =</span> <span class="dv">5</span>, <span class="dt">color =</span> <span class="st">&quot;black&quot;</span>) <span class="op">+</span>
+<span class="st">    </span><span class="kw">geom_hline</span>(<span class="dt">yintercept =</span> <span class="dv">0</span>, <span class="dt">color =</span> <span class="st">&quot;black&quot;</span>, <span class="dt">linetype =</span> <span class="dv">2</span>) <span class="op">+</span>
+<span class="st">    </span><span class="kw">geom_vline</span>(<span class="dt">mapping =</span> <span class="kw">aes</span>(<span class="dt">xintercept =</span> <span class="dv">0</span>), <span class="dt">color =</span> <span class="st">&quot;black&quot;</span>, <span class="dt">linetype =</span> <span class="dv">2</span>) <span class="op">+</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">theme</span>(<span class="dt">axis.line =</span> <span class="kw">element_blank</span>())</code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:gg-biplot"></span>
-<img src="2019_Bookdown_files/figure-html/gg-biplot-1.png" alt="Discriminant biplot and cluster analysis result of potato cultivars." width="100%" />
+<img src="2019_Bookdown_files/figure-html/gg-biplot-1.png" alt="Discriminant biplot and cluster analysis of potato cultivars." width="100%" />
 <p class="caption">
-Figure 2.4: Discriminant biplot and cluster analysis result of potato cultivars.
+Figure 2.5: Discriminant biplot and cluster analysis of potato cultivars.
 </p>
 </div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#ggsave(&quot;images/cultivar_clust.png&quot;, width=10, height=8, dpi = 300)</span></code></pre></div>
-<p>I push cultivars yield cut-off and ionomics groups in the initial data frame.</p>
+<p>The next one separate the discriminant biplot in two stackable plots for easy reading.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">g1 &lt;-<span class="st"> </span><span class="kw">ggplot</span>(centroids, <span class="kw">aes</span>(DS1, DS2, <span class="dt">label =</span> Cultivar, <span class="dt">colour=</span>i_group)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_hline</span>(<span class="dt">yintercept=</span><span class="dv">0</span>, <span class="dt">color=</span><span class="st">&quot;black&quot;</span>, <span class="dt">linetype=</span><span class="dv">2</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_vline</span>(<span class="dt">xintercept=</span><span class="dv">0</span>, <span class="dt">color=</span><span class="st">&quot;black&quot;</span>, <span class="dt">linetype=</span><span class="dv">2</span>) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_label_repel</span>() <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">alpha =</span> <span class="fl">0.5</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">xlim</span>(<span class="kw">c</span>(<span class="op">-</span><span class="dv">3</span>, <span class="dv">3</span>)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">ylim</span>(<span class="kw">c</span>(<span class="op">-</span><span class="fl">3.5</span>, <span class="fl">6.5</span>)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">guides</span>(<span class="dt">colour=</span><span class="ot">FALSE</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">theme_bw</span>(<span class="dt">base_size =</span> <span class="dv">12</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">theme</span>(<span class="dt">axis.text=</span><span class="kw">element_text</span>(<span class="dt">size=</span><span class="dv">12</span>),
+        <span class="dt">text=</span><span class="kw">element_text</span>(<span class="dt">family=</span><span class="st">&quot;Arial&quot;</span>, <span class="dt">face=</span><span class="st">&quot;bold&quot;</span>, <span class="dt">size=</span><span class="dv">12</span>))
+
+g2 &lt;-<span class="st"> </span><span class="kw">ggplot</span>() <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_segment</span>(<span class="dt">data=</span>df, <span class="dt">mapping=</span><span class="kw">aes</span>(<span class="dt">x=</span>x, <span class="dt">y=</span>y, <span class="dt">xend=</span>x<span class="op">+</span>loadings.DS1, <span class="dt">yend=</span>y<span class="op">+</span>loadings.DS2), 
+                 <span class="dt">size =</span> <span class="dv">1</span>, <span class="dt">color=</span><span class="st">&quot;grey50&quot;</span>) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_label</span>(<span class="dt">data=</span>df, <span class="dt">mapping=</span><span class="kw">aes</span>(<span class="dt">x=</span>loadings.DS1, <span class="dt">y=</span>loadings.DS2, <span class="dt">label=</span>labels), 
+             <span class="dt">size=</span><span class="dv">5</span>, <span class="dt">color=</span><span class="st">&quot;white&quot;</span>, <span class="dt">bg =</span> <span class="st">&quot;grey50&quot;</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_hline</span>(<span class="dt">yintercept=</span><span class="dv">0</span>, <span class="dt">color=</span><span class="st">&quot;black&quot;</span>, <span class="dt">linetype=</span><span class="dv">2</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_vline</span>(<span class="dt">xintercept=</span><span class="dv">0</span>, <span class="dt">color=</span><span class="st">&quot;black&quot;</span>, <span class="dt">linetype=</span><span class="dv">2</span>) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">xlim</span>(<span class="kw">c</span>(<span class="op">-</span><span class="dv">3</span>, <span class="dv">3</span>)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">ylim</span>(<span class="kw">c</span>(<span class="op">-</span><span class="fl">3.5</span>, <span class="fl">6.5</span>)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;DS1&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;DS2&quot;</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">theme_bw</span>(<span class="dt">base_size =</span> <span class="dv">12</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">theme</span>(<span class="dt">axis.text=</span><span class="kw">element_text</span>(<span class="dt">size =</span> <span class="dv">12</span>),
+        <span class="dt">text =</span> <span class="kw">element_text</span>(<span class="dt">family =</span> <span class="st">&quot;Arial&quot;</span>, <span class="dt">face =</span> <span class="st">&quot;bold&quot;</span>, <span class="dt">size =</span> <span class="dv">12</span>))
+cowplot<span class="op">::</span><span class="kw">plot_grid</span>(g1, g2)</code></pre></div>
+<div class="figure" style="text-align: center"><span id="fig:grid-plot"></span>
+<img src="2019_Bookdown_files/figure-html/grid-plot-1.png" alt="Grid plot of discriminant and cluster analyses of potato cultivars." width="100%" />
+<p class="caption">
+Figure 2.6: Grid plot of discriminant and cluster analyses of potato cultivars.
+</p>
+</div>
+<p>I push cultivars yield cut-off (<code>yieldCutoff</code>) and ionomics groups (<code>ionomicGroup</code>) in the initial data frame.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ionomicGroup &lt;-<span class="st"> </span><span class="kw">data.frame</span>(lda_centroids[, <span class="dv">1</span>], 
                            <span class="dt">ionomicGroup =</span> <span class="kw">factor</span>(highYieldersKmeans<span class="op">$</span>partition[, <span class="st">&quot;6 groups&quot;</span>]))
 <span class="kw">colnames</span>(ionomicGroup)[<span class="kw">colnames</span>(ionomicGroup)<span class="op">==</span><span class="st">&quot;group&quot;</span>] &lt;-<span class="st"> &quot;Cultivar&quot;</span>
@@ -509,7 +549,7 @@ leaf_clust_df &lt;-<span class="st"> </span>leaf_clust_df <span class="op">%&gt;
 </div>
 <div id="arranging-data-for-machine-learning" class="section level2">
 <h2><span class="header-section-number">2.8</span> Arranging data for Machine Learning</h2>
-<p>I select useful columns for the next chapter (<a href="Chapter-Modeling.html#Chapter-Modeling">3</a>) and save the new table as <code>dfml.csv</code>. I conserve only <code>complete cases</code>.</p>
+<p>I select useful columns for the next chapter (Chapter <a href="Chapter-Modeling.html#Chapter-Modeling">3</a>) and save the new table as <code>dfml.csv</code>. I conserved only <code>complete cases</code>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">new_col &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;yieldCutoff&#39;</span>, <span class="st">&#39;yieldClass&#39;</span>, <span class="st">&#39;ionomicGroup&#39;</span>)
 dfml &lt;-<span class="st"> </span>leaf_clust_df <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">select</span>(<span class="kw">one_of</span>(<span class="kw">c</span>(keys_col, clr_no, cultivarAndyield, new_col, <span class="st">&#39;AnalyseFoliaireStade&#39;</span>))) <span class="op">%&gt;%</span>
@@ -522,13 +562,12 @@ dfml &lt;-<span class="st"> </span>leaf_clust_df <span class="op">%&gt;%</span>
 <span class="kw">nrow</span>(dfml)</code></pre></div>
 <pre><code>## [1] 3382</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">write_csv</span>(dfml, <span class="st">&quot;output/dfml.csv&quot;</span>)</code></pre></div>
-<p>Hence, the data table contains 3382 for the next chapter (Machine learning).</p>
+<p>So, the Machine learning data table contains 3382 samples.</p>
 </div>
 <div id="clr-x-ionomics-groups-interactions-effects" class="section level2">
 <h2><span class="header-section-number">2.9</span> clr x ionomics groups interactions effects</h2>
-<p>I use a linear mixed effect model to assess the effect of clr coordinates on tubers marketable yield between ionomics groups. This last subsection perfom this analysis by extracting and ploting the interaction coefficients of the model.</p>
+<p>I use a linear mixed effect model to assess the effect of clr coordinates on tubers marketable yield in the ionomics groups. This last subsection perfoms this analysis by extracting and ploting the interaction coefficients of the model.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dfml<span class="op">$</span>Cultivar &lt;-<span class="st"> </span><span class="kw">factor</span>(dfml<span class="op">$</span>Cultivar)
-<span class="co">#dfml$Maturity5 &lt;- relevel(dfml$Maturity5, ref = &quot;late&quot;)</span>
 dfml<span class="op">$</span>NoEssai &lt;-<span class="st"> </span><span class="kw">factor</span>(dfml<span class="op">$</span>NoEssai)
 <span class="kw">colnames</span>(dfml)[<span class="kw">colnames</span>(dfml)<span class="op">==</span><span class="st">&quot;ionomicGroup&quot;</span>] &lt;-<span class="st"> &quot;group_i&quot;</span>
 dfml<span class="op">$</span>group_i &lt;-<span class="st"> </span><span class="kw">factor</span>(dfml<span class="op">$</span>group_i)
@@ -536,7 +575,7 @@ dfml<span class="op">$</span>group_i &lt;-<span class="st"> </span><span class="
 clr_no &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;clr_N&quot;</span>, <span class="st">&quot;clr_P&quot;</span>, <span class="st">&quot;clr_K&quot;</span>, <span class="st">&quot;clr_Ca&quot;</span>, <span class="st">&quot;clr_Mg&quot;</span>, <span class="st">&quot;clr_Fv&quot;</span>)
 clrNo &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;clrN&quot;</span>, <span class="st">&quot;clrP&quot;</span>, <span class="st">&quot;clrK&quot;</span>, <span class="st">&quot;clrCa&quot;</span>, <span class="st">&quot;clrMg&quot;</span>, <span class="st">&quot;clrFv&quot;</span>) <span class="co"># for plot</span>
 <span class="kw">colnames</span>(dfml)[<span class="kw">which</span>(<span class="kw">names</span>(dfml) <span class="op">%in%</span><span class="st"> </span>clr_no)] &lt;-<span class="st"> </span>clrNo</code></pre></div>
-<p>I scale clr coordinates before ajusting linear mixed model. Discard the filling value to deal with singularity problem.</p>
+<p>I scale clr coordinates before fitting the linear mixed model. I discard the filling value to deal with singularity problem.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dfml.sc &lt;-<span class="st"> </span>dfml  <span class="co"># copy</span>
 dfml.sc[, clrNo] &lt;-<span class="st"> </span><span class="kw">apply</span>(dfml.sc[, clrNo], <span class="dv">2</span>, scale)
 used_clr =<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;clrN&quot;</span>, <span class="st">&quot;clrP&quot;</span>, <span class="st">&quot;clrK&quot;</span>, <span class="st">&quot;clrCa&quot;</span>, <span class="st">&quot;clrMg&quot;</span>) <span class="co"># without &quot;clr_Fv&quot;</span>
@@ -547,41 +586,40 @@ lmm &lt;-<span class="st"> </span><span class="kw">lme</span>(RendVendable <span
 
 pseudoR2 =<span class="st"> </span><span class="kw">rsq</span>(dfml.sc<span class="op">$</span>RendVendable, <span class="kw">predict</span>(lmm))
 pseudoR2</code></pre></div>
-<pre><code>## [1] 0.7358429</code></pre>
+<pre><code>## [1] 0.734548</code></pre>
 <p>The next code extracts the interactions coefficients of the model and their p-values (pv) matrix.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pv &lt;-<span class="st"> </span><span class="kw">summary</span>(lmm)<span class="op">$</span>tTable[<span class="op">-</span><span class="dv">1</span>,]
-pv</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(pv &lt;-<span class="st"> </span><span class="kw">summary</span>(lmm)<span class="op">$</span>tTable[<span class="op">-</span><span class="dv">1</span>,])</code></pre></div>
 <pre><code>##                     Value  Std.Error   DF    t-value      p-value
-## clrN:group_i1   5.2298330  0.5488003 3151  9.5295736 3.043858e-21
-## clrN:group_i2   4.2894535  0.7324829 3151  5.8560459 5.228142e-09
-## clrN:group_i3   1.2126794  5.6940313 3151  0.2129738 8.313612e-01
-## clrN:group_i4   8.5112319  0.6861852 3151 12.4036946 1.575662e-34
-## clrN:group_i5   6.3268719  2.2896952 3151  2.7631939 5.757120e-03
-## clrN:group_i6   0.6028268  1.0425648 3151  0.5782152 5.631601e-01
-## clrP:group_i1   4.0261982  0.5770872 3151  6.9767591 3.666140e-12
-## clrP:group_i2   4.5034279  1.1678495 3151  3.8561714 1.174790e-04
-## clrP:group_i3   1.1851545  8.6218751 3151  0.1374590 8.906768e-01
-## clrP:group_i4   8.6266242  0.9102367 3151  9.4773420 4.957507e-21
-## clrP:group_i5   7.2379089  3.0554373 3151  2.3688619 1.790289e-02
-## clrP:group_i6  -0.1926581  1.5611122 3151 -0.1234108 9.017897e-01
-## clrK:group_i1   4.4208758  0.7955366 3151  5.5570994 2.971355e-08
-## clrK:group_i2   3.2108675  1.2516033 3151  2.5654035 1.035147e-02
-## clrK:group_i3   5.1095675  8.2466303 3151  0.6195946 5.355695e-01
-## clrK:group_i4   8.7915820  0.9553814 3151  9.2021696 6.216122e-20
-## clrK:group_i5   8.0251547  3.3935570 3151  2.3648210 1.809906e-02
-## clrK:group_i6  -1.1209098  2.0797144 3151 -0.5389729 5.899436e-01
-## clrCa:group_i1  6.1427420  0.7262848 3151  8.4577595 4.111550e-17
-## clrCa:group_i2  4.0161872  1.1965120 3151  3.3565790 7.984878e-04
-## clrCa:group_i3  4.1870874 14.6555907 3151  0.2856990 7.751275e-01
-## clrCa:group_i4  9.8380888  0.9553887 3151 10.2974728 1.759828e-24
-## clrCa:group_i5  9.2636822  2.7864073 3151  3.3245973 8.955941e-04
-## clrCa:group_i6  0.3547081  1.8556044 3151  0.1911550 8.484165e-01
-## clrMg:group_i1  3.6097450  0.5799608 3151  6.2241187 5.482823e-10
-## clrMg:group_i2  1.7079887  1.1002360 3151  1.5523839 1.206708e-01
-## clrMg:group_i3 -1.6751448  7.2883407 3151 -0.2298390 8.182318e-01
-## clrMg:group_i4  7.5223886  0.8981833 3151  8.3751150 8.194176e-17
-## clrMg:group_i5  7.9675211  3.0165445 3151  2.6412741 8.300282e-03
-## clrMg:group_i6 -0.2519248  1.6924764 3151 -0.1488498 8.816817e-01</code></pre>
+## clrN:group_i1   3.9357284  0.4714419 3151  8.3482789 1.023693e-16
+## clrN:group_i2   4.5086936  0.7705283 3151  5.8514314 5.373701e-09
+## clrN:group_i3   1.2133428  6.0172969 3151  0.2016425 8.402092e-01
+## clrN:group_i4   8.9271126  0.7222684 3151 12.3598269 2.653734e-34
+## clrN:group_i5   6.6805497  2.4020738 3151  2.7811591 5.448723e-03
+## clrN:group_i6   1.6894317  1.2249221 3151  1.3792156 1.679262e-01
+## clrP:group_i1   2.2643683  0.5273867 3151  4.2935637 1.811318e-05
+## clrP:group_i2   4.4674134  1.1599644 3151  3.8513367 1.198119e-04
+## clrP:group_i3   1.1989684  8.5344952 3151  0.1404850 8.882858e-01
+## clrP:group_i4   8.5517624  0.9043168 3151  9.4566005 6.012951e-21
+## clrP:group_i5   7.1928922  3.0334416 3151  2.3711985 1.779031e-02
+## clrP:group_i6  -0.2036706  1.6023732 3151 -0.1271056 8.988649e-01
+## clrK:group_i1   2.6720318  0.7392049 3151  3.6147379 3.053569e-04
+## clrK:group_i2   3.2583760  1.2697025 3151  2.5662514 1.032625e-02
+## clrK:group_i3   5.1482219  8.3905696 3151  0.6135724 5.395422e-01
+## clrK:group_i4   8.9001224  0.9695084 3151  9.1800365 7.595482e-20
+## clrK:group_i5   8.1488974  3.4344139 3151  2.3727185 1.771741e-02
+## clrK:group_i6  -0.7143722  2.0991856 3151 -0.3403092 7.336464e-01
+## clrCa:group_i1  4.9639842  0.6928157 3151  7.1649414 9.647259e-13
+## clrCa:group_i2  3.9986183  1.1915629 3151  3.3557760 8.008014e-04
+## clrCa:group_i3  4.1933847 14.5907159 3151  0.2874009 7.738243e-01
+## clrCa:group_i4  9.7662342  0.9515139 3151 10.2638898 2.465437e-24
+## clrCa:group_i5  9.2009961  2.7687837 3151  3.3231184 9.003389e-04
+## clrCa:group_i6  0.3216120  1.8131550 3151  0.1773770 8.592237e-01
+## clrMg:group_i1  1.6655205  0.4952557 3151  3.3629507 7.803491e-04
+## clrMg:group_i2  1.7260687  1.1074917 3151  1.5585387 1.192060e-01
+## clrMg:group_i3 -1.7218358  7.3771342 3151 -0.2334017 8.154646e-01
+## clrMg:group_i4  7.5539671  0.9042983 3151  8.3534022 9.811546e-17
+## clrMg:group_i5  8.0241505  3.0299413 3151  2.6482858 8.130450e-03
+## clrMg:group_i6 -0.2282890  1.6968340 3151 -0.1345382 8.929856e-01</code></pre>
 <p>Then, I extract their confident intervals, and process data for the plot.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">interval &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">Estimate =</span> <span class="kw">intervals</span>(lmm)<span class="op">$</span>fixed[<span class="op">-</span><span class="dv">1</span>, <span class="dv">2</span>],
                     <span class="dt">LL =</span> <span class="kw">intervals</span>(lmm)<span class="op">$</span>fixed[<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>], 
@@ -592,43 +630,40 @@ interval<span class="op">$</span>variable &lt;-<span class="st"> </span><span cl
 interval<span class="op">$</span>ionomic_group &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="kw">paste</span>(<span class="st">&quot;group&quot;</span>, <span class="dv">1</span><span class="op">:</span><span class="kw">nlevels</span>(dfml<span class="op">$</span>group_i)), <span class="kw">length</span>(clrNo)<span class="op">-</span><span class="dv">1</span>)
 interval<span class="op">$</span>used_clr &lt;-<span class="st"> </span><span class="kw">rep</span>(used_clr, <span class="dt">each =</span> <span class="kw">nlevels</span>(dfml<span class="op">$</span>group_i))
 
-interval<span class="op">$</span>pvalue &lt;-<span class="st"> </span>pv[,<span class="st">&quot;p-value&quot;</span>]
-interval<span class="op">$</span>is_significant =<span class="st"> </span><span class="kw">ifelse</span>(interval<span class="op">$</span>pvalue <span class="op">&lt;=</span><span class="st"> </span><span class="fl">0.05</span>,
-                                      <span class="st">&#39;P &lt; 0.05&#39;</span>,
-                                      <span class="st">&#39;P &gt; 0.05&#39;</span>)
+interval<span class="op">$</span>pvalue &lt;-<span class="st"> </span><span class="kw">round</span>(pv[,<span class="st">&quot;p-value&quot;</span>], <span class="dv">4</span>)
+interval<span class="op">$</span>is_significant =<span class="st"> </span><span class="kw">ifelse</span>(interval<span class="op">$</span>pvalue <span class="op">&lt;=</span><span class="st"> </span><span class="fl">0.05</span>, <span class="st">&#39;P &lt; 0.05&#39;</span>, <span class="st">&#39;P &gt; 0.05&#39;</span>)
 interval</code></pre></div>
 <pre><code>## # A tibble: 30 x 8
-##    Estimate     LL    UL variable ionomic_group used_clr   pvalue
-##       &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;         &lt;chr&gt;       &lt;dbl&gt;
-##  1    5.23    4.15  6.31 clrN:gr~ group 1       clrN     3.04e-21
-##  2    4.29    2.85  5.73 clrN:gr~ group 2       clrN     5.23e- 9
-##  3    1.21   -9.95 12.4  clrN:gr~ group 3       clrN     8.31e- 1
-##  4    8.51    7.17  9.86 clrN:gr~ group 4       clrN     1.58e-34
-##  5    6.33    1.84 10.8  clrN:gr~ group 5       clrN     5.76e- 3
-##  6    0.603  -1.44  2.65 clrN:gr~ group 6       clrN     5.63e- 1
-##  7    4.03    2.89  5.16 clrP:gr~ group 1       clrP     3.67e-12
-##  8    4.50    2.21  6.79 clrP:gr~ group 2       clrP     1.17e- 4
-##  9    1.19  -15.7  18.1  clrP:gr~ group 3       clrP     8.91e- 1
-## 10    8.63    6.84 10.4  clrP:gr~ group 4       clrP     4.96e-21
+##    Estimate      LL    UL variable ionomic_group used_clr pvalue
+##       &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;         &lt;chr&gt;     &lt;dbl&gt;
+##  1     3.94   3.01   4.86 clrN:gr~ group 1       clrN     0     
+##  2     4.51   3.00   6.02 clrN:gr~ group 2       clrN     0     
+##  3     1.21 -10.6   13.0  clrN:gr~ group 3       clrN     0.840 
+##  4     8.93   7.51  10.3  clrN:gr~ group 4       clrN     0     
+##  5     6.68   1.97  11.4  clrN:gr~ group 5       clrN     0.0054
+##  6     1.69  -0.712  4.09 clrN:gr~ group 6       clrN     0.168 
+##  7     2.26   1.23   3.30 clrP:gr~ group 1       clrP     0     
+##  8     4.47   2.19   6.74 clrP:gr~ group 2       clrP     0.0001
+##  9     1.20 -15.5   17.9  clrP:gr~ group 3       clrP     0.888 
+## 10     8.55   6.78  10.3  clrP:gr~ group 4       clrP     0     
 ## # ... with 20 more rows, and 1 more variable: is_significant &lt;chr&gt;</code></pre>
 <p>This cell plots the interaction coefficients and their confident intervals using ggplot2.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">options</span>(<span class="dt">repr.plot.width =</span> <span class="dv">4</span>, <span class="dt">repr.plot.height =</span> <span class="dv">8</span>)
-gg &lt;-<span class="st"> </span><span class="kw">ggplot</span>(<span class="dt">data =</span> interval, <span class="dt">mapping =</span> <span class="kw">aes</span>(<span class="dt">x =</span> Estimate, <span class="dt">y =</span> used_clr, <span class="dt">color=</span>is_significant)) <span class="op">+</span>
-<span class="st">         </span><span class="kw">facet_grid</span>(ionomic_group <span class="op">~</span><span class="st"> </span>.) <span class="op">+</span><span class="st"> </span><span class="co">#, scales = &#39;free&#39;, space = &#39;free&#39;) +</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gg &lt;-<span class="st"> </span><span class="kw">ggplot</span>(<span class="dt">data =</span> interval, <span class="dt">mapping =</span> <span class="kw">aes</span>(<span class="dt">x =</span> Estimate, <span class="dt">y =</span> used_clr)) <span class="op">+</span><span class="st"> </span><span class="co">#, color=is_significant)) +</span>
+<span class="st">         </span><span class="kw">facet_grid</span>(ionomic_group <span class="op">~</span><span class="st"> </span>.) <span class="op">+</span><span class="st"> </span>
 <span class="st">         </span><span class="kw">geom_vline</span>(<span class="dt">xintercept =</span> <span class="dv">0</span>, <span class="dt">lty =</span> <span class="dv">2</span>) <span class="op">+</span>
 <span class="st">         </span><span class="kw">geom_segment</span>(<span class="dt">mapping =</span> <span class="kw">aes</span>(<span class="dt">x =</span> LL, <span class="dt">xend =</span> UL, <span class="dt">y =</span> used_clr, <span class="dt">yend =</span> used_clr)) <span class="op">+</span>
 <span class="st">         </span><span class="kw">geom_point</span>() <span class="op">+</span>
 <span class="st">         </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;Coefficient&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;&quot;</span>) <span class="op">+</span>
 <span class="st">         </span><span class="kw">theme_bw</span>() <span class="op">+</span>
-<span class="st">         </span><span class="kw">theme</span>(<span class="dt">text=</span><span class="kw">element_text</span>(<span class="dt">family=</span><span class="st">&quot;Arial&quot;</span>, <span class="dt">face=</span><span class="st">&quot;bold&quot;</span>, <span class="dt">size=</span><span class="dv">12</span>))
-gg <span class="op">+</span><span class="st"> </span><span class="kw">theme</span>(<span class="dt">legend.title =</span> <span class="kw">element_blank</span>())<span class="co">#, legend.position = &#39;bottom&#39;)</span></code></pre></div>
+<span class="st">         </span><span class="kw">theme</span>(<span class="dt">text =</span> <span class="kw">element_text</span>(<span class="dt">family =</span> <span class="st">&quot;Arial&quot;</span>, <span class="dt">face =</span> <span class="st">&quot;bold&quot;</span>, <span class="dt">size =</span> <span class="dv">12</span>))
+gg <span class="op">+</span><span class="st"> </span><span class="kw">theme</span>(<span class="dt">legend.title =</span> <span class="kw">element_blank</span>())</code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:coefficients"></span>
 <img src="2019_Bookdown_files/figure-html/coefficients-1.png" alt="Effect of ionome perturbation on marketable yield as illustrated by a linear mixed effect model." width="100%" />
 <p class="caption">
-Figure 2.5: Effect of ionome perturbation on marketable yield as illustrated by a linear mixed effect model.
+Figure 2.7: Effect of ionome perturbation on marketable yield as illustrated by a linear mixed effect model.
 </p>
 </div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#ggsave(&quot;images/coef_lmm.tiff&quot;, width = 5, height = 5, dpi = 300)</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#ggsave(&quot;images/coef_lmm.tiff&quot;, width = 5, height = 7, dpi = 300)</span></code></pre></div>
 
 </div>
 </div>
@@ -683,6 +718,19 @@ gitbook.start({
 });
 </script>
 
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:" && /^https?:/.test(src))
+      src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
 </body>
 
 </html>
