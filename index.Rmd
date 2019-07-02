@@ -1,6 +1,6 @@
 --- 
-title: "Nutrient Diagnosis Of Potato"
-author: "zcoulibali"
+title: "Assessment of the nutritional imbalance status of potato crop"
+author: "Zonlehoua Coulibali and Serge-Étienne Parent"
 date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
 documentclass: book
@@ -16,7 +16,7 @@ description: "This is a example of using the bookdown package to write a book th
 ## Objective {#Objective}
 
 ***
-This chapter is the first of a series of R markdown codes aiming to describe computations methodology used to derive the results and conclusions of potato nutrient diagnosis article. The data set is a collection of potato surveys and nitrogen (N), phosphorous (P) and potassium (K) fertilizer trials conducted in Quebec from 1970 to 2017 between the US border at the 45^th parallel and the Northern limit of cultivation at the 49^th parallel. The useful variables are the first mature leaf (4^th from top, sampled at the beginning of blossom stage) nitrogen, phosphorus, potassium, calcium and magnesium compositions, cultivars used in experiments, cultivar maturity classes and tuber marketable yield. These variables are extracted from the Québec potato raw data table (`raw_potato_df.csv`) and handled to obtain useful variables for cluster analysis and tuber yield class prediction. A previous exploration has shown that oligoelements contained too many missing values, for this reason these elements were excluded from analysis. The chapter ends with the backup of a processed data frame useful for next chapters. 
+This chapter is the first of a series of R markdown codes aiming to describe computations methodology used to derive the results and conclusions of potato nutrient diagnosis article. The data set is a collection of potato surveys and nitrogen (N), phosphorous (P) and potassium (K) fertilizer trials conducted in Quebec from 1970 to 2017 between the US border at the 45^th parallel and the Northern limit of cultivation at the 49^th parallel. The useful variables are the first mature leaf (4^th from top, sampled at the beginning of blossom stage) nitrogen, phosphorus, potassium, calcium (Ca) and magnesium (Mg) compositions, cultivars used in experiments and tuber marketable yield. These variables are extracted from the Québec potato raw data table (`raw_potato_df.csv`) and tidded to obtain useful variables for cultivars clustering assessment (Chapter \@ref(Chapter-Clustering)), tuber yield prediction (Chapter \@ref(Chapter-Modeling)) and assessment of perturbation vector concept (Chapter \@ref(Chapter-Perturbation-vector)). A previous exploration has shown that oligoelements contained too many missing values, for this reason these elements were excluded from analysis. The chapter ends with the backup of a processed data frame useful for next chapters. 
 
 ***
 
@@ -33,7 +33,7 @@ library("compositions")
 
 ## Québec potato data set
 
-I load the Québec potato raw data set `raw_potato_df.csv` available for the project.
+I load the Québec potato raw data set `raw_potato_df.csv` available for the project in the `data` folder.
 
 ```{r, message=FALSE, warning=FALSE}
 raw_potato_df <- read_csv("data/raw_potato_df.csv")

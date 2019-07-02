@@ -1,0 +1,397 @@
+# Ionome analysis {#Chapter-Clustering}
+
+## Objective
+
+***
+This chapter has two objectives. Firstly, I try to assign cultivars to groups based on diagnostic leaves ionomes. Although plant health is a continuous domain rather than a categorical status, yield thresholds are useful for decision-making. Because yield potential varies widely among cultivars, I split experimental data into low- and high-productivity categories using a marketable yield delimiter at the 65^th percentile for each cultivar. Hence, I use high yielders subpopulation (samples which marketable yield is larger than the yield cut-off) to look for patterns (if there are) discriminating groups of similar multivariate compositions (`ionomics groups`). Then, I check for macroelements that best discriminate cultivars centroids. The discriminant scores are appended to the data frame. In the second stage,  I check the effect of clr coordinates on tubers yield in a bayesian linear mixed effect model. The third sudsection of the chapter maps the experimental sites locations. At the end, the output data file is called `dfml_df.csv` i.e., the data frame for machine learning chapter (Chapter \@ref(Chapter-Modeling)).
+
+***
+
+## Useful libraries and custom functions
+
+A set of packages is needed for data manipulation and visualization like `tidyverse` presented in previous chapter (Chapter \@ref(Chapter-Data-Processing)), [mvoutlier](https://rdrr.io/cran/mvoutlier/) for multivariate outliers detection, [ade4](http://pbil.univ-lyon1.fr/ADE-4) gathers tools for multivariate data analysis (I use it for discriminant analysis), [dbscan](http://www.sthda.com/english/wiki/wiki.php?id_contents=7940) a density-based clustering algorithm, which can be used to identify clusters of any shape in data set containing noise and outliers, [factoextra](https://github.com/kassambara/factoextra) needed with `dbscan` for clustering and visualization, [ggmap](https://github.com/dkahle/ggmap) makes it easy to retrieve raster map tiles from online mapping services like Google Maps and Stamen Maps and plot them using the ggplot2 framework, [ggridges](https://github.com/clauswilke/ggridges) for geoms to make ridgeline plots using ggplot2, [cowplot](https://github.com/wilkelab/cowplot) which can combine multiple ggplot plots to make publication-ready plots, [extrafont](https://www.r-pkg.org/pkg/extrafont) for custom fonts for graphs with ggplot2, [ggrepel](https://github.com/slowkow/ggrepel) provides text and label geoms for 'ggplot2' that help to avoid overlapping text labels, and [brms](https://github.com/paul-buerkner/brms) for bayesian regression modeling using `Stan`.
+
+```{r, warning=FALSE, message=FALSE}
+library("tidyverse")
+library("mvoutlier")
+library("ade4")
+library("dbscan")
+library("factoextra")
+library("ggrepel")
+library("ggmap")
+library("ggridges")
+library("cowplot")
+library("extrafont")
+library("brms")
+```
+
+## Leaves processed compositions data set
+
+For this chapter, the initial data set is the outcome of the previous chapter (Chapter \@ref(Chapter-Data-Processing)) `leaf_clust_df.csv`. Let's load the data frame.
+
+```{r}
+leaf_clust_df <- read_csv("output/leaf_clust_df.csv")
+```
+
+The next cell maps experimental sites locations.
+
+```{r leaf_df-sites-locations, out.width = "100%", fig.align = "center", warning = FALSE, message = FALSE, fig.cap = "Location of experimental sites (green dots) in the Québec potato data set."}
+qc_leaf <- get_stamenmap(bbox = c(left = -76, right = -68, bottom = 45, top = 50), 
+                         zoom = 7, maptype = 'toner-lite')
+ggmap(qc_leaf) +
+  geom_point(data = leaf_clust_df %>%
+               select(LonDD, LatDD) %>%
+               unique(), aes(x = LonDD, y = LatDD),
+             size = 2, shape = 1) + 
+  coord_map("mercator") +
+  labs(x = "Longitude", y = "Latitude") +
+  theme_bw() +
+  theme(text = element_text(family = "Arial", face = "bold", size = 12))
+ggsave("images/leaf_clust_df-sites-locations.png", width = 10, height = 8)
+```
+
+## The yield cut-off, low and high yielders delimiter
+
+For cluster analysis, I keep only high yielders which I fixed as yield 65% quantile cutter for each cultivar. The `cutQ` table is used to add the variable `yieldClass` categorising yield potential to `leaf_clust_df`. `HY` and `LY` stand for high yield and low yield respectively.
+
+```{r}
+cutQ <- leaf_clust_df %>%
+  group_by(Cultivar) %>%
+  select(RendVendable) %>%
+  summarise_if(is.numeric, quantile, probs = 0.65, na.rm = TRUE) %>%
+  rename(rv_cut = RendVendable)
+```
+
+```{r}
+leaf_clust_df <- leaf_clust_df %>%
+  left_join(cutQ, by = "Cultivar") %>%
+  mutate(yieldClass = forcats::fct_relevel(ifelse(RendVendable >= rv_cut, "HY", "LY"), "LY"))
+```
+
+For sake of verification, I compute average yield per yieldClass.
+
+```{r, warning=FALSE}
+mean_yield <- leaf_clust_df %>%
+  group_by(yieldClass) %>%
+  select(RendVendable) %>%
+  summarise_if(is.numeric, mean, na.rm = TRUE)
+mean_yield
+```
+
+So, the average marketable yield is 40.48 Mg $ha^-1$ for high yielders and 24.78 Mg $ha^-1$ for low yielders. In comparison, average potato tuber yields in 2017 in Canada and in Québec were respectively [31.21 Mg $ha^-1$](https://www150.statcan.gc.ca/t1/tbl1/fr/tv.action?pid=3210035801&pickMembers%5B0%5D=1.1) and [28.75 Mg $ha^-1$](https://www150.statcan.gc.ca/t1/tbl1/fr/tv.action?pid=3210035801&pickMembers%5B0%5D=1.6).
+
+## Centered log-ratio (clr) centroids computation
+
+Compositional data transformation is done in the loaded file. I keep only clr-transformed coordinates for high yielders, at 10 % blossom (AnalyseFoliaireStade = 10% fleur) in the next chunk.
+
+```{r}
+hy_df <- leaf_clust_df %>%
+  mutate(isNA = apply(select(., starts_with("clr"), Cultivar, Maturity5, RendVendable), 1, anyNA)) %>%
+  mutate(is10pcf = AnalyseFoliaireStade == "10% fleur") %>%
+  filter(!isNA & is10pcf & yieldClass == "HY" & NoEssai != "2") %>% 
+  select(NoEssai, NoBloc, NoTraitement, starts_with("clr"), Cultivar, Maturity5, RendVendable) %>%
+  droplevels()
+```
+
+`r nrow(hy_df)` lines of observations (samples) will be used to find patterns in potato cultivars. I check the number of samples per cultivar in this high yielders data set. Some cultivars have been discarded from the table after the previous filter.
+
+```{r}
+percentage <- round(with(hy_df, prop.table(table(Cultivar)) * 100), 2)
+distribution <- with(hy_df, cbind(numHY = table(Cultivar), percentage = percentage))
+distribution <- data.frame(cbind(distribution, rownames(distribution)))
+colnames(distribution)[3] <- "Cultivar"
+distribution$numHY <- as.numeric(as.character(distribution$numHY)) # numHY is the number of samples
+distribution$percentage <- as.numeric(as.character(distribution$percentage))
+distribution <- distribution %>% 
+  arrange(desc(numHY)) # arrange in descending order
+```
+
+```{r, HY-cultivar-abundance, fig.height = 10, fig.width = 5, out.width = "100%", fig.align = "center", warning = FALSE, message = FALSE, fig.cap = "High yielders cultivars abundance.", echo = FALSE}
+distribution %>%
+  ggplot(aes(x = reorder(Cultivar, numHY), y = numHY)) +
+  geom_col() +
+  geom_text(aes(label = numHY), hjust = -0.1) +
+  ylim(c(0, 250)) +
+  labs(x = 'Cultivar', y = 'Number of samples') +
+  coord_flip()
+```
+
+Some cultivars are well represented, like Superior and Goldrush. Let's compute number of cultivars and trials in the data frame.
+
+```{r}
+data.frame(numb_cultivars = n_distinct(hy_df$Cultivar, na.rm = TRUE),
+           numb_trials = n_distinct(hy_df$NoEssai, na.rm = TRUE))
+```
+
+I create a table with cultivars, maturity classes and compute median clr values i.e., clr centroids.
+
+```{r}
+hy_clr <- hy_df %>%
+  group_by(Cultivar, Maturity5) %>%
+  select(Cultivar, Maturity5, starts_with("clr")) %>%
+  summarise_all(list(median))
+hy_clr
+```
+
+I use multivariate outliers detection technique to identify outliers with a quantitle critical value of `qcrit = 0.975` by cultivar only if cultivars contain at leat 20 rows. If less than 20 rows, all rows are kept. The new data frame `hy_df_in` will be used for patterns recognition and discriminant analysis.
+
+```{r, warning=FALSE, message=FALSE}
+hy_df_IO <- hy_df %>%
+  group_by(Cultivar) %>%
+  select(starts_with("clr")) %>%
+  do({
+    if (nrow(.) < 20) {
+      IO = rep(1, nrow(.))
+    } else {
+      IO = sign1(.[,-1], qcrit=0.975)$wfinal01
+    }
+    cbind(.,IO)
+  }) %>%
+  ungroup()
+
+hy_df_in <- hy_df_IO %>%
+  filter(IO == 1) %>%
+  select(-IO) %>% 
+  droplevels()
+```
+
+`r nrow(hy_df)-nrow(hy_df_in)` outliers have been discarded. 
+
+## Patterns between potato cultivars
+
+Patterns recognition is done with [dbscan](http://www.sthda.com/english/wiki/wiki.php?id_contents=7940#algorithm-of-dbscan) algorithm which can identify dense regions measured by the number of objects close to a given point. As explained by the author, the key idea is that for each point of a cluster, the neighborhood of a given radius has to contain at least a minimum number of points.
+
+I use the high yielders clr centroids of cultivars in a new data frame which is the same as `hy_df_in` without maturity classes.
+
+```{r}
+hy_centroids <- hy_df_in %>%
+  group_by(Cultivar) %>%
+  select(starts_with("clr")) %>%
+  summarise_all(list(median)) %>%
+  ungroup()
+```
+
+Two important parameters are required for dbscan: epsilon (“eps”) and minimum points (“MinPts”). The parameter `eps` defines the radius of neighborhood around a point x. It’s called the \(\epsilon\)-neighborhood of x. The parameter `MinPts` is the minimum number of neighbors within “eps” radius. The optimal value of “eps” parameter can be determined as follow:
+
+```{r, eps-optimal, out.width = "100%", fig.align = "center", warning = FALSE, message = FALSE, fig.cap = "The optimal value of “eps” parameter."}
+set.seed(5773)
+hy_centroids %>%
+  select(starts_with("clr")) %>%
+  as.matrix() %>% 
+  kNNdistplot(., k = 5)
+abline(h = 0.3, lty = 2)
+```
+
+The chunk below makes the prdiction of clusters delineated by the dbscan algorithm. Zeros are not a cluster or designates the cluster of outliers.
+
+```{r}
+res <- hy_centroids %>%
+  select(starts_with("clr")) %>%
+  as.matrix() %>% 
+  dbscan(., eps = .3, minPts = 5)
+predict(res)
+```
+
+The result can also be visualized graphically as follow:
+
+```{r, cluster-plot, out.width = "100%", fig.align = "center", warning = FALSE, message = FALSE, fig.cap = "Clusters delineated with dbscan."}
+fviz_cluster(res, hy_centroids %>%
+  select(starts_with("clr")) %>%
+  as.matrix(), geom = "point", ggtheme = theme_bw())
+```
+
+Black points are outliers (zeros). As shown on the plot, one cluster means there is no detectable shape between cultivars ionomes as dots are scattered differently. It may not be useful to think of possible strcutures between potato cultivars based on ionome. Nethertheless, one could extract scores of the first two discriminant axes as numerical variables for cultivars in models, and then check for elements that best discriminate cultivars. 
+
+## Axis reduction
+
+Leaves composition data are compositionnal data (non-negative and summing to unity) so are multivariate. As argued by [Legendre et Legendre,  2012](https://www.elsevier.com/books/numerical-ecology/legendre/978-0-444-53868-0), it is not possible to draw such a diagram on paper with more than two or eventually three dimensions, however, even though it is a perfectly valid mathematical construct. For the purpose of analysis, I will project the multidimensional scatter diagram onto bivariate graph which axes are known to be of particular interest. The axes of this graph are chosen to represent a large fraction of the variability of the multidimensional `N-P-K-Mg-Ca-Fv` data matrix, in a space with reduced (i.e. lower) dimensionality relative to the original data set. With the next chunks, I perform a duality diagram (or [dudi](http://pbil.univ-lyon1.fr/ade4/ade4-html/dudi.html)) PCA (priciple component analysis) and store scores and loadings.
+
+```{r}
+pca_leaf <- dudi.pca(hy_df_in %>% 
+                       select(starts_with("clr")),
+                     scannf = FALSE, scale = FALSE)
+lda_leaf <- discrimin(dudi = pca_leaf, fac = factor(hy_df_in$Cultivar), scannf = FALSE)
+if (! "DS1" %in% names(hy_df_in)) hy_df_in <- bind_cols(hy_df_in, lda_leaf$li)
+lda_loading <- lda_leaf$fa %>%
+  rownames_to_column("clr")
+```
+
+This chunk computes discriminant scores centroids for cultivars.
+
+```{r}
+lda_centroids <- hy_df_in %>%
+  select(Cultivar, DS1, DS2) %>%
+  group_by(Cultivar) %>%
+  summarise_all(list(mean)) 
+write_csv(lda_centroids, "output/lda_centroids")
+```
+
+I plot the distance biplot as result of discriminant analysis in separate plots for easy reading. 
+
+```{r, discriminant-grid-plot, fig.height = 5, fig.width = 10, out.width = "100%", fig.align = "center", warning = FALSE, message = FALSE, fig.cap = "Grid plot of discriminant and cluster analyses of potato cultivars."}
+g1 <- lda_centroids %>%
+  ggplot(aes(DS1, DS2, label = Cultivar)) +
+  geom_hline(yintercept=0, color="black", linetype=2) +
+  geom_vline(xintercept=0, color="black", linetype=2) + 
+  geom_label_repel() +
+  geom_point(alpha = 0.5) +
+  xlim(c(-4, 4)) +
+  ylim(c(-6, 5)) +
+  guides(colour=FALSE) +
+  theme_bw(base_size = 12) +
+  theme(axis.text=element_text(size=12),
+        text=element_text(family="Arial", face="bold", size=12))
+
+g2 <- ggplot(data=lda_loading) +
+  geom_hline(yintercept=0, color="black", linetype=2) +
+  geom_vline(xintercept=0, color="black", linetype=2) + 
+  geom_segment(aes(xend=DS1, yend=DS2), x=0, y=0, 
+               size = 1, color="grey50") + 
+  geom_label(aes(x=DS1, y=DS2, label=clr), 
+             size=5, color="white", bg = "grey50")+
+  xlim(c(-4, 4)) +
+  ylim(c(-6, 5)) +
+  labs(x = "DS1", y = "DS2") +
+  theme_bw(base_size = 12) +
+  theme(axis.text=element_text(size = 12),
+        text = element_text(family = "Arial", face = "bold", size = 12))
+plot_grid(g1, g2)
+ggsave("images/discriminant_plots.png", width=10, height=8, dpi = 300)
+```
+
+The first discriminant axis (`DS1`) is formed mainly by `Mg`, `K` and `N`. The second discriminant axis (`DS2`) is driven mainly by `Fv`, `K` and weakely by `Mg` and `Ca`. I append discriminant scores to leaves composition data frame.
+
+```{r}
+leaf_clust_df <- leaf_clust_df %>% 
+  left_join(lda_centroids, by = "Cultivar")
+```
+
+## Do clrs affect potato tuber yield?
+
+I use a bayesian linear mixed effect model to assess the effect of clr coordinates on tubers marketable yield.
+
+```{r}
+mm_df <- leaf_clust_df %>% 
+  select(RendVendable, AnalyseFoliaireStade, starts_with("clr"), NoEssai) %>% 
+  mutate(is10pcf = AnalyseFoliaireStade == "10% fleur") %>%
+  filter(is10pcf & NoEssai != "2") %>% 
+  filter(RendVendable >= 28) %>% 
+  select(-c(AnalyseFoliaireStade, is10pcf))
+```
+
+I scale clr coordinates before fitting the linear mixed model. This allow ....?
+
+```{r}
+mm_df_sc <- mm_df %>% 
+  select(starts_with("clr")) %>%
+  apply(., 2, scale) %>%
+  as_tibble() %>% 
+  mutate(RendVendable = mm_df$RendVendable,
+         NoEssai = mm_df$NoEssai)
+```
+
+The STAN model takes some time to compile and sample (~ 20 minutes on my 4-cores computer), so I created a switch to avoid running it every time the code is run. Feel free to switch `fit_brmmodel` to TRUE. For the model, I discard the filling value to deal with singularity problem.
+
+```{r}
+fit_brmmodel <- FALSE # TRUE 
+if(fit_brmmodel) {
+  lmm_b <- brm(RendVendable ~ clr_N + clr_P + clr_K + clr_Ca + clr_Mg + (1|NoEssai), 
+               data = mm_df_sc %>%
+                 select(RendVendable, starts_with("clr"), NoEssai),
+               prior = prior(normal(0, 10), class = b) + prior(cauchy(0, 2), class = sd),
+               iter = 4000,
+               warmup = 1000,
+               thin = 1,
+               family = gaussian(),
+               algorithm = "sampling",
+               chains = 4,
+               cores = 4, # adjust the number of cores
+               seed = 216102) # random.org
+  save(lmm_b, file = "output/lmm_b.RData")
+} else {
+  load("output/lmm_b.RData")
+}
+```
+
+```{r}
+summary(lmm_b)
+```
+
+I assess the goodness of fit by computing the coefficient of determination `R-squared` using a custom function. I create an intermediate table for this computation.
+
+```{r}
+## R-squared custom function
+rsq <- function(y, y_pred) {
+  sum((y_pred - mean(y))^2) / sum((y - mean(y))^2)
+}
+```
+
+
+```{r}
+pred_obs <- predict(lmm_b) %>% 
+  as_tibble() %>% 
+  select(Estimate) %>% 
+  bind_cols(., RendVendable = mm_df_sc %>% 
+              na.omit() %>% 
+              select(RendVendable))
+rsq(pred_obs$RendVendable, pred_obs$Estimate)
+```
+
+Fixed effects posterior distributions are extracted and tidied.
+
+```{r}
+samples <- posterior_samples(lmm_b, "^b")
+
+samples_tidy <- samples %>%
+  gather() %>% 
+  separate(col = key, into = c("col1", "col2"), sep = "b_") %>%
+  select(-col1)
+
+samples_tidy$clr <- NA
+samples_tidy$clr[grep("clr", samples_tidy$col2)] <- samples_tidy$col2[grep("clr", samples_tidy$col2)]
+
+samples_tidy <- samples_tidy %>%
+  select(-col2)
+```
+
+Then, I plot clrs effects on tubers marketable yield i.e., the posterior distributions of corresponding regression coefficients.
+
+```{r, effect-plot, fig.height = 10, fig.width = 5, out.width = "100%", fig.align = "center", warning = FALSE, message = FALSE, fig.cap = "Effects of clr nutrients on tubers yield."}
+samples_tidy %>%
+  filter(!is.na(clr)) %>% 
+  ggplot(aes(x = value, y = clr, fill=factor(..quantile..))) +
+  geom_vline(xintercept = 0) +
+  stat_density_ridges(rel_min_height = 0.01, geom = "density_ridges_gradient", 
+                      calc_ecdf = TRUE, quantiles = c(0.025, 0.975), scale = 1) +
+  scale_fill_manual(
+    name = "Probability", values = c("#FF0000", "#A0A0A0", "#FF0000"),
+    labels = c("(0, 0.025]", "(0.025, 0.975]", "(0.975, 1]")) +
+  theme(axis.text=element_text(size = 12),
+        text = element_text(family = "Arial", face = "bold", size = 12)) +
+  theme_bw()
+ggsave("images/bayes-mixed-clr.png", width=10, height=8, dpi = 300)
+```
+
+Each regression coefficient refers to the effect of explanatory variable i.e., one clr variable, on the expectation of the response variable i.e., marketable yield, adjusted for the rest of covariates. Posterior distributions far away from the zero value indicate an important contribution of clrs on the prediction of tubers yield. Moreover, the relationship is positive for all the clrs. Positive association means that changes of the explanatory variable cause changes of the same direction for response variable.
+
+## Arranging data for Machine Learning 
+
+I select useful columns for the next chapter (Chapter \@ref(Chapter-Modeling)) and save the new table as `dfml.csv`. I conserved only `complete cases`.
+
+```{r}
+dfml <- leaf_clust_df %>%
+  select(NoEssai, NoBloc, NoTraitement,
+         starts_with("clr"),
+         RendVendable, rv_cut, yieldClass,
+         AnalyseFoliaireStade,
+         Cultivar, Maturity5) %>%
+  mutate(isNA = apply(select(., starts_with("clr"), Cultivar, Maturity5, RendVendable), 1, anyNA)) %>%
+  mutate(is10pcf = AnalyseFoliaireStade == "10% fleur") %>%
+  filter(!isNA & is10pcf & NoEssai != "2") %>% 
+  select(-c(AnalyseFoliaireStade, isNA, is10pcf)) %>%
+  droplevels() %>% 
+  filter(complete.cases(.))
+write_csv(dfml, "output/dfml.csv")
+```
+
+The Machine learning data table contains `r nrow(dfml)` samples.

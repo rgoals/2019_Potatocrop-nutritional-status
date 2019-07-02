@@ -3,13 +3,13 @@
 ## Objective
 
 ***
-The objective of this chapter is to develop, evaluate and compare the performance of some machine learning algorithms (k-nearest neighbors, random forest and support vector machine - [package caret](https://topepo.github.io/caret/index.html)) for the prediction of a potato yield category using both its leaf ionome and its ionomics group. I use the previous chapter (chapter \@ref(Chapter-Clustering)) handeled data file `dfml.csv` which contains clr coordinates, maturity classes, ionomics groups and the yield two categorical variable created using the 65^th percentile for each cultivar. I use `accuracy` as models quality metric. I run the Chi-square homogenity test to compare prediction with a non-informative classification consisting of an equal distribution of 50% successful and 50% unsuccessful cases, using the best model. Then, I filter only true negative specimens i.e., correctely predicted high yielders of training data set in a new data frame for leaf health index purpose (Chapter \@ref(Chapter-Perturbation-vector)). 
+The objective of this chapter is to develop, evaluate and compare the performance of some machine learning algorithms (k-nearest neighbors, random forest and support vector machine - [package caret](https://topepo.github.io/caret/index.html)) in predicting yield categories using clr coordinates. I use the previous chapter (chapter \@ref(Chapter-Clustering)) handeled data file `dfml.csv` which contains clr coordinates, maturity classes and the yield two categorical variable created using the 65^th percentile for each cultivar. I use `accuracy` as models quality metric. I run the Chi-square homogenity test to compare prediction with a non-informative classification consisting of an equal distribution of 50% successful and 50% unsuccessful cases, using the best model (highest accuracy's model). Then, I filter only true negative specimens i.e., correctely predicted high yielders of training data set, in a new data frame for leaf health index analysis purpose (Chapter \@ref(Chapter-Perturbation-vector)).
 
 ***
 
 ## Useful libraries
 
-The `tidyverse` package is always needed for data handling and visualization, and then `extrafont` to make changes in graphs as demanded for the article. The particularly useful packages are `caret` and [kknn](https://www.rdocumentation.org/packages/kknn/versions/1.3.1) needed for machine leraning functions.
+The `tidyverse` package is always needed for data manipulation and visualization, and then `extrafont` to make changes in graphs as demanded for the article. The particularly useful packages are `caret` and [kknn](https://www.rdocumentation.org/packages/kknn/versions/1.3.1) needed for machine leraning functions.
 
 ```{r, warning=FALSE, message=FALSE}
 library("tidyverse")
@@ -24,8 +24,6 @@ I load the `dfml.csv` data set and named it `df`. The clr coordinates are scaled
 
 ```{r}
 df = read_csv('output/dfml.csv')
-colnames(df)[colnames(df)=="ionomicGroup"] <- "group_i" # makes it simplier !
-df$group_i = factor(df$group_i)
 df$Maturity5 = factor(df$Maturity5)
 df$yieldClass = factor(df$yieldClass)
 
@@ -57,7 +55,7 @@ dist %>%
   coord_flip()
 ```
 
-## Processing Machine learning
+## Machine learning
 
 ### Train and Test splits
 
@@ -69,21 +67,7 @@ split_index <- createDataPartition(df.sc$yieldClass, group = "Cultivar",
                                    p = 0.75, list = FALSE, times = 1)
 train_df <- df.sc[split_index, ]
 test_df <- df.sc[-split_index, ]
-
-## With only clr coordinates as predictors
-ml_clr <- c(clrNo, 'yieldClass')
-train_clr = train_df[, ml_clr]
-test_clr = test_df[, ml_clr]
-
-## With clr and maturity classes as predictors
-ml_mc <- c(clrNo, 'Maturity5', 'yieldClass')
-train_mc = train_df[, ml_mc]
-test_mc = test_df[, ml_mc]
-
-## With clr and ionomic groups as predictors
-ml_grp <- c(clrNo, 'group_i', 'yieldClass')
-train_grp = train_df[, ml_grp]
-test_grp = test_df[, ml_grp]
+ml_col <- c(clrNo, "yieldClass")
 ```
 
 With the `kknn` package, we must specify three parameters: `kmax` which is the number of neighbors to consider, `distance` a distance parameter to specify (1 for the Mahattan distance and 2 for the Euclidean distance), and a `kernel` which is a function to measure the distance. A best method currently used to choose the right parameters consists in creating a parameter grid.
@@ -111,11 +95,7 @@ I reset the random number seed before reach run to ensure that the evaluation of
 # a) Non-linear algorithm
 ## kNN
 set.seed(7)
-kknn_clr <- train(yieldClass ~., data = train_clr, method = "kknn", 
-                  metric = metric, trControl = control, tuneGrid = grid)
-kknn_mc <- train(yieldClass ~., data = train_mc, method = "kknn", 
-                 metric = metric, trControl = control, tuneGrid = grid)
-kknn_grp <- train(yieldClass ~., data = train_grp, method = "kknn", 
+kknn_clr <- train(yieldClass ~., data = train_df %>% select(ml_col), method = "kknn", 
                   metric = metric, trControl = control, tuneGrid = grid)
 ```
 
@@ -123,22 +103,14 @@ kknn_grp <- train(yieldClass ~., data = train_grp, method = "kknn",
 # b) Advanced algorithms
 ## SVM
 set.seed(7)
-svm_clr <- train(yieldClass ~., data = train_clr, method = "svmRadial", 
-                 metric = metric, trControl = control)
-svm_mc <- train(yieldClass ~., data = train_mc, method = "svmRadial", 
-                metric = metric, trControl = control)
-svm_grp <- train(yieldClass ~., data = train_grp, method = "svmRadial", 
+svm_clr <- train(yieldClass ~., data = train_df %>% select(ml_col), method = "svmRadial", 
                  metric = metric, trControl = control)
 ```
 
 ```{r}
 ## Random Forest
 set.seed(7)
-rf_clr <- train(yieldClass ~., data = train_clr, method = "rf", 
-                metric = metric, trControl = control)
-rf_mc <- train(yieldClass ~., data = train_mc, method = "rf", 
-               metric = metric, trControl = control)
-rf_grp <- train(yieldClass ~., data = train_grp, method = "rf", 
+rf_clr <- train(yieldClass ~., data = train_df %>% select(ml_col), method = "rf", 
                 metric = metric, trControl = control)
 ```
 
@@ -148,17 +120,10 @@ I assess the accuracy metric also when building the models (training set) but th
 
 ```{r ml-traindotplot, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Comparison of models accuracies at training."}
 # Summary results
-results <- resamples(list(kknn_clr_solely = kknn_clr, 
-                          kknn_clr_and_ionomicgroup = kknn_grp, 
-                          kknn_clr_and_maturityclass = kknn_mc,
-                          
-                          svm_clr_solely = svm_clr, 
-                          svm_clr_and_ionomicgroup = svm_grp, 
-                          svm_clr_and_maturityclass = svm_mc,
-                          
-                          rf_clr_solely = rf_clr, 
-                          rf_clr_and_ionomicgroup = rf_grp, 
-                          rf_clr_and_maturityclass = rf_mc))
+results <- resamples(list(kknn_model = kknn_clr, 
+                          svm_model = svm_clr, 
+                          rf_model = rf_clr)
+                     )
 
 #summary(results) with dotplot()
 dotplot(results)
@@ -168,17 +133,10 @@ This chunk also sorts models in a descending order using accuracies only, in a t
 
 ```{r}
 models_acc <- data.frame(Model = summary(results)$models,
-                       Accuracy = c(confusionMatrix(train_clr$yieldClass, predict(kknn_clr))$overall[1],
-                                    confusionMatrix(train_grp$yieldClass, predict(kknn_grp))$overall[1],
-                                    confusionMatrix(train_mc$yieldClass, predict(kknn_mc))$overall[1],
-                        
-                                    confusionMatrix(train_clr$yieldClass, predict(svm_clr))$overall[1],
-                                    confusionMatrix(train_grp$yieldClass, predict(svm_grp))$overall[1],
-                                    confusionMatrix(train_mc$yieldClass, predict(svm_mc))$overall[1],
-                                
-                                    confusionMatrix(train_clr$yieldClass, predict(rf_clr))$overall[1],
-                                    confusionMatrix(train_grp$yieldClass, predict(rf_grp))$overall[1],
-                                    confusionMatrix(train_mc$yieldClass, predict(rf_mc))$overall[1]))
+                       Accuracy = c(confusionMatrix(train_df$yieldClass, predict(kknn_clr))$overall[1],
+                                    confusionMatrix(train_df$yieldClass, predict(svm_clr))$overall[1],
+                                    confusionMatrix(train_df$yieldClass, predict(rf_clr))$overall[1])
+                       )
 
 models_acc[order(models_acc[,"Accuracy"], decreasing = TRUE), ]
 ```
@@ -188,43 +146,28 @@ models_acc[order(models_acc[,"Accuracy"], decreasing = TRUE), ]
 Model evaluation is an integral part of the model development process. It helps to find the best model that represents our data and how well the chosen model will work in the future. The next chunk performs this computations and gives the sorted accuracy metrics.
 
 ```{r}
-predicted_kknn_clr <- predict(kknn_clr, test_clr)
-predicted_kknn_mc <- predict(kknn_mc, test_mc)
-predicted_kknn_grp <- predict(kknn_grp, test_grp)
-
-predicted_svm_clr <- predict(svm_clr, test_clr)
-predicted_svm_mc <- predict(svm_mc, test_mc)
-predicted_svm_grp <- predict(svm_grp, test_grp)
-
-predicted_rf_clr <- predict(rf_clr, test_clr)
-predicted_rf_mc <- predict(rf_mc, test_mc)
-predicted_rf_grp <- predict(rf_grp, test_grp)
+predicted_kknn_clr <- predict(kknn_clr, test_df %>% select(ml_col))
+predicted_svm_clr <- predict(svm_clr, test_df %>% select(ml_col))
+predicted_rf_clr <- predict(rf_clr, test_df %>% select(ml_col))
 
 #The best model
 tests_acc <- data.frame(Model = summary(results)$models,
                         Accuracy_on_test = c(
-                          confusionMatrix(test_clr$yieldClass, predicted_kknn_clr)$overall[1],
-                          confusionMatrix(test_grp$yieldClass, predicted_kknn_grp)$overall[1],
-                          confusionMatrix(test_mc$yieldClass, predicted_kknn_mc)$overall[1],
-                        
-                          confusionMatrix(test_clr$yieldClass, predicted_svm_clr)$overall[1],
-                          confusionMatrix(test_grp$yieldClass, predicted_svm_grp)$overall[1],
-                          confusionMatrix(test_mc$yieldClass, predicted_svm_mc)$overall[1],
-                                
-                          confusionMatrix(test_clr$yieldClass, predicted_rf_clr)$overall[1],
-                          confusionMatrix(test_grp$yieldClass, predicted_rf_grp)$overall[1],
-                          confusionMatrix(test_mc$yieldClass, predicted_rf_mc)$overall[1]))
+                          confusionMatrix(test_df$yieldClass, predicted_kknn_clr)$overall[1],
+                          confusionMatrix(test_df$yieldClass, predicted_svm_clr)$overall[1],
+                          confusionMatrix(test_df$yieldClass, predicted_rf_clr)$overall[1])
+                        )
 tests_acc[order(tests_acc[,"Accuracy_on_test"], decreasing = TRUE), ]
 ```
 
-The k-nearest neighbours, the random forest and the support vector machine models returned similar predictive accuracies although slightly higher for the random forest (72%) and the k-nearest neighbours (70%) algorithms. Using maturity classes or ionomics groups, the predictive accuracies for all the models on test set are also similar. 
+The k-nearest neighbours, the random forest and the support vector machine models returned similar predictive accuracies although slightly higher for the random forest. 
 
 ## Yield class prediction with rf algorithm
 
-I sort the predictive quality metrics by cultivar with `random forest` algorithm combining clr coordinates and new clusters variable: model `rf_clr_and_ionomicgroup`.
+I sort the predictive quality metrics by cultivar with `random forest` algorithm: model `rf_clr`, and tide the table.
 
 ```{r}
-test_df$ypred = predicted_rf_grp # adds predictions to test set
+test_df$ypred = predicted_rf_clr # adds predictions to test set
 
 cultivar_acc <- test_df %>%
     group_by(Cultivar) %>%
@@ -249,7 +192,7 @@ ggplot(data, aes(x = reorder(Cultivar, Accuracy), y = Accuracy, fill = Accuracy)
   labs(x = 'Cultivar', y = 'Accuracy') +
   coord_flip() +
   theme(text=element_text(family = "Arial", face = "bold", size = 12))
-#ggsave("images/cultivarAcc.tiff", width=5, height=8)
+ggsave("images/cultivar-accuracy.tiff", width=5, height=8)
 ```
 
 ## Comparison with non-informative classification
@@ -257,10 +200,9 @@ ggplot(data, aes(x = reorder(Cultivar, Accuracy), y = Accuracy, fill = Accuracy)
 The non-informative classification consists of an equal distribution of 50% successful and 50% unsuccessful classification cases [(Swets J. A., 1988)](https://science.sciencemag.org/content/240/4857/1285). I run the Chi-square homogenity test to compare predictive accuracy of the random forest model with this non-informative classification model. 
 
 ```{r}
-cm <- confusionMatrix(predicted_rf_grp, test_grp$yieldClass) 
+cm <- confusionMatrix(predicted_rf_clr, test_df$yieldClass) 
 cm$table # confusion matrix
 ```
-
 
 ```{r}
 # rf_clr_and_ionomicgroup model's classification
@@ -283,25 +225,25 @@ khi2_test <- chisq.test(m)
 khi2_test
 ```
 
-The null hypothesis for a non-informative classification is rejected after the chi-square homogeneity test, the p-value is too low (<< 0.05).
+The null hypothesis for a non-informative classification is rejected after the chi-square homogeneity test, the too small p-value denotes important difference between the models.
 
 ## Train data set backup for TN specimens selection
 
 The train data set with predicted yield classes `train_df` backup will be used to test perturbation vector theory in the next chapter.
 
 ```{r}
-pred_yield <- predict(rf_grp, train_grp)
+pred_yield <- predict(rf_clr, train_df %>% select(ml_col))
 train_df = data.frame(cbind(df[split_index, ], pred_yield))
 write_csv(train_df, "output/train_df.csv")
 nrow(train_df)
 ```
 
-I consider as True Negatives (TN) specimens for this study, observations of the training data set having a high yield (HY) and correctly predicted with the `random forest` model. Then, I compute clr centroids for cultivars using True Negatives original (not scaled) clr values. These centroids could be used as `clr norms` for ionomics groups.
+I consider as True Negatives (TN) specimens for this study, observations of the training data set having a high yield (HY) and correctly predicted with the `random forest` model. Then, I compute clr centroids for cultivars using True Negatives original (not scaled) clr values. These centroids could be used as `clr norms` for cultivars.
 
 ```{r}
 TNs = train_df[train_df$yieldClass == 'HY' & pred_yield == 'HY', ]
 TNmedianNorms <- TNs %>%
-  group_by(group_i) %>%
+  group_by(Cultivar) %>%
   select(clrNo) %>%
   summarise_all(list(median))
 TNmedianNorms

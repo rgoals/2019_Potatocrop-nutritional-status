@@ -5,17 +5,17 @@
 ***
 The objective of this chapter is to develop a mathematical workflow useful to adjust the ionome of potato crops for diagnostic purpose. Perturbation in compositional space plays the same role as translation plays in real space. Some natural processes in nature can be interpreted as a change from one composition `C1` to another `C2` through the application of a perturbation:
 
-> `p ⊕ C1 ====> C2`.
+> `p ⊕ C1 ===> C2`.
 
-The difference between `the new observation`  and the closest TN composition can be back-transformed to the compositional space. The obtained vector is the `perturbation vector`. Theoretically, a misbalanced composition could be balanced (translated into a healthy zone) using a perturbation vector. Also, ionome of a new cultivar could be assigned to the closest healthy ionomics group where nutrient requirements have been already documented by fertilizer trials.
+The difference between `a new observation`  and the closest healthy composition (closest TN) can be back-transformed to the compositional space. The obtained vector is the `perturbation vector`. Theoretically, a misbalanced composition could be balanced (translated into a healthy zone) using a perturbation vector. Also, ionome of a new cultivar could be assigned to the closest healthy sample's cultivar, where nutrient requirements have been already documented by fertilizer trials.
 
-I compute a dissimilarity index using the true negative clr as reference. Then, I describe the procedure used to rebalance a misbalanced composition and finally present the results using ggplot2 functions.
+I compute a dissimilarity (or imbalance) index using the true negative clr as references for cultivars. Then, I describe the procedure used to rebalance a misbalanced composition.
 
 ***
 
 ## Data set and useful libraries
 
-We need package [compositions](https://www.rdocumentation.org/packages/compositions/versions/1.40-2) for further clr back-transformation de compositional space. The package [reshape](https://cran.r-project.org/web/packages/reshape/index.html) will be used to melt an intermediate data frame. As explained at the end of the Chapter \@ref(Chapter-Modeling), I consider as True Negatives (TN) specimens (or healthy points) for this study, observations of the `training data set` having a high yield (HY) and correctly predicted by the random forest model.
+We need package [compositions](https://www.rdocumentation.org/packages/compositions/versions/1.40-2) for further clr back-transformation to compositional space. The package [reshape](https://cran.r-project.org/web/packages/reshape/index.html) will be used to melt an intermediate data frame. As explained at the end of the Chapter \@ref(Chapter-Modeling), I consider as True Negatives (TN) specimens (or healthy points) for this study, observations of the `training data set` having a high yield (HY) and correctly predicted by the random forest model.
 
 ```{r, warning=FALSE, message=FALSE}
 library("tidyverse")
@@ -23,14 +23,18 @@ library("extrafont")
 library('compositions')
 library("reshape")
 train_df = read_csv("output/train_df.csv")
-train_df$group_i = factor(train_df$group_i)
-TNs = train_df[train_df$yieldClass == 'HY' & train_df$pred_yield == 'HY', ]
+```
+
+```{r}
+train_df$Cultivar = factor(train_df$Cultivar)
+TNs = train_df %>% 
+  filter(yieldClass == 'HY' & pred_yield == 'HY')
 clrNo = c("clrN", "clrP", "clrK", "clrCa", "clrMg", "clrFv") # for simplicity
 ```
 
 ## Dissimilarity index between compositions
 
-The first step is to compute a dissimilarity index according to the distance from the closest healthy point (the closest TN). I use the Euclidean distance between clr composition as the dissimilarity index. The chunk below shows the custom function used to compute euclidean distance.
+The first step is to compute a dissimilarity index according to the distance from the closest healthy point (the closest TN). I use the Aitchison distance (multivariate Euclidean distance) between clr composition as the dissimilarity index. The chunk below shows the custom function used to compute euclidean distance.
 
 ```{r}
 eucl_dist_f <- function(x, y) {
@@ -45,7 +49,7 @@ debal <- c()
 debal_index <- c()
 for (i in 1:nrow(train_df)) {
     clr_i <- as.numeric(train_df[i, clrNo])
-    eucl_dist <- apply(TNs %>% filter(group_i == train_df$group_i[i]) %>% select(clrNo), 
+    eucl_dist <- apply(TNs %>% filter(Cultivar == train_df$Cultivar[i]) %>% select(clrNo), 
                        1, function(x) eucl_dist_f(x=x, y=clr_i))
     debal_index[i] <- which.min(eucl_dist)
     debal[i] <- eucl_dist[debal_index[i]]
@@ -98,7 +102,7 @@ closest <- TNs[index_misbal, ]
 t(closest)
 ```
 
-Note that ionomics groups of the misbalanced and the closest healthy composition are the same. I compute the clr difference between the closest and the misbalanced points. 
+Note that .... of the misbalanced and the closest healthy composition are the same. I compute the clr difference between the closest and the misbalanced points. 
 
 ```{r}
 closest = closest[clrNo]
@@ -167,7 +171,7 @@ ggplot(data = dfreshape, aes(x = value, y = vectors)) +
     facet_wrap(~ variable, scales = "free_x") +
     labs(x='clr coordinate', y ='') +
     theme(text=element_text(family="Arial", face="bold", size=12))
-#ggsave("images/perturb_dotplot.tiff",  width = 6, height = 3)
+ggsave("images/perturb_dotplot.tiff",  width = 6, height = 3)
 ```
 
 
@@ -179,6 +183,6 @@ ggplot(data=dfreshape, aes(x=variable, y=value, fill=vectors)) +
     theme_bw() +
     theme(legend.title=element_blank()) +
     theme(text=element_text(family="Arial", face="bold", size=12))
-#ggsave("images/perturb_barplot.tiff",  width = 6, height = 3)
+ggsave("images/perturb_barplot.tiff",  width = 6, height = 3)
 ```
 
