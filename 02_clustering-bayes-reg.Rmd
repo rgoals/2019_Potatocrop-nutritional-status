@@ -35,7 +35,7 @@ leaf_clust_df <- read_csv("output/leaf_clust_df.csv")
 
 The next cell maps experimental sites locations.
 
-```{r leaf_df-sites-locations, out.width = "100%", fig.align = "center", warning = FALSE, message = FALSE, fig.cap = "Location of experimental sites (green dots) in the Québec potato data set."}
+```{r leaf-df-sites-locations, out.width = "100%", fig.align = "center", warning = FALSE, message = FALSE, fig.cap = "Location of experimental sites in the Québec potato data set."}
 qc_leaf <- get_stamenmap(bbox = c(left = -76, right = -68, bottom = 45, top = 50), 
                          zoom = 7, maptype = 'toner-lite')
 ggmap(qc_leaf) +
@@ -47,7 +47,7 @@ ggmap(qc_leaf) +
   labs(x = "Longitude", y = "Latitude") +
   theme_bw() +
   theme(text = element_text(family = "Arial", face = "bold", size = 12))
-ggsave("images/leaf_clust_df-sites-locations.png", width = 10, height = 8)
+ggsave("images/leaf-df-sites-locations.png", width = 10, height = 8)
 ```
 
 ## The yield cut-off, low and high yielders delimiter
