@@ -3,7 +3,7 @@
 ## Objective
 
 ***
-This chapter has two objectives. Firstly, I try to assign cultivars to groups based on diagnostic leaves ionomes. Although plant health is a continuous domain rather than a categorical status, yield thresholds are useful for decision-making. Because yield potential varies widely among cultivars, I split experimental data into low- and high-productivity categories using a marketable yield delimiter at the 65^th percentile for each cultivar. Hence, I use high yielders subpopulation (samples which marketable yield is larger than the yield cut-off) to look for patterns (if there are) discriminating groups of similar multivariate compositions (`ionomics groups`). Then, I check for macroelements that best discriminate cultivars centroids. The discriminant scores are appended to the data frame. In the second stage,  I check the effect of clr coordinates on tubers yield in a bayesian linear mixed effect model. The third sudsection of the chapter maps the experimental sites locations. At the end, the output data file is called `dfml_df.csv` i.e., the data frame for machine learning chapter (Chapter \@ref(Chapter-Modeling)).
+This chapter has two objectives. Firstly, I try to assign cultivars to groups based on diagnostic leaves ionomes. Although plant health is a continuous domain rather than a categorical status, yield thresholds are useful for decision-making. Because yield potential varies widely among cultivars, I split experimental data into low- and high-productivity categories using a marketable yield delimiter at the 65^th percentile for each cultivar. Hence, I use high yielders subpopulation (samples which marketable yield is larger than the yield cut-off) to look for patterns (if there are) discriminating groups of similar multivariate compositions (`ionomics groups`). Then, I check for macroelements that best discriminate cultivars centroids. The discriminant scores are appended to the data frame. In the second stage, I check the effect of clr coordinates on tubers yield in a bayesian linear mixed effect model. The third subsection of the chapter maps the experimental sites locations. At the end, the output data file is called `dfml_df.csv` i.e., the data frame for machine learning chapter (Chapter \@ref(Chapter-Modeling)).
 
 ***
 
@@ -78,7 +78,7 @@ mean_yield <- leaf_clust_df %>%
 mean_yield
 ```
 
-So, the average marketable yield is 40.48 Mg $ha^-1$ for high yielders and 24.78 Mg $ha^-1$ for low yielders. In comparison, average potato tuber yields in 2017 in Canada and in Québec were respectively [31.21 Mg $ha^-1$](https://www150.statcan.gc.ca/t1/tbl1/fr/tv.action?pid=3210035801&pickMembers%5B0%5D=1.1) and [28.75 Mg $ha^-1$](https://www150.statcan.gc.ca/t1/tbl1/fr/tv.action?pid=3210035801&pickMembers%5B0%5D=1.6).
+So, the average marketable yield is 40.48 Mg $ha^-1$ for high yielders and 24.78 Mg $ha^-1$ for low yielders. In comparison, average potato tuber yields in 2018 in Canada and in Québec were respectively [31.21 Mg $ha^-1$](https://www150.statcan.gc.ca/t1/tbl1/fr/tv.action?pid=3210035801&pickMembers%5B0%5D=1.1) and [28.75 Mg $ha^-1$](https://www150.statcan.gc.ca/t1/tbl1/fr/tv.action?pid=3210035801&pickMembers%5B0%5D=1.6).
 
 ## Centered log-ratio (clr) centroids computation
 
