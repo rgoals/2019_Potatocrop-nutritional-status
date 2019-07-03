@@ -5,7 +5,7 @@
 ***
 The objective of this chapter is to develop a mathematical workflow useful to adjust the ionome of potato crops for diagnostic purpose. Perturbation in compositional space plays the same role as translation plays in real space. Some natural processes in nature can be interpreted as a change from one composition `C1` to another `C2` through the application of a perturbation:
 
-> `p ⊕ C1 ===> C2`.
+> p ⊕ C1 ===> C2.
 
 The difference between `a new observation`  and the closest healthy composition (closest TN) can be back-transformed to the compositional space. The obtained vector is the `perturbation vector`. Theoretically, a misbalanced composition could be balanced (translated into a healthy zone) using a perturbation vector. Also, ionome of a new cultivar could be assigned to the closest healthy sample's cultivar, where nutrient requirements have been already documented by fertilizer trials.
 
@@ -49,7 +49,7 @@ debal <- c()
 debal_index <- c()
 for (i in 1:nrow(train_df)) {
     clr_i <- as.numeric(train_df[i, clrNo])
-    eucl_dist <- apply(TNs %>% filter(Cultivar == train_df$Cultivar[i]) %>% select(clrNo), 
+    eucl_dist <- apply(TNs %>% filter(Cultivar == train_df$Cultivar[i]) %>% select(clrNo), # 
                        1, function(x) eucl_dist_f(x=x, y=clr_i))
     debal_index[i] <- which.min(eucl_dist)
     debal[i] <- eucl_dist[debal_index[i]]
@@ -57,6 +57,35 @@ for (i in 1:nrow(train_df)) {
 train_df$debal <- debal
 train_df %>% glimpse()
 ```
+
+>>>>> simplement pour apprécier la corrélation entre indice de debalancement et rendement
+
+Add regression line, correlation coefficient and equantions of the fitted line. Key functions:
+> stat_smooth() [ggplot2]
+> stat_cor() [ggpubr]
+> stat_poly_eq()[ggpmisc]
+
+```{r, warning=FALSE, message=FALSE}
+library("ggpubr")
+library("ggpmisc")
+```
+
+```{r}
+# Polynomial regression. Show equation and adjusted R2
+data <- train_df %>% filter(debal != 0); x=data$debal; y=data$RendVendable
+formula <- y ~ poly(x, 2)#, raw = TRUE)
+
+p <- ggplot(data = data, aes(x = debal, y = RendVendable)) +
+  geom_point() +
+  geom_smooth(formula = formula) +
+  stat_poly_eq(
+    aes(label =  paste(..eq.label.., ..adj.rr.label.., sep = "~~~~")),
+    formula = formula, parse = TRUE, label.x = 0.50
+    )
+p
+```
+
+>>>>>> Fin appréciation. 
 
 ## Rebalancing a misbalanced sample by perturbation
 
@@ -78,16 +107,16 @@ misbalanced <- unbalanced # copy
 t(misbalanced)
 ```
 
-How could we rebalance it? The first step is to find `in TNs of the corresponding ionomic group` the closest balanced point. Let's re-compute its Euclidean distances from TNs and identify the sample from which the distance is minimum.
+How could we rebalance it? The first step is to find `in TNs of the corresponding cultivar` the closest balanced point. Let's re-compute its Euclidean distances from TNs and identify the sample from which the distance is minimum.
 
 ```{r}
 misbalanced <- misbalanced[clrNo]
-eucl_dist_misbal <- apply(TNs[, clrNo], 1, function(x) eucl_dist_f(x=x, y=misbalanced))
+eucl_dist_misbal <- apply(TNs[, clrNo], 1, function(x) eucl_dist_f(x = x, y = misbalanced))
 index_misbal <- which.min(t(data.frame(eucl_dist_misbal))) 
 index_misbal # return the index of the sample
 ```
 
-The closest healthy sample is the one which index is `r index_misbal`. Using this index we could refind the `debal` value of the misbalanced sample for check.
+The closest healthy sample is the one which index is `r index_misbal`. Using this index we could refind the imbalance index value (`debal`) of the misbalanced sample for check.
 
 ```{r}
 (misbal = eucl_dist_misbal[index_misbal])
@@ -102,7 +131,7 @@ closest <- TNs[index_misbal, ]
 t(closest)
 ```
 
-Note that .... of the misbalanced and the closest healthy composition are the same. I compute the clr difference between the closest and the misbalanced points. 
+Note that `Cultivar` of the misbalanced and the closest healthy composition are the same. I compute the clr difference between the closest and the misbalanced points. 
 
 ```{r}
 closest = closest[clrNo]
@@ -165,8 +194,8 @@ dfreshape
 
 The next two chunks plot with dots and histograms for each vector. Visualization is better with histograms.
 
-```{r hi-perturb-dotplot, fig.height = 3, fig.width = 6, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Perturbation vector computation example dotplot using the most imbalanced foliar sample."}
-ggplot(data = dfreshape, aes(x = value, y = vectors)) +
+```{r hi-perturb-dotplot, fig.height = 4, fig.width = 7, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Perturbation vector computation example dotplot using the most imbalanced foliar sample."}
+ggplot(data = dfreshape, aes(x = value, y = vectors, colour = vectors)) +
     geom_point() +
     facet_wrap(~ variable, scales = "free_x") +
     labs(x='clr coordinate', y ='') +
@@ -174,9 +203,7 @@ ggplot(data = dfreshape, aes(x = value, y = vectors)) +
 ggsave("images/perturb_dotplot.tiff",  width = 6, height = 3)
 ```
 
-
-
-```{r hi-perturb-barplot, fig.height = 3, fig.width = 6, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Perturbation vector computation example barplot using the most imbalanced foliar sample."}
+```{r hi-perturb-barplot, fig.height = 4, fig.width = 6, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Perturbation vector computation example barplot using the most imbalanced foliar sample."}
 ggplot(data=dfreshape, aes(x=variable, y=value, fill=vectors)) +
     geom_bar(stat="identity", position=position_dodge()) +
     coord_flip() +

@@ -24,7 +24,7 @@
 <meta name="author" content="Zonlehoua Coulibali and Serge-Étienne Parent" />
 
 
-<meta name="date" content="2019-07-02" />
+<meta name="date" content="2019-07-03" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -171,7 +171,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <hr />
 <p>The objective of this chapter is to develop a mathematical workflow useful to adjust the ionome of potato crops for diagnostic purpose. Perturbation in compositional space plays the same role as translation plays in real space. Some natural processes in nature can be interpreted as a change from one composition <code>C1</code> to another <code>C2</code> through the application of a perturbation:</p>
 <blockquote>
-<p><code>p ⊕ C1 ===&gt; C2</code>.</p>
+<p>p ⊕ C1 ===&gt; C2.</p>
 </blockquote>
 <p>The difference between <code>a new observation</code> and the closest healthy composition (closest TN) can be back-transformed to the compositional space. The obtained vector is the <code>perturbation vector</code>. Theoretically, a misbalanced composition could be balanced (translated into a healthy zone) using a perturbation vector. Also, ionome of a new cultivar could be assigned to the closest healthy sample’s cultivar, where nutrient requirements have been already documented by fertilizer trials.</p>
 <p>I compute a dissimilarity (or imbalance) index using the true negative clr as references for cultivars. Then, I describe the procedure used to rebalance a misbalanced composition.</p>
@@ -201,7 +201,7 @@ clrNo =<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot
 debal_index &lt;-<span class="st"> </span><span class="kw">c</span>()
 <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(train_df)) {
     clr_i &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(train_df[i, clrNo])
-    eucl_dist &lt;-<span class="st"> </span><span class="kw">apply</span>(TNs <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(Cultivar <span class="op">==</span><span class="st"> </span>train_df<span class="op">$</span>Cultivar[i]) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(clrNo), 
+    eucl_dist &lt;-<span class="st"> </span><span class="kw">apply</span>(TNs <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(Cultivar <span class="op">==</span><span class="st"> </span>train_df<span class="op">$</span>Cultivar[i]) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(clrNo), <span class="co"># </span>
                        <span class="dv">1</span>, <span class="cf">function</span>(x) <span class="kw">eucl_dist_f</span>(<span class="dt">x=</span>x, <span class="dt">y=</span>clr_i))
     debal_index[i] &lt;-<span class="st"> </span><span class="kw">which.min</span>(eucl_dist)
     debal[i] &lt;-<span class="st"> </span>eucl_dist[debal_index[i]]
@@ -226,6 +226,47 @@ train_df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"
 ## $ Maturity5    &lt;chr&gt; &quot;mid-season&quot;, &quot;mid-season&quot;, &quot;mid-season&quot;, &quot;mid-se...
 ## $ pred_yield   &lt;chr&gt; &quot;LY&quot;, &quot;LY&quot;, &quot;LY&quot;, &quot;LY&quot;, &quot;HY&quot;, &quot;HY&quot;, &quot;LY&quot;, &quot;HY&quot;, &quot;...
 ## $ debal        &lt;dbl&gt; 0.2915435, 0.3247296, 0.2628167, 0.2987338, 0.000...</code></pre>
+<blockquote>
+<blockquote>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>simplement pour apprécier la corrélation entre indice de debalancement et rendement</p>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+<p>Add regression line, correlation coefficient and equantions of the fitted line. Key functions: &gt; stat_smooth() [ggplot2] &gt; stat_cor() [ggpubr] &gt; stat_poly_eq()[ggpmisc]</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(<span class="st">&quot;ggpubr&quot;</span>)
+<span class="kw">library</span>(<span class="st">&quot;ggpmisc&quot;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Polynomial regression. Show equation and adjusted R2</span>
+data &lt;-<span class="st"> </span>train_df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(debal <span class="op">!=</span><span class="st"> </span><span class="dv">0</span>); x=data<span class="op">$</span>debal; y=data<span class="op">$</span>RendVendable
+formula &lt;-<span class="st"> </span>y <span class="op">~</span><span class="st"> </span><span class="kw">poly</span>(x, <span class="dv">2</span>)<span class="co">#, raw = TRUE)</span>
+
+p &lt;-<span class="st"> </span><span class="kw">ggplot</span>(<span class="dt">data =</span> data, <span class="kw">aes</span>(<span class="dt">x =</span> debal, <span class="dt">y =</span> RendVendable)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">formula =</span> formula) <span class="op">+</span>
+<span class="st">  </span><span class="kw">stat_poly_eq</span>(
+    <span class="kw">aes</span>(<span class="dt">label =</span>  <span class="kw">paste</span>(..eq.label.., ..adj.rr.label.., <span class="dt">sep =</span> <span class="st">&quot;~~~~&quot;</span>)),
+    <span class="dt">formula =</span> formula, <span class="dt">parse =</span> <span class="ot">TRUE</span>, <span class="dt">label.x =</span> <span class="fl">0.50</span>
+    )
+p</code></pre></div>
+<pre><code>## `geom_smooth()` using method = &#39;gam&#39; and formula &#39;y ~ s(x, bs = &quot;cs&quot;)&#39;</code></pre>
+<p><img src="2019_Bookdown_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<blockquote>
+<blockquote>
+<blockquote>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>Fin appréciation.</p>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
 </div>
 <div id="rebalancing-a-misbalanced-sample-by-perturbation" class="section level2">
 <h2><span class="header-section-number">4.4</span> Rebalancing a misbalanced sample by perturbation</h2>
@@ -273,13 +314,13 @@ misbalanced &lt;-<span class="st"> </span>unbalanced <span class="co"># copy</sp
 ## Maturity5    &quot;early mid-season&quot;
 ## pred_yield   &quot;LY&quot;              
 ## debal        &quot;1.256154&quot;</code></pre>
-<p>How could we rebalance it? The first step is to find <code>in TNs of the corresponding ionomic group</code> the closest balanced point. Let’s re-compute its Euclidean distances from TNs and identify the sample from which the distance is minimum.</p>
+<p>How could we rebalance it? The first step is to find <code>in TNs of the corresponding cultivar</code> the closest balanced point. Let’s re-compute its Euclidean distances from TNs and identify the sample from which the distance is minimum.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">misbalanced &lt;-<span class="st"> </span>misbalanced[clrNo]
-eucl_dist_misbal &lt;-<span class="st"> </span><span class="kw">apply</span>(TNs[, clrNo], <span class="dv">1</span>, <span class="cf">function</span>(x) <span class="kw">eucl_dist_f</span>(<span class="dt">x=</span>x, <span class="dt">y=</span>misbalanced))
+eucl_dist_misbal &lt;-<span class="st"> </span><span class="kw">apply</span>(TNs[, clrNo], <span class="dv">1</span>, <span class="cf">function</span>(x) <span class="kw">eucl_dist_f</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> misbalanced))
 index_misbal &lt;-<span class="st"> </span><span class="kw">which.min</span>(<span class="kw">t</span>(<span class="kw">data.frame</span>(eucl_dist_misbal))) 
 index_misbal <span class="co"># return the index of the sample</span></code></pre></div>
 <pre><code>## [1] 610</code></pre>
-<p>The closest healthy sample is the one which index is 610. Using this index we could refind the <code>debal</code> value of the misbalanced sample for check.</p>
+<p>The closest healthy sample is the one which index is 610. Using this index we could refind the imbalance index value (<code>debal</code>) of the misbalanced sample for check.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(<span class="dt">misbal =</span> eucl_dist_misbal[index_misbal])</code></pre></div>
 <pre><code>## [1] 1.256154</code></pre>
 <p>The Euclidean distance matches with the corresponding <code>debal</code> value: <code>unbalanced$debal[1]</code> = 1.2561535.</p>
@@ -302,7 +343,7 @@ index_misbal <span class="co"># return the index of the sample</span></code></pr
 ## Cultivar     &quot;Superior&quot;        
 ## Maturity5    &quot;early mid-season&quot;
 ## pred_yield   &quot;HY&quot;</code></pre>
-<p>Note that …. of the misbalanced and the closest healthy composition are the same. I compute the clr difference between the closest and the misbalanced points.</p>
+<p>Note that <code>Cultivar</code> of the misbalanced and the closest healthy composition are the same. I compute the clr difference between the closest and the misbalanced points.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">closest =<span class="st"> </span>closest[clrNo]
 clr_diff =<span class="st"> </span>closest <span class="op">-</span><span class="st"> </span>misbalanced
 <span class="kw">t</span>(clr_diff)</code></pre></div>
@@ -399,7 +440,7 @@ dfreshape =<span class="st"> </span><span class="kw">melt</span>(df) <span class
 ## 17    reference    clrFv  3.19969068
 ## 18 perturbation    clrFv  0.49901414</code></pre>
 <p>The next two chunks plot with dots and histograms for each vector. Visualization is better with histograms.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(<span class="dt">data =</span> dfreshape, <span class="kw">aes</span>(<span class="dt">x =</span> value, <span class="dt">y =</span> vectors)) <span class="op">+</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(<span class="dt">data =</span> dfreshape, <span class="kw">aes</span>(<span class="dt">x =</span> value, <span class="dt">y =</span> vectors, <span class="dt">colour =</span> vectors)) <span class="op">+</span>
 <span class="st">    </span><span class="kw">geom_point</span>() <span class="op">+</span>
 <span class="st">    </span><span class="kw">facet_wrap</span>(<span class="op">~</span><span class="st"> </span>variable, <span class="dt">scales =</span> <span class="st">&quot;free_x&quot;</span>) <span class="op">+</span>
 <span class="st">    </span><span class="kw">labs</span>(<span class="dt">x=</span><span class="st">&#39;clr coordinate&#39;</span>, <span class="dt">y =</span><span class="st">&#39;&#39;</span>) <span class="op">+</span>

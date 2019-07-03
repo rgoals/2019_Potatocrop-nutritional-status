@@ -24,7 +24,7 @@
 <meta name="author" content="Zonlehoua Coulibali and Serge-Étienne Parent" />
 
 
-<meta name="date" content="2019-07-02" />
+<meta name="date" content="2019-07-03" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -169,7 +169,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="objective-1" class="section level2">
 <h2><span class="header-section-number">3.1</span> Objective</h2>
 <hr />
-<p>The objective of this chapter is to develop, evaluate and compare the performance of some machine learning algorithms (k-nearest neighbors, random forest and support vector machine - <a href="https://topepo.github.io/caret/index.html">package caret</a>) in predicting yield categories using clr coordinates. I use the previous chapter (chapter <a href="Chapter-Clustering.html#Chapter-Clustering">2</a>) handeled data file <code>dfml.csv</code> which contains clr coordinates, maturity classes and the yield two categorical variable created using the 65^th percentile for each cultivar. I use <code>accuracy</code> as models quality metric. I run the Chi-square homogenity test to compare prediction with a non-informative classification consisting of an equal distribution of 50% successful and 50% unsuccessful cases, using the best model (highest accuracy’s model). Then, I filter only true negative specimens i.e., correctely predicted high yielders of training data set, in a new data frame for leaf health index purpose (Chapter <a href="Chapter-Perturbation-vector.html#Chapter-Perturbation-vector">4</a>).</p>
+<p>The objective of this chapter is to develop, evaluate and compare the performance of some machine learning algorithms (k-nearest neighbors, random forest and support vector machine - <a href="https://topepo.github.io/caret/index.html">package caret</a>) in predicting yield categories using clr coordinates. I use the previous chapter (chapter <a href="Chapter-Clustering.html#Chapter-Clustering">2</a>) handeled data file <code>dfml.csv</code> which contains clr coordinates, maturity classes and the yield two categorical variable created using the 65^th percentile for each cultivar. I use <code>accuracy</code> as models quality metric. I run the Chi-square homogenity test to compare prediction with a non-informative classification consisting of an equal distribution of 50% successful and 50% unsuccessful cases, using the best model (highest accuracy’s model). Then, I filter only true negative specimens i.e., correctely predicted high yielders of training data set, in a new data frame for leaf health index analysis purpose (Chapter <a href="Chapter-Perturbation-vector.html#Chapter-Perturbation-vector">4</a>).</p>
 <hr />
 </div>
 <div id="useful-libraries" class="section level2">
