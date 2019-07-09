@@ -194,13 +194,17 @@ predict(res)
 
 The result can also be visualized graphically as follow:
 
-```{r, cluster-plot, out.width = "100%", fig.align = "center", warning = FALSE, message = FALSE, fig.cap = "Clusters delineated with dbscan."}
+```{r, cluster-plot, out.width = "100%", fig.align = "center", warning = FALSE, message = FALSE, fig.cap = "Cluster plot of poato cultivars based on centered log-ratio N P K Mg Ca transformed compositions of diagnostic leaves."}
 fviz_cluster(res, hy_centroids %>%
   select(starts_with("clr")) %>%
-  as.matrix(), geom = "point", ggtheme = theme_bw())
+  as.matrix(), geom = "point", font.family = "Arial", ggtheme = theme_bw()) +
+  theme(text = element_text(size = 12),
+        axis.title = element_text(size = 12),
+        axis.text = element_text(size = 12))
+ggsave("images/cluster_plot.png", width=10, height=6, dpi = 300)
 ```
 
-Black points are outliers (zeros). As shown on the plot, one cluster means there is no detectable shape between cultivars ionomes as dots are scattered differently. It may not be useful to think of possible strcutures between potato cultivars based on ionome. Nethertheless, one could extract scores of the first two discriminant axes as numerical variables for cultivars in models, and then check for elements that best discriminate cultivars. 
+Black points are outliers (zeros). As shown on the plot, one cluster means there is no detectable shape between cultivars ionomes as dots are scattered differently. It may not be useful to think of possible structures between potato cultivars based on ionome. Nethertheless, one could extract scores of the first two discriminant axes as numerical variables for cultivars in models, and then check for elements that best discriminate cultivars. 
 
 ## Axis reduction
 
@@ -231,11 +235,11 @@ I plot the distance biplot as result of discriminant analysis in separate plots 
 ```{r, discriminant-grid-plot, fig.height = 5, fig.width = 10, out.width = "100%", fig.align = "center", warning = FALSE, message = FALSE, fig.cap = "Grid plot of discriminant and cluster analyses of potato cultivars."}
 g1 <- lda_centroids %>%
   ggplot(aes(DS1, DS2, label = Cultivar)) +
-  geom_hline(yintercept=0, color="black", linetype=2) +
-  geom_vline(xintercept=0, color="black", linetype=2) + 
-  geom_label_repel() +
+  geom_hline(yintercept=0, color="black") +
+  geom_vline(xintercept=0, color="black") + 
+  geom_label_repel(label.size = 1) +
   geom_point(alpha = 0.5) +
-  xlim(c(-4, 4)) +
+  xlim(c(-5, 5)) +
   ylim(c(-6, 5)) +
   guides(colour=FALSE) +
   theme_bw(base_size = 12) +
@@ -243,23 +247,23 @@ g1 <- lda_centroids %>%
         text=element_text(family="Arial", face="bold", size=12))
 
 g2 <- ggplot(data=lda_loading) +
-  geom_hline(yintercept=0, color="black", linetype=2) +
-  geom_vline(xintercept=0, color="black", linetype=2) + 
+  geom_hline(yintercept=0, color="black") +
+  geom_vline(xintercept=0, color="black") + 
   geom_segment(aes(xend=DS1, yend=DS2), x=0, y=0, 
                size = 1, color="grey50") + 
   geom_label(aes(x=DS1, y=DS2, label=clr), 
              size=5, color="white", bg = "grey50")+
-  xlim(c(-4, 4)) +
+  xlim(c(-5, 5)) +
   ylim(c(-6, 5)) +
   labs(x = "DS1", y = "DS2") +
   theme_bw(base_size = 12) +
   theme(axis.text=element_text(size = 12),
         text = element_text(family = "Arial", face = "bold", size = 12))
 plot_grid(g1, g2)
-ggsave("images/discriminant_plots.png", width=10, height=8, dpi = 300)
+ggsave("images/discriminant_plots.png", width=10, height=6, dpi = 300)
 ```
 
-The first discriminant axis (`DS1`) is formed mainly by `Mg`, `K` and `N`. The second discriminant axis (`DS2`) is driven mainly by `Fv`, `K` and weakely by `Mg` and `Ca`. I append discriminant scores to leaves composition data frame.
+The first discriminant axis (`DS1`) is formed mainly by `Mg`, `K` and `N`. The second discriminant axis (`DS2`) is driven mainly by `Fv`, `K` and weakly by `Mg`, `Ca` and `P`. I append discriminant scores to leaves composition data frame.
 
 ```{r}
 leaf_clust_df <- leaf_clust_df %>% 
@@ -356,7 +360,7 @@ samples_tidy <- samples_tidy %>%
 
 Then, I plot clrs effects on tubers marketable yield i.e., the posterior distributions of corresponding regression coefficients.
 
-```{r, effect-plot, fig.height = 10, fig.width = 5, out.width = "100%", fig.align = "center", warning = FALSE, message = FALSE, fig.cap = "Effects of clr nutrients on tubers yield."}
+```{r, effect-plot, fig.height = 8, fig.width = 5, out.width = "100%", fig.align = "center", warning = FALSE, message = FALSE, fig.cap = "Effects of clr nutrients on tubers yield."}
 samples_tidy %>%
   filter(!is.na(clr)) %>% 
   ggplot(aes(x = value, y = clr, fill=factor(..quantile..))) +
@@ -369,7 +373,7 @@ samples_tidy %>%
   theme(axis.text=element_text(size = 12),
         text = element_text(family = "Arial", face = "bold", size = 12)) +
   theme_bw()
-ggsave("images/bayes-mixed-clr.png", width=10, height=8, dpi = 300)
+ggsave("images/bayes-mixed-clr.png", width=5, height=8, dpi = 300)
 ```
 
 Each regression coefficient refers to the effect of explanatory variable i.e., one clr variable, on the expectation of the response variable i.e., marketable yield, adjusted for the rest of covariates. Posterior distributions far away from the zero value indicate an important contribution of clrs on the prediction of tubers yield. Moreover, the relationship is positive for all the clrs. Positive association means that changes of the explanatory variable cause changes of the same direction for response variable.

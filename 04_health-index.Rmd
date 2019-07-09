@@ -72,7 +72,7 @@ library("ggpmisc")
 
 ```{r}
 # Polynomial regression. Show equation and adjusted R2
-data <- train_df %>% filter(debal != 0); x=data$debal; y=data$RendVendable
+data <- train_df %>% filter(debal != 0); x = data$debal; y = data$RendVendable
 formula <- y ~ poly(x, 2)#, raw = TRUE)
 
 p <- ggplot(data = data, aes(x = debal, y = RendVendable)) +
