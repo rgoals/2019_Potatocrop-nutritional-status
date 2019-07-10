@@ -157,7 +157,7 @@ hy_df_in <- hy_df_IO %>%
 
 `r nrow(hy_df)-nrow(hy_df_in)` outliers have been discarded. 
 
-## Patterns between potato cultivars
+## Clustering potato cultivars with ionome
 
 Patterns recognition is done with [dbscan](http://www.sthda.com/english/wiki/wiki.php?id_contents=7940#algorithm-of-dbscan) algorithm which can identify dense regions measured by the number of objects close to a given point. As explained by the author, the key idea is that for each point of a cluster, the neighborhood of a given radius has to contain at least a minimum number of points.
 

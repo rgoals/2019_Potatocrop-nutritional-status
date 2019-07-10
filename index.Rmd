@@ -5,15 +5,12 @@ date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
 documentclass: book
 output: bookdown::gitbook
-description: "This is a example of using the bookdown package to write a book that describ the statistical computations of my PhD Project, for publication on Github. The output format choosed is bookdown::gitbook. Next features are set out for after (bibliography and links)."
-#bibliography: [book.bib, packages.bib]
-#biblio-style: apalike
-#link-citations: yes
+description: "This is a example of using the bookdown package to write a book that describ the statistical computations of my PhD Project, for publication on Github. The output format choosed is bookdown::gitbook."
 ---
 
 # Data processing {#Chapter-Data-Processing}
 
-## Objective {#Objective}
+## Objective
 
 ***
 This chapter is the first of a series of R markdown codes aiming to describe computations methodology used to derive the results and conclusions of potato nutrient diagnosis article. The data set is a collection of potato surveys and nitrogen (N), phosphorous (P) and potassium (K) fertilizer trials conducted in Quebec from 1970 to 2017 between the US border at the 45^th parallel and the Northern limit of cultivation at the 49^th parallel. The useful variables are the first mature leaf (4^th from top, sampled at the beginning of blossom stage) nitrogen, phosphorus, potassium, calcium (Ca) and magnesium (Mg) compositions, cultivars used in experiments and tuber marketable yield. These variables are extracted from the Québec potato raw data table (`raw_potato_df.csv`) and tidded to obtain useful variables for cultivars clustering assessment (Chapter \@ref(Chapter-Clustering)), tuber yield prediction (Chapter \@ref(Chapter-Modeling)) and assessment of perturbation vector concept (Chapter \@ref(Chapter-Perturbation-vector)). A previous exploration has shown that oligoelements contained too many missing values, for this reason these elements were excluded from analysis. The chapter ends with the backup of a processed data frame useful for next chapters. 
