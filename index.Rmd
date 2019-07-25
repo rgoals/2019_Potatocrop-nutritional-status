@@ -1,5 +1,5 @@
 --- 
-title: "Assessment of the nutritional imbalance status of potato crop"
+title: "Balancing the nutritional status of potato crops."
 author: "Zonlehoua Coulibali and Serge-Étienne Parent"
 date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
