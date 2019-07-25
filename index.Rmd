@@ -5,7 +5,7 @@ date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
 documentclass: book
 output: bookdown::gitbook
-description: "This is a example of using the bookdown package to write a book that describ the statistical computations of my PhD Project, for publication on Github. The output format choosed is bookdown::gitbook."
+description: "I use the bookdown package to write a book that describs the statistical computations of my PhD Project, for publication on Github. The output format choosed is bookdown::gitbook."
 ---
 
 # Data processing {#Chapter-Data-Processing}
@@ -13,13 +13,13 @@ description: "This is a example of using the bookdown package to write a book th
 ## Objective
 
 ***
-This chapter is the first of a series of R markdown codes aiming to describe computations methodology used to derive the results and conclusions of potato nutrient diagnosis article. The data set is a collection of potato surveys and nitrogen (N), phosphorous (P) and potassium (K) fertilizer trials conducted in Quebec from 1970 to 2017 between the US border at the 45^th parallel and the Northern limit of cultivation at the 49^th parallel. The useful variables are the first mature leaf (4^th from top, sampled at the beginning of blossom stage) nitrogen, phosphorus, potassium, calcium (Ca) and magnesium (Mg) compositions, cultivars used in experiments and tuber marketable yield. These variables are extracted from the Québec potato raw data table (`raw_potato_df.csv`) and tidded to obtain useful variables for cultivars clustering assessment (Chapter \@ref(Chapter-Clustering)), tuber yield prediction (Chapter \@ref(Chapter-Modeling)) and assessment of perturbation vector concept (Chapter \@ref(Chapter-Perturbation-vector)). A previous exploration has shown that oligoelements contained too many missing values, for this reason these elements were excluded from analysis. The chapter ends with the backup of a processed data frame useful for next chapters. 
+This chapter is the first of a series of R markdown codes aiming to describe computations methodology used to derive the results and conclusions of potato nutrient diagnosis article. The data set is a collection of potato surveys and nitrogen (N), phosphorous (P) and potassium (K) fertilizer trials conducted in Quebec from 1970 to 2017 between the US border at the 45^th parallel and the Northern limit of cultivation at the 49^th parallel. The useful variables are the first mature leaf (4^th from top, sampled at the beginning of blossom stage) nitrogen, phosphorus, potassium, calcium (Ca) and magnesium (Mg) compositions, cultivars used in experiments and tuber marketable yield. These variables are extracted from the Québec potato raw data table (`raw_potato_df.csv`) and tidded to obtain useful variables for cultivars clustering assessment (Chapter \@ref(Chapter-Clustering)), tuber yield prediction (Chapter \@ref(Chapter-Modeling)) and assessment of perturbation vector concept (Chapter \@ref(Chapter-Perturbation)). A previous exploration has shown that oligoelements contained too many missing values, for this reason these elements were excluded from analysis. The chapter ends with the backup of a processed data frame useful for next chapters. 
 
 ***
 
 ## Useful libraries for data handling
 
-I need package [tidyverse](https://www.tidyverse.org/) which loads a set of packages for data handling and vizualisation. I used [Amelia](https://www.rdocumentation.org/packages/Amelia/versions/1.7.5) for missing data vizualisation, [robCompositions](https://www.rdocumentation.org/packages/robCompositions/versions/2.1.0) to robustely impute missing values in compositional data using knn methods, [compositions](http://www.stat.boogaart.de/compositions) to transforme compositions into compositionnal space.
+I need package [tidyverse](https://www.tidyverse.org/) which loads a set of packages for easy data manipulation and visualization. I used [Amelia](https://www.rdocumentation.org/packages/Amelia/versions/1.7.5) for missing data vizualisation, [robCompositions](https://www.rdocumentation.org/packages/robCompositions/versions/2.1.0) to robustely impute missing values in compositional data using knn methods, [compositions](http://www.stat.boogaart.de/compositions) to transforme compositions into compositionnal space.
 
 ```{r, message=FALSE, warning=FALSE}
 library("tidyverse")

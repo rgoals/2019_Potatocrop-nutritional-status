@@ -3,13 +3,13 @@
 ## Objective
 
 ***
-The objective of this chapter is to develop, evaluate and compare the performance of some machine learning algorithms (k-nearest neighbors, random forest and support vector machine - [package caret](https://topepo.github.io/caret/index.html)) in predicting yield categories using clr coordinates. I use the previous chapter (chapter \@ref(Chapter-Clustering)) handeled data file `dfml.csv` which contains clr coordinates, maturity classes and the yield two categorical variable created using the 65^th percentile for each cultivar. I use `accuracy` as models quality metric. I run the Chi-square homogenity test to compare prediction with a non-informative classification consisting of an equal distribution of 50% successful and 50% unsuccessful cases, using the best model (highest accuracy's model). Then, I filter only true negative specimens i.e., correctely predicted high yielders of training data set, in a new data frame for leaf health index analysis purpose (Chapter \@ref(Chapter-Perturbation-vector)).
+The objective of this chapter is to develop, evaluate and compare the performance of some machine learning algorithms (k-nearest neighbors, random forest and support vector machine - [package caret](https://topepo.github.io/caret/index.html)) in predicting yield categories using clr coordinates. I use the previous chapter (chapter \@ref(Chapter-Clustering)) handeled data file `dfml.csv` which contains clr coordinates, maturity classes and the yield two categorical variable created using the 65^th percentile for each cultivar. I use `accuracy` as models quality metric. I run the Chi-square homogenity test to compare prediction with a random classifier consisting of an equal distribution of 50% successful and 50% unsuccessful cases, using the best model (highest accuracy's model). Then, I filter only true negative specimens i.e., correctely predicted high yielders of training data set, in a new data frame for leaf health index analysis purpose (Chapter \@ref(Chapter-Perturbation)).
 
 ***
 
 ## Useful libraries
 
-The `tidyverse` package is always needed for data manipulation and visualization, and then `extrafont` to make changes in graphs as demanded for the article. The particularly useful packages are `caret` and [kknn](https://www.rdocumentation.org/packages/kknn/versions/1.3.1) needed for machine leraning functions.
+The `tidyverse` package is always needed for data easy manipulation and visualization, and then `extrafont` to make changes in graphs as demanded for the article. The particularly useful packages are `caret` and [kknn](https://www.rdocumentation.org/packages/kknn/versions/1.3.1) needed for machine leraning functions.
 
 ```{r, warning=FALSE, message=FALSE}
 library("tidyverse")
@@ -23,59 +23,38 @@ library('kknn')
 I load the `dfml.csv` data set and named it `df`. The clr coordinates are scaled to zero mean and unity variance.
 
 ```{r}
-df = read_csv('output/dfml.csv')
-df$Maturity5 = factor(df$Maturity5)
-df$yieldClass = factor(df$yieldClass)
+dfml = read_csv('output/dfml.csv')
+dfml$Maturity5 = factor(dfml$Maturity5)
+dfml$yieldClass = factor(dfml$yieldClass)
 
 clr_no <- c("clr_N", "clr_P", "clr_K", "clr_Mg", "clr_Ca", "clr_Fv")
 clrNo <- c("clrN", "clrP", "clrK", "clrMg", "clrCa", "clrFv")
-colnames(df)[which(names(df) %in% clr_no)] <- clrNo
+colnames(dfml)[which(names(dfml) %in% clr_no)] <- clrNo
 
-df.sc <- df # copy
-df.sc[, clrNo] <- apply(df.sc[, clrNo], 2, scale) # scale clr coordinates
-```
-
-I check the data frame to see cultivars abundance. Cultivar `Goldrush` overcomes the others.
-
-```{r}
-pc <- round(with(df.sc, prop.table(table(Cultivar)) * 100), 2)
-dist <- with(df.sc, cbind(freq = table(Cultivar), percentage = pc))
-dist <- data.frame(cbind(dist, rownames(dist)))
-colnames(dist)[3] <- "Cultivar"
-dist$freq <- as.numeric(as.character(dist$freq))
-```
-
-```{r, ml-cultivar-abundance, fig.height = 10, fig.width = 5, out.width = "100%", fig.align = "center", warning = FALSE, message = FALSE, fig.cap = "Cultivars abundance in the machine learning data frame.", echo = FALSE}
-dist %>%
-  ggplot(aes(x = reorder(Cultivar, freq), y = freq)) +
-  geom_col() +
-  geom_text(aes(label = freq), hjust = -0.1) +
-  ylim(c(0, 650)) +
-  labs(x = 'Cultivar', y = 'Number of samples') +
-  coord_flip()
+dfml.sc <- dfml # copy
+dfml.sc[, clrNo] <- apply(dfml.sc[, clrNo], 2, scale) # scale predictors
 ```
 
 ## Machine learning
 
-### Train and Test splits
+### Data train and test splits
 
-I randomly split the data into a training set (75 % of the data) used to fit the models, and a testing set (remaining 25 %) I use for models' evaluation. The next chunk splits data and groups predictors using three schemes.
+I randomly split the data into a training set (75% of the data) used to fit the models, and a testing set (remaining 25%) I use for models' evaluation. The next chunk splits data and groups predictors using three schemes.
 
 ```{r}
-set.seed(853739)
-split_index <- createDataPartition(df.sc$yieldClass, group = "Cultivar",
+set.seed(85379)
+split_index <- createDataPartition(dfml.sc$yieldClass, group = "Cultivar",
                                    p = 0.75, list = FALSE, times = 1)
-train_df <- df.sc[split_index, ]
-test_df <- df.sc[-split_index, ]
+train_df <- dfml.sc[split_index, ]
+test_df <- dfml.sc[-split_index, ]
 ml_col <- c(clrNo, "yieldClass")
 ```
 
 With the `kknn` package, we must specify three parameters: `kmax` which is the number of neighbors to consider, `distance` a distance parameter to specify (1 for the Mahattan distance and 2 for the Euclidean distance), and a `kernel` which is a function to measure the distance. A best method currently used to choose the right parameters consists in creating a parameter grid.
 
 ```{r}
-grid <-  expand.grid(kmax = c(7,9,12,15), distance = 1:2,
-                     kernel = c("rectangular", "gaussian", "optimal"))
-grid
+(grid <-  expand.grid(kmax = c(7,9,12,15), distance = 1:2,
+                     kernel = c("rectangular", "gaussian", "optimal")))
 ```
 
 I use the metric of “Accuracy” to evaluate models. This is a ratio of the number of correctly predicted instances divided by the total number of instances in the dataset (e.g. 95% accurate). 
@@ -118,12 +97,11 @@ rf_clr <- train(yieldClass ~., data = train_df %>% select(ml_col), method = "rf"
 
 I assess the accuracy metric also when building the models (training set) but the target metric is for the evaluation set. This chart sorts models.
 
-```{r ml-traindotplot, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Comparison of models accuracies at training."}
+```{r ml-traindotplot, fig.height = 3, fig.width = 5, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Comparison of models accuracies at training."}
 # Summary results
 results <- resamples(list(kknn_model = kknn_clr, 
                           svm_model = svm_clr, 
-                          rf_model = rf_clr)
-                     )
+                          rf_model = rf_clr))
 
 #summary(results) with dotplot()
 dotplot(results)
@@ -135,13 +113,21 @@ This chunk also sorts models in a descending order using accuracies only, in a t
 models_acc <- data.frame(Model = summary(results)$models,
                        Accuracy = c(confusionMatrix(train_df$yieldClass, predict(kknn_clr))$overall[1],
                                     confusionMatrix(train_df$yieldClass, predict(svm_clr))$overall[1],
-                                    confusionMatrix(train_df$yieldClass, predict(rf_clr))$overall[1])
-                       )
+                                    confusionMatrix(train_df$yieldClass, predict(rf_clr))$overall[1]))
 
 models_acc[order(models_acc[,"Accuracy"], decreasing = TRUE), ]
 ```
 
-### Models' evaluation (on testing set)
+The next one prints the best tuning parameters that maximizes model accuracy.
+
+```{r}
+data.frame(Model = summary(results)$models,
+           param = c(kknn_clr$bestTune, 
+                     svm_clr$bestTune, 
+                     rf_clr$bestTune))
+```
+
+### Models' evaluation (test set)
 
 Model evaluation is an integral part of the model development process. It helps to find the best model that represents our data and how well the chosen model will work in the future. The next chunk performs this computations and gives the sorted accuracy metrics.
 
@@ -155,14 +141,28 @@ tests_acc <- data.frame(Model = summary(results)$models,
                         Accuracy_on_test = c(
                           confusionMatrix(test_df$yieldClass, predicted_kknn_clr)$overall[1],
                           confusionMatrix(test_df$yieldClass, predicted_svm_clr)$overall[1],
-                          confusionMatrix(test_df$yieldClass, predicted_rf_clr)$overall[1])
-                        )
+                          confusionMatrix(test_df$yieldClass, predicted_rf_clr)$overall[1]))
 tests_acc[order(tests_acc[,"Accuracy_on_test"], decreasing = TRUE), ]
 ```
 
-The k-nearest neighbours, the random forest and the support vector machine models returned similar predictive accuracies although slightly higher for the random forest. 
+The k-nearest neighbours, the random forest and the support vector machine models returned similar predictive accuracies (..... although slightly higher for the random forest !!!.....). 
 
-## Yield class prediction with rf algorithm
+## Estimate variable importance
+
+The varImp() method is then used to estimate the variable importance, which is printed (summarized) and plotted. `varImp()` ranks features by importance.
+
+```{r}
+importance <- varImp(rf_clr, scale = FALSE) # scale between 1 to 100
+print(importance)
+```
+
+```{r, var-imp-plot, fig.height = 2, fig.width = 4, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Importance of clr variables (effect) in the model."}
+#tiff('images/var-imp-plot.tiff')
+plot(importance, cex = 1.2, cex.lab = 2, cex.axis = 2, ylab = "variable", col = "black")
+#dev.off()
+```
+
+## Make predictions on the test data with rf model
 
 I sort the predictive quality metrics by cultivar with `random forest` algorithm: model `rf_clr`, and tide the table.
 
@@ -183,16 +183,14 @@ data[order(data[,"Accuracy"], decreasing=T), ]
 
 The predictive accuracy is very high for some cultivars, but this result must be taken with care due to small size of samples often available. The next chunk plots accuracies for cultivars using ggplot2 functions.
 
-```{r accuracy_cultivar, fig.height = 8, fig.width = 5, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Predictive accuracy for cultivars."}
-ggplot(data, aes(x = reorder(Cultivar, Accuracy), y = Accuracy, fill = Accuracy)) +
-  geom_col() +
-  scale_fill_gradient(low = "lightgrey", high = "black") + 
-  geom_text(aes(label = Accuracy), hjust = -0.1) +
-  ylim(c(0, 1.1)) +
-  labs(x = 'Cultivar', y = 'Accuracy') +
-  coord_flip() +
-  theme(text=element_text(family = "Arial", face = "bold", size = 12))
-ggsave("images/cultivar-accuracy.tiff", width=5, height=8)
+```{r accuracy_cultivar, fig.height = 5, fig.width = 9, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Predictive accuracy for cultivars."}
+ggplot(data, aes(x = reorder(Cultivar, Accuracy), y = Accuracy)) +
+  geom_col(aes(fill = numb_samples)) +
+  scale_fill_gradient(low = "grey50", high = "black") +
+  labs(x = 'Cultivar', y = 'Accuracy', fill = "Samples (n)") +
+  theme(text = element_text(family = "Arial", face = "bold", size = 12)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = 12))
+ggsave("images/cultivar-accuracy.tiff", width = 9, height = 5)
 ```
 
 ## Comparison with non-informative classification
@@ -229,19 +227,25 @@ The null hypothesis for a non-informative classification is rejected after the c
 
 ## Train data set backup for TN specimens selection
 
-The train data set with predicted yield classes `train_df` backup will be used to test perturbation vector theory in the next chapter.
+The train data set with predicted yield classes `train_df` backup will be used to illustrate the perturbation vector theory in the next chapter. The effect of perturbing one or several elements on the whole compositional space will be assessed with the testing set.
 
 ```{r}
-pred_yield <- predict(rf_clr, train_df %>% select(ml_col))
-train_df = data.frame(cbind(df[split_index, ], pred_yield))
+tr_Pyield <- as.character(predict(rf_clr, train_df %>% select(ml_col)))
+train_df <- data.frame(cbind(dfml[split_index, ], tr_Pyield))
+#train_df$yieldClass <- as.character(train_df$yieldClass)
+
+te_Pyield <- as.character(predict(rf_clr, test_df %>% select(ml_col)))
+test_df <- data.frame(cbind(dfml[-split_index, ], te_Pyield))
+#test_df$yieldClass <- as.character(test_df$yieldClass)
+
 write_csv(train_df, "output/train_df.csv")
-nrow(train_df)
+write_csv(test_df, "output/test_df.csv")
 ```
 
 I consider as True Negatives (TN) specimens for this study, observations of the training data set having a high yield (HY) and correctly predicted with the `random forest` model. Then, I compute clr centroids for cultivars using True Negatives original (not scaled) clr values. These centroids could be used as `clr norms` for cultivars.
 
 ```{r}
-TNs = train_df[train_df$yieldClass == 'HY' & pred_yield == 'HY', ]
+TNs = train_df[train_df$yieldClass == 'HY' & tr_Pyield == 'HY', ]
 TNmedianNorms <- TNs %>%
   group_by(Cultivar) %>%
   select(clrNo) %>%
