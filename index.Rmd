@@ -5,7 +5,7 @@ date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
 documentclass: book
 output: bookdown::gitbook
-description: "I use the bookdown package to write a book that describs the statistical computations of my PhD Project, for publication on Github. The output format choosed is bookdown::gitbook."
+description: "We use the bookdown package to write a book that describs the statistical computations of my PhD Project, for publication on Github."
 ---
 
 # Data processing {#Chapter-Data-Processing}
@@ -13,13 +13,13 @@ description: "I use the bookdown package to write a book that describs the stati
 ## Objective
 
 ***
-This chapter is the first of a series of R markdown codes aiming to describe computations methodology used to derive the results and conclusions of potato nutrient diagnosis article. The data set is a collection of potato surveys and nitrogen (N), phosphorous (P) and potassium (K) fertilizer trials conducted in Quebec from 1970 to 2017 between the US border at the 45^th parallel and the Northern limit of cultivation at the 49^th parallel. The useful variables are the first mature leaf (4^th from top, sampled at the beginning of blossom stage) nitrogen, phosphorus, potassium, calcium (Ca) and magnesium (Mg) compositions, cultivars used in experiments and tuber marketable yield. These variables are extracted from the Québec potato raw data table (`raw_potato_df.csv`) and tidded to obtain useful variables for cultivars clustering assessment (Chapter \@ref(Chapter-Clustering)), tuber yield prediction (Chapter \@ref(Chapter-Modeling)) and assessment of perturbation vector concept (Chapter \@ref(Chapter-Perturbation)). A previous exploration has shown that oligoelements contained too many missing values, for this reason these elements were excluded from analysis. The chapter ends with the backup of a processed data frame useful for next chapters. 
+This chapter is the first of a series of R markdown codes aiming to describe computations methodology used to derive the results and conclusions of potato nutrient diagnosis article. The data set is a collection of potato surveys and N, P and K fertilizer trials conducted in Quebec from 1970 to 2017 between the US border at the 45^th parallel and near the Northern limit of cultivation at the 49^th parallel. The useful variables are the first mature leaf (4^th from top, collected at the beginning of blossom stage) N, P, K, Ca and Mg compositions, cultivars used in experiments and tuber marketable yield. These variables are selected from the Québec potato raw data table (`raw_potato_df.csv`) and processed to give useful variables for cultivars clustering (Chapter \@ref(Chapter-Clustering)), tuber yield prediction (Chapter \@ref(Chapter-Modeling)) and assessment of perturbation vector concept (Chapter \@ref(Chapter-Perturbation)). A previous exploration showed that oligoelements contained too many missing values, for this reason these elements were excluded from analysis. The chapter ends with the backup of a processed data frame useful for next chapters. 
 
 ***
 
 ## Useful libraries for data handling
 
-I need package [tidyverse](https://www.tidyverse.org/) which loads a set of packages for easy data manipulation and visualization. I used [Amelia](https://www.rdocumentation.org/packages/Amelia/versions/1.7.5) for missing data vizualisation, [robCompositions](https://www.rdocumentation.org/packages/robCompositions/versions/2.1.0) to robustely impute missing values in compositional data using knn methods, [compositions](http://www.stat.boogaart.de/compositions) to transforme compositions into compositionnal space.
+We need package [tidyverse](https://www.tidyverse.org/) which loads a set of packages for easy data manipulation and visualization. A set of other packages is used: [Amelia](https://www.rdocumentation.org/packages/Amelia/versions/1.7.5) for missing data vizualisation, [robCompositions](https://www.rdocumentation.org/packages/robCompositions/versions/2.1.0) to robustely impute missing values in compositional data using k-nearest neigbhors methods, and [compositions](http://www.stat.boogaart.de/compositions) to transforme compositions into compositionnal space.
 
 ```{r, message=FALSE, warning=FALSE}
 library("tidyverse")
@@ -30,7 +30,7 @@ library("compositions")
 
 ## Québec potato data set
 
-I load the Québec potato raw data set `raw_potato_df.csv` available for the project in the `data` folder.
+Let's load the Québec potato raw data set `raw_potato_df.csv` available for the project in the `data` folder.
 
 ```{r, message=FALSE, warning=FALSE}
 raw_potato_df <- read_csv("data/raw_potato_df.csv")
@@ -38,7 +38,7 @@ raw_potato_df <- read_csv("data/raw_potato_df.csv")
 
 ## Selection of useful variables
 
-I create custom vectors of attributes which help select useful data columns for computations. The year of experiment is not needed instead it permits to know how long ago expériements have been monitored.  Geographical coordinates will be needed to map experimental sites locations later.
+We create custom vectors of attributes which help select useful data columns for computations. The year of experiment is not needed instead it permits to know how long ago expériements have been monitored.  Geographical coordinates are useful to map experimental sites locations later.
 
 ```{r}
 keys_col <- c('NoEssai', 'NoBloc', 'NoTraitement')
@@ -49,7 +49,7 @@ useful_col <- c(keys_col, extra_col, cultivarAndyield, longNameMacro)
 macroElements <- c("N", "P", "K", "Ca", "Mg") # for simplicity
 ```
 
-The reduced data frame becomes `leaf_df` which stands for the diagnostic leaves macroelements composition data frame combining corresponding cultivars data, marketable yield, year of experiment and sites geographical coordinates.
+The reduced data frame becomes `leaf_df` which stands for the diagnostic leaves macroelements composition data frame combining corresponding cultivars names, marketable yield, year of experiment and sites geographical coordinates.
 
 ```{r}
 leaf_df <- raw_potato_df %>% select(useful_col)
@@ -59,7 +59,7 @@ glimpse(leaf_df)
 
 ## Arranging the data frame
 
-I set trial number `NoEssai` as factor, relevel categorical `maturity order` variable and choose cultivar `Superior` as reference as it has the maximum number of observations. Then, abundance of cultivars is ploted.
+Thess chunks set trial number `NoEssai` as factor, relevel categorical `maturity order` variable and choose cultivar `Superior` as reference as it has the maximum number of observations. Then, abundance of cultivars is ploted.
 
 ```{r}
 percentage <- round(with(leaf_df, prop.table(table(Cultivar)) * 100), 2)
@@ -89,7 +89,7 @@ leaf_df$Maturity5 <- ordered(leaf_df$Maturity5,
                                        "mid-season","mid-season late","late"))
 ```
 
-I portrait missing values for the sake of imputation. As explained in the section \@ref(Objective), I will retain after this processing only reasonably imputable data i.e., missing data of a sample less than half the number of studied attributes. The next cell maps the portrait of missing values.
+We portray missing values for the sake of imputation. As explained in the section \@ref(Objective), we will retain after this processing only reasonably imputable data _i.e._ samples with a number of missing variable values less than half the number of studied attributes. The next cell maps the portrait of missing values.
 
 ```{r matrix-missing-comp, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Portrait of missing macroelements."}
 leafIonome <- leaf_df[macroElements]
@@ -107,7 +107,7 @@ leaf_df$leaf_anyNA <- apply(leaf_df[macroElements], 1, function(X) any(is.na(X))
 leaf_df$leaf_countNA <- apply(leaf_df[macroElements], 1, function(X) sum(is.na(X)))
 ```
 
-The next cell performs the imputation. Since the imputation is a time-consuming process, we saved it in a `csv` stored in the subfolder `output` and have put a switch to put on if one wants to perform the computation again. The imputation is made by KNNs in the Aitchison (compositions-friendly) metric for rows where there are 1 or 2 missing values, i.e. `filter(leaf_countNA <= 3)`.
+The next cell performs the imputation. Since the imputation is a time-consuming process, we saved it in a `csv` stored in the subfolder `output` and have put a switch to put on if one wants to perform the computation again. The imputation is made by KNNs in the Aitchison (compositions-friendly) metric for rows where there are 1 or 2 missing values, _i.e._ `filter(leaf_countNA <= 3)`.
 
 ```{r}
 # Warning: could be a long process
@@ -133,14 +133,14 @@ if (perform_imputation) {
 }
 ```
 
-With the next cell I append imputed columns to the data frame. The nutrients diagnosis will be done with imputed compositions.
+With the next cell, imputed columnsare appended to the data frame. The nutrients diagnosis will be done with imputed compositions.
 
 ```{r}
 leaf_df <- bind_cols(leaf_df, leaf_complete)
 leaf_df <- leaf_df %>% select(-c("leaf_allNA", "leaf_anyNA"))
 ```
 
-[Compositional data](https://en.wikipedia.org/wiki/Compositional_data) are data where the elements of the composition are non-negative and sum to unity. I compute `Fv` standing for `filling value`, an amalgamation of all other elements closing the [simplex](https://en.wikipedia.org/wiki/Simplex) to 100%.
+[Compositional data](https://en.wikipedia.org/wiki/Compositional_data) are data where the elements of the composition are non-negative and sum to unity. I compute `Fv` standing for `filling value`, an amalgamation of all other elements closing the [simplex](https://en.wikipedia.org/wiki/Simplex) proportions to 100%.
 
 ```{r}
 leaf_df <- leaf_df %>%
@@ -150,7 +150,7 @@ leaf_df <- leaf_df %>%
 if (!"Fv" %in% macroElements) macroElements <- c(macroElements, "Fv")
 ```
 
-I use centered log-ratio (`clr`) transformation for discriminant analysis and perturbation vector concept assessment.The next cell performs this calculation. The `clr` coordinates are computed in an external (intermediate) data table. 
+The centered log-ratio (`clr`) transformed compositions will be used for discriminant analysis and perturbation vector concept assessment.The next cell performs this calculation. The `clr` coordinates are computed in an external (intermediate) data table. 
 
 ```{r}
 leaf_composition <- leaf_df %>%
@@ -163,7 +163,7 @@ names(leaf_clr) <- paste0("clr_", macroElements)
 write_csv(leaf_clr, "output/leaf_clr.csv")
 ```
 
-The next cell binds these clr-transformed compositions to the raw composition data frame and retains useful columns. I also used this cell to discard all the samples with too many missing compositions.
+The next cell binds these clr-transformed compositions to the raw composition data frame and retains useful columns. This cell also discards all the samples with too many missing compositions.
 
 ```{r}
 leaf_df <- bind_cols(leaf_df, leaf_clr)
@@ -174,7 +174,7 @@ leaf_df <- leaf_df %>%
 
 ## Cultivar classes correction
 
-From a previous checking, I noticed that cultivars `Mystere` and `Vivaldi` have different repported maturity classes in the data set, `mid-season late` and `late` for `Mystere`, then `early mid-season` and `mid-season` for `Vivaldi` respectively. Their new maturity classes names are based on a majority vote for this study. The next cell perform this correction. I also make missing values explicit for this categorical variable.
+From a preliminary checking, we noticed that cultivars `Mystere` and `Vivaldi` have different repported maturity classes in the data set, `mid-season late` and `late` for `Mystere`, then `early mid-season` and `mid-season` for `Vivaldi` respectively. Their new maturity classes names are based on a majority vote for this study. The next cell perform this correction. We also make missing values explicit for this categorical variable.
 
 ```{r}
 leaf_df$Maturity5[leaf_df$Cultivar == "Mystere"] <- "late"
@@ -184,7 +184,7 @@ leaf_df$Cultivar <- forcats::fct_explicit_na(leaf_df$Cultivar) # makes missing v
 
 ## Summarise and backup
 
-Finally, I summarized the processed data frame to record the years of begining and ending of experiment, the remaining number of experiments, cultivars and maturity classes. The definitive leaves data frame is stored as `leaf_clust_df.csv` in `output` subfolder as it is an intermediate file, for cluster analysis (Chapter \@ref(Chapter-Clustering)). 
+Finally, we summarized the processed data frame to record the years of begining and ending of experiments, the remaining number of experiments, cultivars and maturity classes. The definitive leaves data frame is stored as `leaf_clust_df.csv` in `output` subfolder as it is an intermediate file, for cluster analysis (Chapter \@ref(Chapter-Clustering)). 
 
 ```{r}
 leaf_df %>%
