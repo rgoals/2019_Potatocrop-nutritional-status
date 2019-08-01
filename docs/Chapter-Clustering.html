@@ -24,7 +24,7 @@
 <meta name="author" content="Zonlehoua Coulibali and Serge-Étienne Parent" />
 
 
-<meta name="date" content="2019-07-30" />
+<meta name="date" content="2019-08-01" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -141,9 +141,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="4.1" data-path="Chapter-Perturbation.html"><a href="Chapter-Perturbation.html#objective-3"><i class="fa fa-check"></i><b>4.1</b> Objective</a></li>
 <li class="chapter" data-level="4.2" data-path="Chapter-Perturbation.html"><a href="Chapter-Perturbation.html#data-set-and-useful-libraries"><i class="fa fa-check"></i><b>4.2</b> Data set and useful libraries</a></li>
 <li class="chapter" data-level="4.3" data-path="Chapter-Perturbation.html"><a href="Chapter-Perturbation.html#euclidean-distance-from-nutritionally-balanced-compositions"><i class="fa fa-check"></i><b>4.3</b> Euclidean distance from nutritionally balanced compositions</a></li>
-<li class="chapter" data-level="4.4" data-path="Chapter-Perturbation.html"><a href="Chapter-Perturbation.html#perturbation-effect-of-some-elements-on-the-simplex"><i class="fa fa-check"></i><b>4.4</b> Perturbation effect of some elements on the simplex</a></li>
-<li class="chapter" data-level="4.5" data-path="Chapter-Perturbation.html"><a href="Chapter-Perturbation.html#euclidean-distance-from-nutritionally-balanced-compositions-1"><i class="fa fa-check"></i><b>4.5</b> Euclidean distance from nutritionally balanced compositions</a></li>
-<li class="chapter" data-level="4.6" data-path="Chapter-Perturbation.html"><a href="Chapter-Perturbation.html#rebalancing-a-misbalanced-sample-by-perturbation"><i class="fa fa-check"></i><b>4.6</b> Rebalancing a misbalanced sample by perturbation</a></li>
+<li class="chapter" data-level="4.4" data-path="Chapter-Perturbation.html"><a href="Chapter-Perturbation.html#perturbation-effect-of-some-elements-on-the-whole"><i class="fa fa-check"></i><b>4.4</b> Perturbation effect of some elements on the whole</a></li>
+<li class="chapter" data-level="4.5" data-path="Chapter-Perturbation.html"><a href="Chapter-Perturbation.html#rebalancing-a-misbalanced-sample-by-perturbation"><i class="fa fa-check"></i><b>4.5</b> Rebalancing a misbalanced sample by perturbation</a></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
 <li class="divider"></li>
@@ -192,24 +191,12 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">leaf_clust_df &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;output/leaf_clust_df.csv&quot;</span>)</code></pre></div>
 <pre><code>## Parsed with column specification:
 ## cols(
-##   NoEssai = col_double(),
-##   NoBloc = col_double(),
-##   NoTraitement = col_double(),
-##   Annee = col_double(),
-##   LatDD = col_double(),
-##   LonDD = col_double(),
+##   .default = col_double(),
 ##   AnalyseFoliaireStade = col_character(),
 ##   Cultivar = col_character(),
-##   Maturity5 = col_character(),
-##   RendVendable = col_double(),
-##   leaf_countNA = col_double(),
-##   clr_N = col_double(),
-##   clr_P = col_double(),
-##   clr_K = col_double(),
-##   clr_Ca = col_double(),
-##   clr_Mg = col_double(),
-##   clr_Fv = col_double()
+##   Maturity5 = col_character()
 ## )</code></pre>
+<pre><code>## See spec(...) for full column specifications.</code></pre>
 <p>The experimental sites locations are mapped as follows.</p>
 <div class="figure" style="text-align: center"><span id="fig:leaf-df-sites-locations"></span>
 <img src="2019_Bookdown_files/figure-html/leaf-df-sites-locations-1.png" alt="Location of experimental sites in the Québec potato data set." width="100%" />

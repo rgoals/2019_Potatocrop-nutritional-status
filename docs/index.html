@@ -24,7 +24,7 @@
 <meta name="author" content="Zonlehoua Coulibali and Serge-Étienne Parent" />
 
 
-<meta name="date" content="2019-07-30" />
+<meta name="date" content="2019-08-01" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -141,9 +141,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="4.1" data-path="Chapter-Perturbation.html"><a href="Chapter-Perturbation.html#objective-3"><i class="fa fa-check"></i><b>4.1</b> Objective</a></li>
 <li class="chapter" data-level="4.2" data-path="Chapter-Perturbation.html"><a href="Chapter-Perturbation.html#data-set-and-useful-libraries"><i class="fa fa-check"></i><b>4.2</b> Data set and useful libraries</a></li>
 <li class="chapter" data-level="4.3" data-path="Chapter-Perturbation.html"><a href="Chapter-Perturbation.html#euclidean-distance-from-nutritionally-balanced-compositions"><i class="fa fa-check"></i><b>4.3</b> Euclidean distance from nutritionally balanced compositions</a></li>
-<li class="chapter" data-level="4.4" data-path="Chapter-Perturbation.html"><a href="Chapter-Perturbation.html#perturbation-effect-of-some-elements-on-the-simplex"><i class="fa fa-check"></i><b>4.4</b> Perturbation effect of some elements on the simplex</a></li>
-<li class="chapter" data-level="4.5" data-path="Chapter-Perturbation.html"><a href="Chapter-Perturbation.html#euclidean-distance-from-nutritionally-balanced-compositions-1"><i class="fa fa-check"></i><b>4.5</b> Euclidean distance from nutritionally balanced compositions</a></li>
-<li class="chapter" data-level="4.6" data-path="Chapter-Perturbation.html"><a href="Chapter-Perturbation.html#rebalancing-a-misbalanced-sample-by-perturbation"><i class="fa fa-check"></i><b>4.6</b> Rebalancing a misbalanced sample by perturbation</a></li>
+<li class="chapter" data-level="4.4" data-path="Chapter-Perturbation.html"><a href="Chapter-Perturbation.html#perturbation-effect-of-some-elements-on-the-whole"><i class="fa fa-check"></i><b>4.4</b> Perturbation effect of some elements on the whole</a></li>
+<li class="chapter" data-level="4.5" data-path="Chapter-Perturbation.html"><a href="Chapter-Perturbation.html#rebalancing-a-misbalanced-sample-by-perturbation"><i class="fa fa-check"></i><b>4.5</b> Rebalancing a misbalanced sample by perturbation</a></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
 <li class="divider"></li>
@@ -169,14 +168,14 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="header">
 <h1 class="title">Balancing the nutritional status of potato crops.</h1>
 <p class="author"><em>Zonlehoua Coulibali and Serge-Étienne Parent</em></p>
-<p class="date"><em>2019-07-30</em></p>
+<p class="date"><em>2019-08-01</em></p>
 </div>
 <div id="Chapter-Data-Processing" class="section level1">
 <h1><span class="header-section-number">Chapter 1</span> Data processing</h1>
 <div id="objective" class="section level2">
 <h2><span class="header-section-number">1.1</span> Objective</h2>
 <hr />
-<p>This chapter is the first of a series of R markdown codes aiming to describe computations methodology used to derive the results and conclusions of potato nutrient diagnosis article. The data set is a collection of potato surveys and N, P and K fertilizer trials conducted in Quebec from 1970 to 2017 between the US border at the 45^th parallel and near the Northern limit of cultivation at the 49^th parallel. The useful variables are the first mature leaf (4^th from top, collected at the beginning of blossom stage) N, P, K, Ca and Mg compositions, cultivars used in experiments and tuber marketable yield. These variables are selected from the Québec potato raw data table (<code>raw_potato_df.csv</code>) and processed to give useful variables for cultivars clustering (Chapter <a href="Chapter-Clustering.html#Chapter-Clustering">2</a>), tuber yield prediction (Chapter <a href="Chapter-Modeling.html#Chapter-Modeling">3</a>) and assessment of perturbation vector concept (Chapter <a href="Chapter-Perturbation.html#Chapter-Perturbation">4</a>). A previous exploration showed that oligoelements contained too many missing values, for this reason these elements were excluded from analysis. The chapter ends with the backup of a processed data frame useful for next chapters.</p>
+<p>This chapter is the first of a series of R markdown codes aiming to describe computations methodology used to derive the results and conclusions of potato nutrient diagnosis article. The data set is a collection of potato surveys and N, P and K fertilizer trials conducted in Quebec from 1970 to 2017 between the US border at the 45^th parallel and near the Northern limit of cultivation at the 49^th parallel. The useful variables are the first mature leaf (4^th from top, collected at the beginning of blossom stage) N, P, K, Ca and Mg compositions, cultivars used in experiments and tuber marketable yield. These variables are selected from the Québec potato raw data table (<code>raw_leaf_df.csv</code>) and processed to give useful variables for cultivars clustering (Chapter <a href="Chapter-Clustering.html#Chapter-Clustering">2</a>), tuber yield prediction (Chapter <a href="Chapter-Modeling.html#Chapter-Modeling">3</a>) and assessment of perturbation vector concept (Chapter <a href="Chapter-Perturbation.html#Chapter-Perturbation">4</a>). A previous exploration showed that oligoelements contained too many missing values, for this reason these elements were excluded from analysis. The chapter ends with the backup of a processed data frame useful for next chapters.</p>
 <hr />
 </div>
 <div id="useful-libraries-for-data-handling" class="section level2">
@@ -189,24 +188,27 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </div>
 <div id="quebec-potato-data-set" class="section level2">
 <h2><span class="header-section-number">1.3</span> Québec potato data set</h2>
-<p>Let’s load the Québec potato raw data set <code>raw_potato_df.csv</code> available for the project in the <code>data</code> folder.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">raw_potato_df &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;data/raw_potato_df.csv&quot;</span>)</code></pre></div>
+<p>Let’s load the Québec potato leaves raw compositions data set <code>raw_leaf_df.csv</code> available for the project in the <code>data</code> folder.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">raw_leaf_df &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;data/raw_leaf_df.csv&quot;</span>)</code></pre></div>
 </div>
 <div id="selection-of-useful-variables" class="section level2">
 <h2><span class="header-section-number">1.4</span> Selection of useful variables</h2>
 <p>We create custom vectors of attributes which help select useful data columns for computations. The year of experiment is not needed instead it permits to know how long ago expériements have been monitored. Geographical coordinates are useful to map experimental sites locations later.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">keys_col &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;NoEssai&#39;</span>, <span class="st">&#39;NoBloc&#39;</span>, <span class="st">&#39;NoTraitement&#39;</span>)
-longNameMacro &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;AnalyseFoliaireN&quot;</span>,<span class="st">&quot;AnalyseFoliaireP&quot;</span>,<span class="st">&quot;AnalyseFoliaireK&quot;</span>, <span class="st">&quot;AnalyseFoliaireCa&quot;</span>,<span class="st">&quot;AnalyseFoliaireMg&quot;</span>)
-extra_col &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;Annee&#39;</span>, <span class="st">&#39;LatDD&#39;</span>, <span class="st">&#39;LonDD&#39;</span>, <span class="st">&#39;AnalyseFoliaireStade&#39;</span>)
-cultivarAndyield &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;Cultivar&#39;</span>, <span class="st">&#39;Maturity5&#39;</span>, <span class="st">&#39;RendVendable&#39;</span>)
-useful_col &lt;-<span class="st"> </span><span class="kw">c</span>(keys_col, extra_col, cultivarAndyield, longNameMacro)
+location &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;Annee&#39;</span>, <span class="st">&#39;LatDD&#39;</span>, <span class="st">&#39;LonDD&#39;</span>)
+cultivars &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;AnalyseFoliaireStade&#39;</span>, <span class="st">&#39;Cultivar&#39;</span>, <span class="st">&#39;Maturity5&#39;</span>)
+discard_col &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;AnalyseFoliaireC&quot;</span>, <span class="st">&quot;AnalyseFoliaireS&quot;</span>, <span class="st">&quot;AnalyseFoliaireB&quot;</span>, <span class="st">&quot;AnalyseFoliaireCu&quot;</span>, 
+                <span class="st">&quot;AnalyseFoliaireZn&quot;</span>, <span class="st">&quot;AnalyseFoliaireMn&quot;</span>, <span class="st">&quot;AnalyseFoliaireFe&quot;</span>, <span class="st">&quot;AnalyseFoliaireAl&quot;</span>)
+longNameMacro &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;AnalyseFoliaireN&quot;</span>,<span class="st">&quot;AnalyseFoliaireP&quot;</span>,<span class="st">&quot;AnalyseFoliaireK&quot;</span>, 
+                   <span class="st">&quot;AnalyseFoliaireCa&quot;</span>,<span class="st">&quot;AnalyseFoliaireMg&quot;</span>)
+outputs &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;RendVendable&#39;</span>, <span class="st">&#39;RendPetit&#39;</span>, <span class="st">&#39;RendMoy&#39;</span>, <span class="st">&#39;RendGros&#39;</span>)
 macroElements &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;N&quot;</span>, <span class="st">&quot;P&quot;</span>, <span class="st">&quot;K&quot;</span>, <span class="st">&quot;Ca&quot;</span>, <span class="st">&quot;Mg&quot;</span>) <span class="co"># for simplicity</span></code></pre></div>
 <p>The reduced data frame becomes <code>leaf_df</code> which stands for the diagnostic leaves macroelements composition data frame combining corresponding cultivars names, marketable yield, year of experiment and sites geographical coordinates.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">leaf_df &lt;-<span class="st"> </span>raw_potato_df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(useful_col)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">leaf_df &lt;-<span class="st"> </span>raw_leaf_df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(<span class="op">-</span>discard_col)
 <span class="kw">colnames</span>(leaf_df)[<span class="kw">which</span>(<span class="kw">names</span>(leaf_df) <span class="op">%in%</span><span class="st"> </span>longNameMacro)] &lt;-<span class="st"> </span>macroElements
 <span class="kw">glimpse</span>(leaf_df)</code></pre></div>
 <pre><code>## Observations: 12,991
-## Variables: 15
+## Variables: 18
 ## $ NoEssai              &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,...
 ## $ NoBloc               &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2,...
 ## $ NoTraitement         &lt;dbl&gt; 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6,...
@@ -216,16 +218,19 @@ macroElements &lt;-<span class="st"> </span><span class="kw">c</span>(<span clas
 ## $ AnalyseFoliaireStade &lt;chr&gt; &quot;10% fleur&quot;, &quot;10% fleur&quot;, &quot;10% fleur&quot;, &quot;1...
 ## $ Cultivar             &lt;chr&gt; &quot;Goldrush&quot;, &quot;Goldrush&quot;, &quot;Goldrush&quot;, &quot;Gold...
 ## $ Maturity5            &lt;chr&gt; &quot;mid-season&quot;, &quot;mid-season&quot;, &quot;mid-season&quot;,...
-## $ RendVendable         &lt;dbl&gt; 18.9442, 40.3518, 33.0379, 37.5505, 46.00...
 ## $ N                    &lt;dbl&gt; 3.805, 3.356, 3.657, 3.610, 4.983, 4.277,...
 ## $ P                    &lt;dbl&gt; 0.22, 0.20, 0.22, 0.18, 0.22, 0.21, 0.28,...
 ## $ K                    &lt;dbl&gt; 6.31, 6.85, 6.44, 5.36, 5.92, 6.73, 5.75,...
 ## $ Ca                   &lt;dbl&gt; 1.69, 1.31, 1.13, 1.30, 1.23, 1.38, 1.17,...
-## $ Mg                   &lt;dbl&gt; 0.53, 0.21, 0.32, 0.50, 0.44, 0.45, 0.51,...</code></pre>
+## $ Mg                   &lt;dbl&gt; 0.53, 0.21, 0.32, 0.50, 0.44, 0.45, 0.51,...
+## $ RendVendable         &lt;dbl&gt; 18.9442, 40.3518, 33.0379, 37.5505, 46.00...
+## $ RendPetit            &lt;dbl&gt; 3.9458, 4.9159, 6.3220, 3.6515, 4.6652, 4...
+## $ RendMoy              &lt;dbl&gt; 11.4123, 17.5599, 13.6795, 16.2410, 18.99...
+## $ RendGros             &lt;dbl&gt; 3.5861, 17.8760, 13.0364, 17.6580, 22.345...</code></pre>
 </div>
 <div id="arranging-the-data-frame" class="section level2">
 <h2><span class="header-section-number">1.5</span> Arranging the data frame</h2>
-<p>Thess chunks set trial number <code>NoEssai</code> as factor, relevel categorical <code>maturity order</code> variable and choose cultivar <code>Superior</code> as reference as it has the maximum number of observations. Then, abundance of cultivars is ploted.</p>
+<p>These chunks set trial number <code>NoEssai</code> as factor, relevel categorical <code>maturity order</code> variable and choose cultivar <code>Superior</code> as reference as it has the maximum number of observations. Then, abundance of cultivars is ploted.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">percentage &lt;-<span class="st"> </span><span class="kw">round</span>(<span class="kw">with</span>(leaf_df, <span class="kw">prop.table</span>(<span class="kw">table</span>(Cultivar)) <span class="op">*</span><span class="st"> </span><span class="dv">100</span>), <span class="dv">2</span>)
 distribution &lt;-<span class="st"> </span><span class="kw">with</span>(leaf_df, <span class="kw">cbind</span>(<span class="dt">numbOfsamples =</span> <span class="kw">table</span>(Cultivar), <span class="dt">percentage =</span> percentage))
 distribution &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">cbind</span>(distribution, <span class="kw">rownames</span>(distribution)))
@@ -310,7 +315,7 @@ leaf_clr &lt;-<span class="st"> </span><span class="kw">clr</span>(leaf_composit
 <p>The next cell binds these clr-transformed compositions to the raw composition data frame and retains useful columns. This cell also discards all the samples with too many missing compositions.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">leaf_df &lt;-<span class="st"> </span><span class="kw">bind_cols</span>(leaf_df, leaf_clr)
 leaf_df &lt;-<span class="st"> </span>leaf_df <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="kw">select</span>(keys_col, extra_col, cultivarAndyield, <span class="st">&quot;leaf_countNA&quot;</span>, <span class="kw">starts_with</span>(<span class="st">&quot;clr&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">select</span>(keys_col, location, cultivars, outputs, <span class="st">&quot;leaf_countNA&quot;</span>, <span class="kw">starts_with</span>(<span class="st">&quot;clr&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">filter</span>(leaf_countNA <span class="op">&lt;=</span><span class="st"> </span><span class="dv">3</span>)</code></pre></div>
 </div>
 <div id="cultivar-classes-correction" class="section level2">

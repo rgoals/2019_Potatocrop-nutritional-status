@@ -13,7 +13,7 @@ description: "We use the bookdown package to write a book that describs the stat
 ## Objective
 
 ***
-This chapter is the first of a series of R markdown codes aiming to describe computations methodology used to derive the results and conclusions of potato nutrient diagnosis article. The data set is a collection of potato surveys and N, P and K fertilizer trials conducted in Quebec from 1970 to 2017 between the US border at the 45^th parallel and near the Northern limit of cultivation at the 49^th parallel. The useful variables are the first mature leaf (4^th from top, collected at the beginning of blossom stage) N, P, K, Ca and Mg compositions, cultivars used in experiments and tuber marketable yield. These variables are selected from the Québec potato raw data table (`raw_potato_df.csv`) and processed to give useful variables for cultivars clustering (Chapter \@ref(Chapter-Clustering)), tuber yield prediction (Chapter \@ref(Chapter-Modeling)) and assessment of perturbation vector concept (Chapter \@ref(Chapter-Perturbation)). A previous exploration showed that oligoelements contained too many missing values, for this reason these elements were excluded from analysis. The chapter ends with the backup of a processed data frame useful for next chapters. 
+This chapter is the first of a series of R markdown codes aiming to describe computations methodology used to derive the results and conclusions of potato nutrient diagnosis article. The data set is a collection of potato surveys and N, P and K fertilizer trials conducted in Quebec from 1970 to 2017 between the US border at the 45^th parallel and near the Northern limit of cultivation at the 49^th parallel. The useful variables are the first mature leaf (4^th from top, collected at the beginning of blossom stage) N, P, K, Ca and Mg compositions, cultivars used in experiments and tuber marketable yield. These variables are selected from the Québec potato raw data table (`raw_leaf_df.csv`) and processed to give useful variables for cultivars clustering (Chapter \@ref(Chapter-Clustering)), tuber yield prediction (Chapter \@ref(Chapter-Modeling)) and assessment of perturbation vector concept (Chapter \@ref(Chapter-Perturbation)). A previous exploration showed that oligoelements contained too many missing values, for this reason these elements were excluded from analysis. The chapter ends with the backup of a processed data frame useful for next chapters. 
 
 ***
 
@@ -30,10 +30,10 @@ library("compositions")
 
 ## Québec potato data set
 
-Let's load the Québec potato raw data set `raw_potato_df.csv` available for the project in the `data` folder.
+Let's load the Québec potato leaves raw compositions data set `raw_leaf_df.csv` available for the project in the `data` folder.
 
 ```{r, message=FALSE, warning=FALSE}
-raw_potato_df <- read_csv("data/raw_potato_df.csv")
+raw_leaf_df <- read_csv("data/raw_leaf_df.csv")
 ```
 
 ## Selection of useful variables
@@ -42,24 +42,27 @@ We create custom vectors of attributes which help select useful data columns for
 
 ```{r}
 keys_col <- c('NoEssai', 'NoBloc', 'NoTraitement')
-longNameMacro <- c("AnalyseFoliaireN","AnalyseFoliaireP","AnalyseFoliaireK", "AnalyseFoliaireCa","AnalyseFoliaireMg")
-extra_col <- c('Annee', 'LatDD', 'LonDD', 'AnalyseFoliaireStade')
-cultivarAndyield <- c('Cultivar', 'Maturity5', 'RendVendable')
-useful_col <- c(keys_col, extra_col, cultivarAndyield, longNameMacro)
+location <- c('Annee', 'LatDD', 'LonDD')
+cultivars <- c('AnalyseFoliaireStade', 'Cultivar', 'Maturity5')
+discard_col <- c("AnalyseFoliaireC", "AnalyseFoliaireS", "AnalyseFoliaireB", "AnalyseFoliaireCu", 
+                "AnalyseFoliaireZn", "AnalyseFoliaireMn", "AnalyseFoliaireFe", "AnalyseFoliaireAl")
+longNameMacro <- c("AnalyseFoliaireN","AnalyseFoliaireP","AnalyseFoliaireK", 
+                   "AnalyseFoliaireCa","AnalyseFoliaireMg")
+outputs <- c('RendVendable', 'RendPetit', 'RendMoy', 'RendGros')
 macroElements <- c("N", "P", "K", "Ca", "Mg") # for simplicity
 ```
 
 The reduced data frame becomes `leaf_df` which stands for the diagnostic leaves macroelements composition data frame combining corresponding cultivars names, marketable yield, year of experiment and sites geographical coordinates.
 
 ```{r}
-leaf_df <- raw_potato_df %>% select(useful_col)
+leaf_df <- raw_leaf_df %>% select(-discard_col)
 colnames(leaf_df)[which(names(leaf_df) %in% longNameMacro)] <- macroElements
 glimpse(leaf_df)
 ```
 
 ## Arranging the data frame
 
-Thess chunks set trial number `NoEssai` as factor, relevel categorical `maturity order` variable and choose cultivar `Superior` as reference as it has the maximum number of observations. Then, abundance of cultivars is ploted.
+These chunks set trial number `NoEssai` as factor, relevel categorical `maturity order` variable and choose cultivar `Superior` as reference as it has the maximum number of observations. Then, abundance of cultivars is ploted.
 
 ```{r}
 percentage <- round(with(leaf_df, prop.table(table(Cultivar)) * 100), 2)
@@ -168,7 +171,7 @@ The next cell binds these clr-transformed compositions to the raw composition da
 ```{r}
 leaf_df <- bind_cols(leaf_df, leaf_clr)
 leaf_df <- leaf_df %>% 
-  select(keys_col, extra_col, cultivarAndyield, "leaf_countNA", starts_with("clr")) %>% 
+  select(keys_col, location, cultivars, outputs, "leaf_countNA", starts_with("clr")) %>% 
   filter(leaf_countNA <= 3)
 ```
 

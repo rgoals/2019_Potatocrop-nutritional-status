@@ -24,7 +24,7 @@
 <meta name="author" content="Zonlehoua Coulibali and Serge-Étienne Parent" />
 
 
-<meta name="date" content="2019-07-30" />
+<meta name="date" content="2019-08-01" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -312,21 +312,24 @@ test_df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">
 <p>This subsection illustrates the principle that strictly positive data constrained to some whole are inherently related to each other. Changing a proportion (so, perturbation on some proportion(s)) inherently affects at least another proportion, because such data convey only relative information <a href="https://rss.onlinelibrary.wiley.com/doi/abs/10.1111/j.2517-6161.1982.tb01195.x">(Aitchison, 1982)</a>.</p>
 <p><code>leaf_clr_o</code> stands for original clr values of the tidded test set <code>test_df</code>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Compute (or select here) the clrs</span>
-leaf_clr_o &lt;-<span class="st"> </span>test_df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(debal <span class="op">&gt;=</span><span class="st"> </span><span class="kw">quantile</span>(train_df<span class="op">$</span>debal, <span class="dt">p =</span> .<span class="dv">75</span>)) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(clr_no)
+leaf_clr_o &lt;-<span class="st"> </span>test_df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(clr_no)
+<span class="co">#leaf_clr_o &lt;- test_df %&gt;% </span>
+<span class="co">#  filter(debal &gt;= quantile(train_df$debal, p = .75)) %&gt;% </span>
+<span class="co">#  select(clr_no)</span>
 <span class="kw">summary</span>(leaf_clr_o)</code></pre></div>
 <pre><code>##      clr_N            clr_P            clr_K             clr_Ca       
-##  Min.   :0.0000   Min.   :-3.269   Min.   :-0.2536   Min.   :-1.8753  
-##  1st Qu.:0.5379   1st Qu.:-2.282   1st Qu.: 0.3240   1st Qu.:-1.1985  
-##  Median :0.6666   Median :-2.126   Median : 0.4573   Median :-0.9451  
-##  Mean   :0.6785   Mean   :-2.071   Mean   : 0.5222   Mean   :-0.9706  
-##  3rd Qu.:0.9000   3rd Qu.:-1.876   3rd Qu.: 0.6810   3rd Qu.:-0.7196  
-##  Max.   :1.1772   Max.   :-1.192   Max.   : 1.8047   Max.   : 0.1681  
+##  Min.   :0.0000   Min.   :-3.269   Min.   :-0.2536   Min.   :-2.0486  
+##  1st Qu.:0.6102   1st Qu.:-2.175   1st Qu.: 0.2745   1st Qu.:-1.1665  
+##  Median :0.7247   Median :-2.019   Median : 0.4467   Median :-0.9961  
+##  Mean   :0.7221   Mean   :-2.017   Mean   : 0.4584   Mean   :-1.0031  
+##  3rd Qu.:0.8509   3rd Qu.:-1.858   3rd Qu.: 0.6252   3rd Qu.:-0.8262  
+##  Max.   :1.2106   Max.   :-1.192   Max.   : 1.8047   Max.   : 0.1681  
 ##      clr_Mg            clr_Fv     
-##  Min.   :-3.1532   Min.   :3.244  
-##  1st Qu.:-2.0416   1st Qu.:3.475  
-##  Median :-1.7612   Median :3.600  
-##  Mean   :-1.7654   Mean   :3.606  
-##  3rd Qu.:-1.4794   3rd Qu.:3.717  
+##  Min.   :-3.1532   Min.   :3.221  
+##  1st Qu.:-1.9464   1st Qu.:3.466  
+##  Median :-1.7007   Median :3.548  
+##  Mean   :-1.7196   Mean   :3.559  
+##  3rd Qu.:-1.4893   3rd Qu.:3.644  
 ##  Max.   :-0.6893   Max.   :4.330</code></pre>
 <p>Let’s perturb the original clr values for <code>N</code> and <code>P</code>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Perturb the original clrs</span>
@@ -338,18 +341,18 @@ leaf_clr_f &lt;-<span class="st"> </span>leaf_clr_o
 }
 <span class="kw">summary</span>(leaf_clr_f)</code></pre></div>
 <pre><code>##      clr_N            clr_P            clr_K             clr_Ca       
-##  Min.   :0.0000   Min.   :-3.923   Min.   :-0.2536   Min.   :-1.8753  
-##  1st Qu.:0.6454   1st Qu.:-2.738   1st Qu.: 0.3240   1st Qu.:-1.1985  
-##  Median :0.7999   Median :-2.551   Median : 0.4573   Median :-0.9451  
-##  Mean   :0.8142   Mean   :-2.485   Mean   : 0.5222   Mean   :-0.9706  
-##  3rd Qu.:1.0800   3rd Qu.:-2.251   3rd Qu.: 0.6810   3rd Qu.:-0.7196  
-##  Max.   :1.4127   Max.   :-1.431   Max.   : 1.8047   Max.   : 0.1681  
+##  Min.   :0.0000   Min.   :-3.923   Min.   :-0.2536   Min.   :-2.0486  
+##  1st Qu.:0.7323   1st Qu.:-2.610   1st Qu.: 0.2745   1st Qu.:-1.1665  
+##  Median :0.8696   Median :-2.422   Median : 0.4467   Median :-0.9961  
+##  Mean   :0.8666   Mean   :-2.420   Mean   : 0.4584   Mean   :-1.0031  
+##  3rd Qu.:1.0211   3rd Qu.:-2.229   3rd Qu.: 0.6252   3rd Qu.:-0.8262  
+##  Max.   :1.4528   Max.   :-1.431   Max.   : 1.8047   Max.   : 0.1681  
 ##      clr_Mg            clr_Fv     
-##  Min.   :-3.1532   Min.   :3.244  
-##  1st Qu.:-2.0416   1st Qu.:3.475  
-##  Median :-1.7612   Median :3.600  
-##  Mean   :-1.7654   Mean   :3.606  
-##  3rd Qu.:-1.4794   3rd Qu.:3.717  
+##  Min.   :-3.1532   Min.   :3.221  
+##  1st Qu.:-1.9464   1st Qu.:3.466  
+##  Median :-1.7007   Median :3.548  
+##  Mean   :-1.7196   Mean   :3.559  
+##  3rd Qu.:-1.4893   3rd Qu.:3.644  
 ##  Max.   :-0.6893   Max.   :4.330</code></pre>
 <p>The next one transforms clrs (original and perturbed clrs) back to compositions.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># From clrs to compositions</span>
@@ -397,26 +400,26 @@ imbalanced &lt;-<span class="st"> </span>train_df[<span class="kw">sample</span>
 ## pred_yield   &quot;LY&quot;        
 ## debal        &quot;0.08202369&quot;</code></pre>
 <p>Or even, we could rather use the most imbalanced occurrence, why not !</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">imbalanced &lt;-<span class="st"> </span>train_df[<span class="kw">which.max</span>(imbalanced<span class="op">$</span>debal), ]
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">imbalanced &lt;-<span class="st"> </span>train_df[<span class="kw">which.max</span>(train_df<span class="op">$</span>debal), ]
 misbalanced &lt;-<span class="st"> </span>imbalanced <span class="co"># copy</span>
 <span class="kw">t</span>(misbalanced)</code></pre></div>
-<pre><code>##              [,1]        
-## NoEssai      &quot;1&quot;         
-## NoBloc       &quot;1&quot;         
-## NoTraitement &quot;1&quot;         
-## clr_N        &quot;0.3321186&quot; 
-## clr_P        &quot;-2.518325&quot; 
-## clr_K        &quot;0.8379383&quot; 
-## clr_Ca       &quot;-0.4794688&quot;
-## clr_Mg       &quot;-1.639076&quot; 
-## clr_Fv       &quot;3.466813&quot;  
-## RendVendable &quot;18.9442&quot;   
-## rv_cut       &quot;41.33053&quot;  
-## yieldClass   &quot;LY&quot;        
-## Cultivar     &quot;Goldrush&quot;  
-## Maturity5    &quot;mid-season&quot;
-## pred_yield   &quot;LY&quot;        
-## debal        &quot;0.2915435&quot;</code></pre>
+<pre><code>##              [,1]              
+## NoEssai      &quot;200&quot;             
+## NoBloc       &quot;1&quot;               
+## NoTraitement &quot;2&quot;               
+## clr_N        &quot;0.957698&quot;        
+## clr_P        &quot;-1.83199&quot;        
+## clr_K        &quot;-0.04637332&quot;     
+## clr_Ca       &quot;0.4678508&quot;       
+## clr_Mg       &quot;-2.247862&quot;       
+## clr_Fv       &quot;2.700677&quot;        
+## RendVendable &quot;30.37194&quot;        
+## rv_cut       &quot;32.6&quot;            
+## yieldClass   &quot;LY&quot;              
+## Cultivar     &quot;Superior&quot;        
+## Maturity5    &quot;early mid-season&quot;
+## pred_yield   &quot;LY&quot;              
+## debal        &quot;1.345815&quot;</code></pre>
 <p>How could we rebalance it? The first step is to find the closest balanced point in the TNs of the corresponding cultivar. Let’s re-compute its Euclidean distances from TNs and identify the TNs’ sample from which the distance is minimum.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">misbalanced &lt;-<span class="st"> </span>misbalanced[clr_no]
 eucl_dist_misbal &lt;-<span class="st"> </span><span class="kw">apply</span>(TNs <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(Cultivar <span class="op">==</span><span class="st"> </span>imbalanced<span class="op">$</span>Cultivar) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(clr_no), 
@@ -424,54 +427,54 @@ eucl_dist_misbal &lt;-<span class="st"> </span><span class="kw">apply</span>(TNs
 
 index_misbal &lt;-<span class="st"> </span><span class="kw">which.min</span>(<span class="kw">t</span>(<span class="kw">data.frame</span>(eucl_dist_misbal))) 
 index_misbal <span class="co"># return the index of the sample</span></code></pre></div>
-<pre><code>## [1] 6</code></pre>
-<p>The closest healthy sample is the one which index is 6 in TNs charing the same cultivar with the new sample. Using this index we could refind the minimum imbalance index value computed.</p>
+<pre><code>## [1] 60</code></pre>
+<p>The closest healthy sample is the one which index is 60 in TNs charing the same cultivar with the new sample. Using this index we could refind the minimum imbalance index value computed.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(misbal &lt;-<span class="st"> </span>eucl_dist_misbal[index_misbal])</code></pre></div>
-<pre><code>## [1] 0.2915435</code></pre>
-<p>The Euclidean distance matches with the corresponding <code>debal</code> value: <code>imbalanced$debal[1]</code> = 0.2915435. The <code>closest point in the TNs</code> subset is this one:</p>
+<pre><code>## [1] 1.345815</code></pre>
+<p>The Euclidean distance matches with the corresponding <code>debal</code> value: <code>imbalanced$debal[1]</code> = 1.3458148. The <code>closest point in the TNs</code> subset is this one:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">target_TNs &lt;-<span class="st"> </span>TNs <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">filter</span>(Cultivar <span class="op">==</span><span class="st"> </span>imbalanced<span class="op">$</span>Cultivar)
 closest &lt;-<span class="st"> </span>target_TNs[index_misbal, ]
 <span class="kw">t</span>(closest)</code></pre></div>
-<pre><code>##              [,1]        
-## NoEssai      &quot;1&quot;         
-## NoBloc       &quot;2&quot;         
-## NoTraitement &quot;7&quot;         
-## clr_N        &quot;0.507674&quot;  
-## clr_P        &quot;-2.508926&quot; 
-## clr_K        &quot;0.6763481&quot; 
-## clr_Ca       &quot;-0.5881744&quot;
-## clr_Mg       &quot;-1.517286&quot; 
-## clr_Fv       &quot;3.430364&quot;  
-## RendVendable &quot;41.8669&quot;   
-## rv_cut       &quot;41.33053&quot;  
-## yieldClass   &quot;HY&quot;        
-## Cultivar     &quot;Goldrush&quot;  
-## Maturity5    &quot;mid-season&quot;
+<pre><code>##              [,1]              
+## NoEssai      &quot;71&quot;              
+## NoBloc       &quot;3&quot;               
+## NoTraitement &quot;5&quot;               
+## clr_N        &quot;0.5576154&quot;       
+## clr_P        &quot;-2.078376&quot;       
+## clr_K        &quot;0.4710692&quot;       
+## clr_Ca       &quot;-0.3762287&quot;      
+## clr_Mg       &quot;-2.022806&quot;       
+## clr_Fv       &quot;3.448726&quot;        
+## RendVendable &quot;37.56831&quot;        
+## rv_cut       &quot;32.6&quot;            
+## yieldClass   &quot;HY&quot;              
+## Cultivar     &quot;Superior&quot;        
+## Maturity5    &quot;early mid-season&quot;
 ## pred_yield   &quot;HY&quot;</code></pre>
 <p>Note that <code>Cultivar</code> of the misbalanced and the closest healthy composition are the same. We compute the clr difference between the closest and the misbalanced points.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">closest =<span class="st"> </span>closest[clr_no]
 clr_diff =<span class="st"> </span>closest <span class="op">-</span><span class="st"> </span>misbalanced
 <span class="kw">t</span>(clr_diff)</code></pre></div>
-<pre><code>##                [,1]
-## clr_N   0.175555410
-## clr_P   0.009399157
-## clr_K  -0.161590174
-## clr_Ca -0.108705515
-## clr_Mg  0.121789866
-## clr_Fv -0.036448743</code></pre>
+<pre><code>##              [,1]
+## clr_N  -0.4000826
+## clr_P  -0.2463863
+## clr_K   0.5174425
+## clr_Ca -0.8440794
+## clr_Mg  0.2250562
+## clr_Fv  0.7480496</code></pre>
 <p>The perturbation vector is that clr difference back-transformed to leaf compositional space.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">comp_names &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;N&quot;</span>, <span class="st">&quot;P&quot;</span>, <span class="st">&quot;K&quot;</span>, <span class="st">&quot;Ca&quot;</span>, <span class="st">&quot;Mg&quot;</span>, <span class="st">&quot;Fv&quot;</span>)
 perturbation_vector &lt;-<span class="st"> </span><span class="kw">clrInv</span>(clr_diff)
 <span class="kw">names</span>(perturbation_vector) &lt;-<span class="st"> </span>comp_names
 <span class="kw">t</span>(perturbation_vector)</code></pre></div>
-<pre><code>##    [,1]     
-## N  0.1972424
-## P  0.1670473
-## K  0.1407926
-## Ca 0.1484387
-## Mg 0.1869176
-## Fv 0.1595614
+<pre><code>##    [,1]      
+## N  0.09679140
+## P  0.11287200
+## K  0.24227737
+## Ca 0.06208853
+## Mg 0.18085523
+## Fv 0.30511547
 ## attr(,&quot;class&quot;)
 ## [1] acomp</code></pre>
 <p>Next, we should compute the corresponding compositions of the clr coordinates of the misbalanced point, as well as the closest TN point. The vectors could be gathered in a table made up of perturbation vector, misbalanced composition and the closest reference sample (pmc).</p>
@@ -484,14 +487,14 @@ closest_comp &lt;-<span class="st"> </span><span class="kw">clrInv</span>(closes
 pmc =<span class="st"> </span><span class="kw">rbind</span>(perturbation_vector, misbal_comp, closest_comp)
 <span class="kw">rownames</span>(pmc) =<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;perturbation_vector&quot;</span>,<span class="st">&quot;misbal_comp&quot;</span>,<span class="st">&quot;closest_comp&quot;</span>)
 pmc</code></pre></div>
-<pre><code>##                             N         P         K        Ca        Mg
-## perturbation_vector 0.1972424 0.1670473 0.1407926 0.1484387 0.1869176
-## misbal_comp         0.0380500 0.0022000 0.0631000 0.0169000 0.0053000
-## closest_comp        0.0469700 0.0023000 0.0556000 0.0157000 0.0062000
+<pre><code>##                             N           P         K         Ca        Mg
+## perturbation_vector 0.0967914 0.112872002 0.2422774 0.06208853 0.1808552
+## misbal_comp         0.1282805 0.007881602 0.0470000 0.07860000 0.0052000
+## closest_comp        0.0488500 0.003500000 0.0448000 0.01920000 0.0037000
 ##                            Fv
-## perturbation_vector 0.1595614
-## misbal_comp         0.8744500
-## closest_comp        0.8732300</code></pre>
+## perturbation_vector 0.3051155
+## misbal_comp         0.7330379
+## closest_comp        0.8799500</code></pre>
 <p>We could even check that the simplex is closed to 1 for each vector.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sum</span>(perturbation_vector); <span class="kw">sum</span>(misbal_comp); <span class="kw">sum</span>(closest_comp)</code></pre></div>
 <pre><code>## [1] 1</code></pre>
@@ -499,24 +502,24 @@ pmc</code></pre></div>
 <pre><code>## [1] 1</code></pre>
 <p>The closest composition minus the misbalanced composition should return the perturbation vector.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">print</span>(closest_comp <span class="op">-</span><span class="st"> </span>misbal_comp)</code></pre></div>
-<pre><code>##      N         P         K         Ca        Mg        Fv       
-## [1,] 0.1972424 0.1670473 0.1407926 0.1484387 0.1869176 0.1595614
+<pre><code>##      N         P        K         Ca         Mg        Fv       
+## [1,] 0.0967914 0.112872 0.2422774 0.06208853 0.1808552 0.3051155
 ## attr(,&quot;class&quot;)
 ## [1] acomp</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">print</span>(perturbation_vector) <span class="co"># for comparison</span></code></pre></div>
-<pre><code>##      N         P         K         Ca        Mg        Fv       
-## [1,] 0.1972424 0.1670473 0.1407926 0.1484387 0.1869176 0.1595614
+<pre><code>##      N         P        K         Ca         Mg        Fv       
+## [1,] 0.0967914 0.112872 0.2422774 0.06208853 0.1808552 0.3051155
 ## attr(,&quot;class&quot;)
 ## [1] acomp</code></pre>
 <p>Or even, perturb the misbalanced point by the perturbation vector, you should obtain the closest TN point:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">print</span>(misbal_comp <span class="op">+</span><span class="st"> </span>perturbation_vector) <span class="co"># perturbation</span></code></pre></div>
 <pre><code>##      N       P      K      Ca     Mg     Fv     
-## [1,] 0.04697 0.0023 0.0556 0.0157 0.0062 0.87323
+## [1,] 0.04885 0.0035 0.0448 0.0192 0.0037 0.87995
 ## attr(,&quot;class&quot;)
 ## [1] acomp</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">print</span>(closest_comp)                      <span class="co"># for comparison</span></code></pre></div>
 <pre><code>##      N       P      K      Ca     Mg     Fv     
-## [1,] 0.04697 0.0023 0.0556 0.0157 0.0062 0.87323
+## [1,] 0.04885 0.0035 0.0448 0.0192 0.0037 0.87995
 ## attr(,&quot;class&quot;)
 ## [1] acomp</code></pre>
 <p>So, the assumption is true. The next codes show the concept using dots plots and histograms for each vector. A data frame is tidded for ggplot. Visualization is better with histograms.</p>

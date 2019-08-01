@@ -24,7 +24,7 @@
 <meta name="author" content="Zonlehoua Coulibali and Serge-Étienne Parent" />
 
 
-<meta name="date" content="2019-07-30" />
+<meta name="date" content="2019-08-01" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -486,7 +486,7 @@ train_df &lt;-<span class="st"> </span><span class="kw">bind_cols</span>(dfml[sp
 ## 10 Chieftain   0.767 -1.91 0.407  -1.83 -1.04    3.60
 ## # ... with 33 more rows</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">write_csv</span>(TNmeanNorms, <span class="st">&quot;output/provisional_norms.csv&quot;</span>)</code></pre></div>
-<p>We also save prediction for testing set, not scaled clr test data.</p>
+<p>We also save prediction for testing set.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">te_pred &lt;-<span class="st"> </span><span class="kw">predict</span>(kknn_, test_df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(ml_col))
 test_df &lt;-<span class="st"> </span><span class="kw">bind_cols</span>(dfml[<span class="op">-</span>split_index, ], <span class="dt">pred_yield =</span> te_pred)</code></pre></div>
 <p>And finally backup for next chapter.</p>

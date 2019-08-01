@@ -100,7 +100,10 @@ This subsection illustrates the principle that strictly positive data constraine
 
 ```{r}
 # Compute (or select here) the clrs
-leaf_clr_o <- test_df %>% filter(debal >= quantile(train_df$debal, p = .75)) %>% select(clr_no)
+leaf_clr_o <- test_df %>% select(clr_no)
+#leaf_clr_o <- test_df %>% 
+#  filter(debal >= quantile(train_df$debal, p = .75)) %>% 
+#  select(clr_no)
 summary(leaf_clr_o)
 ```
 
@@ -176,7 +179,7 @@ t(imbalanced)
 Or even, we could rather use the most imbalanced occurrence, why not !
 
 ```{r}
-imbalanced <- train_df[which.max(imbalanced$debal), ]
+imbalanced <- train_df[which.max(train_df$debal), ]
 misbalanced <- imbalanced # copy
 t(misbalanced)
 ```
