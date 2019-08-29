@@ -24,7 +24,7 @@
 <meta name="author" content="Zonlehoua Coulibali and Serge-Étienne Parent" />
 
 
-<meta name="date" content="2019-08-01" />
+<meta name="date" content="2019-08-29" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -293,22 +293,22 @@ Figure 3.1: Comparison of models accuracies at training.
                                     <span class="kw">confusionMatrix</span>(train_df<span class="op">$</span>yieldClass, <span class="kw">predict</span>(rf_))<span class="op">$</span>overall[<span class="dv">1</span>]))
 models_acc[<span class="kw">order</span>(models_acc[,<span class="st">&quot;Accuracy&quot;</span>], <span class="dt">decreasing =</span> <span class="ot">TRUE</span>), ]</code></pre></div>
 <pre><code>##        Model  Accuracy
-## 3   rf_model 0.9834450
-## 1 kknn_model 0.8561293
-## 2  svm_model 0.6614111</code></pre>
+## 3   rf_model 0.9810800
+## 1 kknn_model 0.8557351
+## 2  svm_model 0.6748128</code></pre>
 <p>The next one prints the best tuning parameters that maximizes model accuracy.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data.frame</span>(<span class="dt">Model =</span> <span class="kw">summary</span>(results)<span class="op">$</span>models,
            <span class="dt">param =</span> <span class="kw">c</span>(kknn_<span class="op">$</span>bestTune, 
                      svm_<span class="op">$</span>bestTune, 
                      rf_<span class="op">$</span>bestTune))</code></pre></div>
 <pre><code>##        Model param.kmax param.distance param.kernel param.sigma param.C
-## 1 kknn_model         12              1     gaussian   0.1953406     0.5
-## 2  svm_model         12              1     gaussian   0.1953406     0.5
-## 3   rf_model         12              1     gaussian   0.1953406     0.5
+## 1 kknn_model         12              1      optimal   0.1840573       1
+## 2  svm_model         12              1      optimal   0.1840573       1
+## 3   rf_model         12              1      optimal   0.1840573       1
 ##   param.mtry
-## 1          6
-## 2          6
-## 3          6</code></pre>
+## 1          2
+## 2          2
+## 3          2</code></pre>
 </div>
 <div id="models-evaluation-test-set" class="section level3">
 <h3><span class="header-section-number">3.4.4</span> Models’ evaluation (test set)</h3>
@@ -325,9 +325,9 @@ tests_acc &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span
                           <span class="kw">confusionMatrix</span>(test_df<span class="op">$</span>yieldClass, predicted_rf_)<span class="op">$</span>overall[<span class="dv">1</span>]))
 tests_acc[<span class="kw">order</span>(tests_acc[,<span class="st">&quot;Accuracy_on_test&quot;</span>], <span class="dt">decreasing =</span> <span class="ot">TRUE</span>), ]</code></pre></div>
 <pre><code>##        Model Accuracy_on_test
-## 1 kknn_model        0.6994083
-## 3   rf_model        0.6923077
-## 2  svm_model        0.6437870</code></pre>
+## 3   rf_model        0.7076923
+## 1 kknn_model        0.7065089
+## 2  svm_model        0.6402367</code></pre>
 <p>The k-nearest neighbours, the random forest and the support vector machine models returned similar predictive accuracies (<em>although slightly higher for the former</em>).</p>
 </div>
 </div>
@@ -339,12 +339,12 @@ tests_acc[<span class="kw">order</span>(tests_acc[,<span class="st">&quot;Accura
 <pre><code>## rf variable importance
 ## 
 ##        Overall
-## clr_N    241.7
-## clr_Fv   195.3
-## clr_Mg   194.6
-## clr_Ca   189.5
-## clr_K    183.5
-## clr_P    177.1</code></pre>
+## clr_N    220.4
+## clr_Mg   201.3
+## clr_Fv   193.3
+## clr_K    190.8
+## clr_Ca   185.5
+## clr_P    184.4</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#tiff(&#39;images/var-imp-plot.tiff&#39;)</span>
 <span class="kw">plot</span>(importance, <span class="dt">cex =</span> <span class="fl">1.2</span>, <span class="dt">cex.lab =</span> <span class="dv">2</span>, <span class="dt">cex.axis =</span> <span class="dv">2</span>, <span class="dt">ylab =</span> <span class="st">&quot;variable&quot;</span>, <span class="dt">col =</span> <span class="st">&quot;black&quot;</span>)</code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:var-imp-plot"></span>
@@ -371,48 +371,48 @@ cultivar_acc<span class="op">$</span>numb_samples &lt;-<span class="st"> </span>
 data =<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">subset</span>(cultivar_acc, Accuracy<span class="op">&gt;</span><span class="dv">0</span>))
 data[<span class="kw">order</span>(data[,<span class="st">&quot;Accuracy&quot;</span>], <span class="dt">decreasing=</span>T), ]</code></pre></div>
 <pre><code>##              Cultivar Accuracy numb_samples
-## 3               Ambra     1.00            1
-## 9            Carolina     1.00            1
-## 12 Dark Red Chieftain     1.00            6
-## 20             Lamoka     1.00            1
-## 25          Peribonka     1.00            2
-## 40             W 1386     1.00            5
-## 41             Waneta     1.00            3
-## 24            Norland     0.94           18
-## 19           Kennebec     0.83           42
-## 29               Reba     0.83            6
-## 4             Andover     0.80            5
-## 17           Goldrush     0.80          143
-## 35            Shepody     0.77           30
-## 37            Snowden     0.77           39
-## 11     Coastal Russet     0.76           41
-## 2          AC Chaleur     0.75            8
-## 10          Chieftain     0.75           71
-## 34     Russet Norkota     0.75            4
-## 22            Mystere     0.73           11
-## 33     Russet Burbank     0.71            7
-## 8         Bijou Rouge     0.67           12
-## 18            Harmony     0.67            3
+## 4               Ambra     1.00            1
+## 10           Carolina     1.00            3
+## 13 Dark Red Chieftain     1.00            4
+## 19            Harmony     1.00            1
+## 25          Peribonka     1.00            1
+## 38             Viking     1.00            1
+## 22            Mystere     0.94           18
+## 2          AC Chaleur     0.86            7
+## 29               Reba     0.86            7
+## 5             Andover     0.80           10
+## 24            Norland     0.80           15
+## 28           Prospect     0.80            5
+## 33     Russet Burbank     0.80            5
+## 40             W 1386     0.80            5
+## 36            Snowden     0.79           43
+## 18           Goldrush     0.76          140
+## 11          Chieftain     0.75           57
+## 26               Pike     0.75            4
+## 37           Superior     0.75          105
+## 20           Kennebec     0.73           48
+## 16            FL 1533     0.72           39
+## 15            FL 1207     0.71           91
+## 6             Aquilon     0.67           15
 ## 21            Lanorma     0.67            3
-## 28           Prospect     0.67            6
-## 31          Red Maria     0.67            6
-## 36              Sifra     0.67            3
-## 38           Superior     0.67           86
-## 15            FL 1533     0.66           47
-## 6               Argos     0.60            5
-## 14            FL 1207     0.60           81
-## 16    Frontier Russet     0.60            5
-## 39            Vivaldi     0.60            5
-## 42         Yukon Gold     0.59           17
-## 5             Aquilon     0.58           12
-## 13             Estima     0.57           14
-## 7            Atlantic     0.53           47
-## 1          AC Belmont     0.50           16
-## 27         Pommerelle     0.45           11
-## 30          Red Cloud     0.40            5
-## 23           Nordonna     0.25            4
-## 32               Roko     0.25            4
-## 26               Pike     0.17            6</code></pre>
+## 34     Russet Norkota     0.67            3
+## 42         Yukon Gold     0.63           19
+## 8            Atlantic     0.62           42
+## 12     Coastal Russet     0.62           55
+## 7               Argos     0.60            5
+## 1          AC Belmont     0.58           12
+## 17    Frontier Russet     0.57            7
+## 35            Shepody     0.52           25
+## 3            Amandine     0.50            2
+## 9         Bijou Rouge     0.50            8
+## 30          Red Cloud     0.50            4
+## 27         Pommerelle     0.43            7
+## 39            Vivaldi     0.40            5
+## 23           Nordonna     0.33            3
+## 31          Red Maria     0.33            6
+## 32               Roko     0.33            3
+## 14             Estima     0.25            4
+## 41             Waneta     0.25            4</code></pre>
 <p>The predictive accuracy is very high for some cultivars, but this result must be taken with care due to small size of samples often available. We plot accuracies for cultivars using ggplot2 functions.</p>
 <div class="figure" style="text-align: center"><span id="fig:accuracy-cultivar"></span>
 <img src="2019_Bookdown_files/figure-html/accuracy-cultivar-1.png" alt="Predictive accuracy for cultivars." width="100%" />
@@ -428,8 +428,8 @@ Figure 3.3: Predictive accuracy for cultivars.
 cm<span class="op">$</span>table <span class="co"># confusion matrix</span></code></pre></div>
 <pre><code>##           Reference
 ## Prediction  HY  LY
-##         HY 194 115
-##         LY 139 397</code></pre>
+##         HY 192 107
+##         LY 141 405</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># rf_clr_and_ionomicgroup model&#39;s classification</span>
 good_class &lt;-<span class="st"> </span>cm<span class="op">$</span>table[<span class="dv">1</span>,<span class="dv">1</span>]<span class="op">+</span>cm<span class="op">$</span>table[<span class="dv">2</span>,<span class="dv">2</span>] <span class="co"># HY or LY and correctly predicted</span>
 misclass &lt;-<span class="st"> </span>cm<span class="op">$</span>table[<span class="dv">1</span>,<span class="dv">2</span>]<span class="op">+</span>cm<span class="op">$</span>table[<span class="dv">2</span>,<span class="dv">1</span>]   <span class="co"># wrong classification</span>
@@ -445,7 +445,7 @@ non_inf_model &lt;-<span class="st"> </span><span class="kw">c</span>(good_nim, 
 m &lt;-<span class="st"> </span><span class="kw">rbind</span>(ml_class, non_inf_model)
 m</code></pre></div>
 <pre><code>##                [,1]  [,2]
-## ml_class      591.0 254.0
+## ml_class      597.0 248.0
 ## non_inf_model 422.5 422.5</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># chisq.test</span>
 khi2_test &lt;-<span class="st"> </span><span class="kw">chisq.test</span>(m)
@@ -454,7 +454,7 @@ khi2_test</code></pre></div>
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
 ## data:  m
-## X-squared = 69.155, df = 1, p-value &lt; 2.2e-16</code></pre>
+## X-squared = 74.422, df = 1, p-value &lt; 2.2e-16</code></pre>
 <p>The null hypothesis for a non-informative classification is rejected after the chi-square homogeneity test, the too small p-value denotes important difference between the models.</p>
 </div>
 <div id="nutritionally-balanced-compositions" class="section level2">
@@ -471,20 +471,20 @@ train_df &lt;-<span class="st"> </span><span class="kw">bind_cols</span>(dfml[sp
 <span class="st">  </span><span class="kw">summarise_all</span>(<span class="kw">list</span>(mean))</code></pre></div>
 <pre><code>## Adding missing grouping variables: `Cultivar`</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">TNmeanNorms</code></pre></div>
-<pre><code>## # A tibble: 43 x 7
+<pre><code>## # A tibble: 45 x 7
 ##    Cultivar    clr_N clr_P clr_K clr_Mg clr_Ca clr_Fv
 ##    &lt;chr&gt;       &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
-##  1 AC Belmont  0.708 -2.11 0.610  -1.63 -1.06    3.49
-##  2 AC Chaleur  0.710 -1.97 0.319  -1.52 -1.03    3.49
-##  3 Ambra       0.710 -2.01 0.296  -1.39 -1.05    3.44
-##  4 Andover     0.878 -2.18 0.723  -2.21 -0.819   3.61
-##  5 Aquilon     0.813 -1.93 0.388  -1.84 -0.898   3.46
-##  6 Argos       0.751 -1.79 0.550  -1.69 -1.23    3.42
-##  7 Atlantic    0.783 -1.86 0.105  -1.50 -1.08    3.56
-##  8 Bijou Rouge 0.941 -1.96 0.526  -2.07 -1.07    3.64
-##  9 Carolina    0.595 -2.18 0.114  -1.32 -0.833   3.63
-## 10 Chieftain   0.767 -1.91 0.407  -1.83 -1.04    3.60
-## # ... with 33 more rows</code></pre>
+##  1 AC Belmont  0.703 -2.12 0.622  -1.62 -1.07    3.49
+##  2 AC Chaleur  0.704 -1.93 0.360  -1.55 -1.07    3.50
+##  3 Amandine    0.519 -2.29 0.557  -1.62 -0.696   3.53
+##  4 Ambra       0.713 -1.98 0.275  -1.39 -1.08    3.46
+##  5 Andover     0.904 -2.20 0.743  -2.19 -0.850   3.60
+##  6 Aquilon     0.810 -1.94 0.404  -1.83 -0.894   3.45
+##  7 Argos       0.819 -1.75 0.402  -1.70 -1.13    3.36
+##  8 Atlantic    0.775 -1.90 0.132  -1.50 -1.07    3.57
+##  9 Bijou Rouge 0.962 -2.06 0.598  -2.16 -1.01    3.68
+## 10 Carolina    0.595 -2.18 0.114  -1.32 -0.833   3.63
+## # ... with 35 more rows</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">write_csv</span>(TNmeanNorms, <span class="st">&quot;output/provisional_norms.csv&quot;</span>)</code></pre></div>
 <p>We also save prediction for testing set.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">te_pred &lt;-<span class="st"> </span><span class="kw">predict</span>(kknn_, test_df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(ml_col))

@@ -24,7 +24,7 @@
 <meta name="author" content="Zonlehoua Coulibali and Serge-Étienne Parent" />
 
 
-<meta name="date" content="2019-08-01" />
+<meta name="date" content="2019-08-29" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -257,24 +257,24 @@ debal_index &lt;-<span class="st"> </span><span class="kw">c</span>()
 train_df<span class="op">$</span>debal &lt;-<span class="st"> </span>debal
 train_df &lt;-<span class="st"> </span>train_df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(debal <span class="op">!=</span><span class="st"> </span><span class="dv">0</span>)
 train_df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">glimpse</span>()</code></pre></div>
-<pre><code>## Observations: 1,715
+<pre><code>## Observations: 1,724
 ## Variables: 16
-## $ NoEssai      &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 4, 4, 4, 4, 4, 5, 5...
-## $ NoBloc       &lt;dbl&gt; 1, 1, 2, 2, 3, 3, 3, 3, 3, 1, 1, 2, 2, 2, 3, 1, 1...
-## $ NoTraitement &lt;dbl&gt; 1, 2, 1, 2, 1, 2, 3, 4, 5, 1, 2, 1, 2, 3, 5, 1, 2...
-## $ clr_N        &lt;dbl&gt; 0.3321186, 0.4252302, 0.4730353, 0.3431300, 0.648...
-## $ clr_P        &lt;dbl&gt; -2.518325, -2.394957, -2.289625, -2.273704, -2.17...
-## $ clr_K        &lt;dbl&gt; 0.8379383, 1.1387291, 0.7189277, 1.2075359, 1.116...
-## $ clr_Ca       &lt;dbl&gt; -0.4794688, -0.5154924, -0.5418289, -0.6414516, -...
-## $ clr_Mg       &lt;dbl&gt; -1.639076, -2.346167, -1.698261, -2.164505, -2.40...
-## $ clr_Fv       &lt;dbl&gt; 3.466813, 3.692658, 3.337752, 3.528995, 3.510555,...
-## $ RendVendable &lt;dbl&gt; 18.944200, 40.351800, 15.118300, 36.264300, 26.55...
+## $ NoEssai      &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 4, 4, 4, 4, 4, 4...
+## $ NoBloc       &lt;dbl&gt; 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 1, 2, 2, 2, 2, 3, 3...
+## $ NoTraitement &lt;dbl&gt; 1, 2, 3, 6, 1, 2, 8, 4, 5, 7, 1, 1, 2, 3, 4, 2, 3...
+## $ clr_N        &lt;dbl&gt; 0.3321186, 0.4252302, 0.4453417, 0.4885647, 0.473...
+## $ clr_P        &lt;dbl&gt; -2.518325, -2.394957, -2.365429, -2.525335, -2.28...
+## $ clr_K        &lt;dbl&gt; 0.8379383, 1.1387291, 1.0112272, 0.9418880, 0.718...
+## $ clr_Ca       &lt;dbl&gt; -0.4794688, -0.5154924, -0.7290838, -0.6426036, -...
+## $ clr_Mg       &lt;dbl&gt; -1.639076, -2.346167, -1.990736, -1.763195, -1.69...
+## $ clr_Fv       &lt;dbl&gt; 3.466813, 3.692658, 3.628680, 3.500681, 3.337752,...
+## $ RendVendable &lt;dbl&gt; 18.944200, 40.351800, 33.037900, 41.016700, 15.11...
 ## $ rv_cut       &lt;dbl&gt; 41.33053, 41.33053, 41.33053, 41.33053, 41.33053,...
 ## $ yieldClass   &lt;chr&gt; &quot;LY&quot;, &quot;LY&quot;, &quot;LY&quot;, &quot;LY&quot;, &quot;LY&quot;, &quot;LY&quot;, &quot;HY&quot;, &quot;LY&quot;, &quot;...
 ## $ Cultivar     &lt;chr&gt; &quot;Goldrush&quot;, &quot;Goldrush&quot;, &quot;Goldrush&quot;, &quot;Goldrush&quot;, &quot;...
 ## $ Maturity5    &lt;chr&gt; &quot;mid-season&quot;, &quot;mid-season&quot;, &quot;mid-season&quot;, &quot;mid-se...
-## $ pred_yield   &lt;chr&gt; &quot;LY&quot;, &quot;LY&quot;, &quot;LY&quot;, &quot;HY&quot;, &quot;LY&quot;, &quot;LY&quot;, &quot;LY&quot;, &quot;LY&quot;, &quot;...
-## $ debal        &lt;dbl&gt; 0.2915435, 0.3247296, 0.3075426, 0.3472900, 0.329...</code></pre>
+## $ pred_yield   &lt;chr&gt; &quot;LY&quot;, &quot;LY&quot;, &quot;HY&quot;, &quot;LY&quot;, &quot;LY&quot;, &quot;HY&quot;, &quot;LY&quot;, &quot;LY&quot;, &quot;...
+## $ debal        &lt;dbl&gt; 0.4859422, 0.3245021, 0.2126167, 0.2987338, 0.384...</code></pre>
 <p>For test_df:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">debal &lt;-<span class="st"> </span><span class="kw">c</span>()
 debal_index &lt;-<span class="st"> </span><span class="kw">c</span>()
@@ -288,24 +288,24 @@ debal_index &lt;-<span class="st"> </span><span class="kw">c</span>()
 test_df<span class="op">$</span>debal &lt;-<span class="st"> </span>debal
 test_df &lt;-<span class="st"> </span>test_df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(debal <span class="op">!=</span><span class="st"> </span><span class="dv">0</span>)
 test_df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">glimpse</span>()</code></pre></div>
-<pre><code>## Observations: 787
+<pre><code>## Observations: 803
 ## Variables: 16
-## $ NoEssai      &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5...
-## $ NoBloc       &lt;dbl&gt; 1, 1, 1, 1, 2, 3, 1, 1, 2, 2, 3, 3, 3, 3, 3, 1, 2...
-## $ NoTraitement &lt;dbl&gt; 3, 4, 5, 6, 5, 8, 3, 5, 4, 5, 1, 2, 3, 4, 6, 4, 4...
-## $ clr_N        &lt;dbl&gt; 0.4453417, 0.3993264, 0.6519389, 0.4885647, 0.569...
-## $ clr_P        &lt;dbl&gt; -2.365429, -2.599180, -2.468221, -2.525335, -2.42...
-## $ clr_K        &lt;dbl&gt; 1.0112272, 0.7945826, 0.8242433, 0.9418880, 0.721...
-## $ clr_Ca       &lt;dbl&gt; -0.7290838, -0.6220171, -0.7470790, -0.6426036, -...
-## $ clr_Mg       &lt;dbl&gt; -1.990736, -1.577529, -1.775074, -1.763195, -1.73...
-## $ clr_Fv       &lt;dbl&gt; 3.628680, 3.604817, 3.514191, 3.500681, 3.524081,...
-## $ RendVendable &lt;dbl&gt; 33.03790, 37.55050, 46.00890, 41.01670, 42.95690,...
+## $ NoEssai      &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 4, 4, 4, 4, 4, 5, 5, 5, 5...
+## $ NoBloc       &lt;dbl&gt; 1, 1, 2, 2, 2, 3, 3, 3, 1, 1, 1, 1, 3, 1, 1, 1, 2...
+## $ NoTraitement &lt;dbl&gt; 4, 5, 5, 6, 7, 1, 2, 8, 2, 3, 5, 6, 1, 2, 4, 5, 5...
+## $ clr_N        &lt;dbl&gt; 0.3993264, 0.6519389, 0.5692523, 0.7251908, 0.507...
+## $ clr_P        &lt;dbl&gt; -2.599180, -2.468221, -2.423432, -2.327678, -2.50...
+## $ clr_K        &lt;dbl&gt; 0.7945826, 0.8242433, 0.7214698, 0.7597218, 0.676...
+## $ clr_Ca       &lt;dbl&gt; -0.6220171, -0.7470790, -0.6610863, -0.6945233, -...
+## $ clr_Mg       &lt;dbl&gt; -1.577529, -1.775074, -1.730285, -1.991205, -1.51...
+## $ clr_Fv       &lt;dbl&gt; 3.604817, 3.514191, 3.524081, 3.528494, 3.430364,...
+## $ RendVendable &lt;dbl&gt; 37.55050, 46.00890, 42.95690, 49.24620, 41.86690,...
 ## $ rv_cut       &lt;dbl&gt; 41.33053, 41.33053, 41.33053, 41.33053, 41.33053,...
-## $ yieldClass   &lt;chr&gt; &quot;LY&quot;, &quot;LY&quot;, &quot;HY&quot;, &quot;LY&quot;, &quot;HY&quot;, &quot;HY&quot;, &quot;LY&quot;, &quot;HY&quot;, &quot;...
+## $ yieldClass   &lt;chr&gt; &quot;LY&quot;, &quot;HY&quot;, &quot;HY&quot;, &quot;HY&quot;, &quot;HY&quot;, &quot;LY&quot;, &quot;LY&quot;, &quot;HY&quot;, &quot;...
 ## $ Cultivar     &lt;chr&gt; &quot;Goldrush&quot;, &quot;Goldrush&quot;, &quot;Goldrush&quot;, &quot;Goldrush&quot;, &quot;...
 ## $ Maturity5    &lt;chr&gt; &quot;mid-season&quot;, &quot;mid-season&quot;, &quot;mid-season&quot;, &quot;mid-se...
-## $ pred_yield   &lt;chr&gt; &quot;HY&quot;, &quot;LY&quot;, &quot;HY&quot;, &quot;HY&quot;, &quot;LY&quot;, &quot;LY&quot;, &quot;HY&quot;, &quot;LY&quot;, &quot;...
-## $ debal        &lt;dbl&gt; 0.21261668, 0.26281673, 0.08804962, 0.29873382, 0...</code></pre>
+## $ pred_yield   &lt;chr&gt; &quot;HY&quot;, &quot;HY&quot;, &quot;LY&quot;, &quot;LY&quot;, &quot;LY&quot;, &quot;LY&quot;, &quot;HY&quot;, &quot;LY&quot;, &quot;...
+## $ debal        &lt;dbl&gt; 0.48988609, 0.16712719, 0.23425051, 0.21198871, 0...</code></pre>
 </div>
 <div id="perturbation-effect-of-some-elements-on-the-whole" class="section level2">
 <h2><span class="header-section-number">4.4</span> Perturbation effect of some elements on the whole</h2>
@@ -317,20 +317,20 @@ leaf_clr_o &lt;-<span class="st"> </span>test_df <span class="op">%&gt;%</span><
 <span class="co">#  filter(debal &gt;= quantile(train_df$debal, p = .75)) %&gt;% </span>
 <span class="co">#  select(clr_no)</span>
 <span class="kw">summary</span>(leaf_clr_o)</code></pre></div>
-<pre><code>##      clr_N            clr_P            clr_K             clr_Ca       
-##  Min.   :0.0000   Min.   :-3.269   Min.   :-0.2536   Min.   :-2.0486  
-##  1st Qu.:0.6102   1st Qu.:-2.175   1st Qu.: 0.2745   1st Qu.:-1.1665  
-##  Median :0.7247   Median :-2.019   Median : 0.4467   Median :-0.9961  
-##  Mean   :0.7221   Mean   :-2.017   Mean   : 0.4584   Mean   :-1.0031  
-##  3rd Qu.:0.8509   3rd Qu.:-1.858   3rd Qu.: 0.6252   3rd Qu.:-0.8262  
-##  Max.   :1.2106   Max.   :-1.192   Max.   : 1.8047   Max.   : 0.1681  
+<pre><code>##      clr_N            clr_P            clr_K             clr_Ca        
+##  Min.   :0.0000   Min.   :-3.159   Min.   :-0.3560   Min.   :-1.98953  
+##  1st Qu.:0.6253   1st Qu.:-2.171   1st Qu.: 0.2671   1st Qu.:-1.16304  
+##  Median :0.7282   Median :-2.005   Median : 0.4315   Median :-1.00005  
+##  Mean   :0.7227   Mean   :-2.004   Mean   : 0.4567   Mean   :-1.00711  
+##  3rd Qu.:0.8349   3rd Qu.:-1.838   3rd Qu.: 0.6078   3rd Qu.:-0.84266  
+##  Max.   :1.2106   Max.   :-1.186   Max.   : 1.8047   Max.   : 0.06082  
 ##      clr_Mg            clr_Fv     
-##  Min.   :-3.1532   Min.   :3.221  
-##  1st Qu.:-1.9464   1st Qu.:3.466  
-##  Median :-1.7007   Median :3.548  
-##  Mean   :-1.7196   Mean   :3.559  
-##  3rd Qu.:-1.4893   3rd Qu.:3.644  
-##  Max.   :-0.6893   Max.   :4.330</code></pre>
+##  Min.   :-2.7207   Min.   :2.969  
+##  1st Qu.:-1.9545   1st Qu.:3.472  
+##  Median :-1.7108   Median :3.547  
+##  Mean   :-1.7294   Mean   :3.561  
+##  3rd Qu.:-1.5006   3rd Qu.:3.640  
+##  Max.   :-0.6952   Max.   :4.167</code></pre>
 <p>Let’s perturb the original clr values for <code>N</code> and <code>P</code>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Perturb the original clrs</span>
 pert_col &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>) <span class="co"># the column indices which is perturbed: clr_N and clr_K respectively</span>
@@ -340,20 +340,20 @@ leaf_clr_f &lt;-<span class="st"> </span>leaf_clr_o
   leaf_clr_f[, pert_col[i]] &lt;-<span class="st"> </span>leaf_clr_f[, pert_col[i]] <span class="op">*</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span>perturbation[i])
 }
 <span class="kw">summary</span>(leaf_clr_f)</code></pre></div>
-<pre><code>##      clr_N            clr_P            clr_K             clr_Ca       
-##  Min.   :0.0000   Min.   :-3.923   Min.   :-0.2536   Min.   :-2.0486  
-##  1st Qu.:0.7323   1st Qu.:-2.610   1st Qu.: 0.2745   1st Qu.:-1.1665  
-##  Median :0.8696   Median :-2.422   Median : 0.4467   Median :-0.9961  
-##  Mean   :0.8666   Mean   :-2.420   Mean   : 0.4584   Mean   :-1.0031  
-##  3rd Qu.:1.0211   3rd Qu.:-2.229   3rd Qu.: 0.6252   3rd Qu.:-0.8262  
-##  Max.   :1.4528   Max.   :-1.431   Max.   : 1.8047   Max.   : 0.1681  
+<pre><code>##      clr_N            clr_P            clr_K             clr_Ca        
+##  Min.   :0.0000   Min.   :-3.791   Min.   :-0.3560   Min.   :-1.98953  
+##  1st Qu.:0.7503   1st Qu.:-2.605   1st Qu.: 0.2671   1st Qu.:-1.16304  
+##  Median :0.8739   Median :-2.406   Median : 0.4315   Median :-1.00005  
+##  Mean   :0.8672   Mean   :-2.404   Mean   : 0.4567   Mean   :-1.00711  
+##  3rd Qu.:1.0019   3rd Qu.:-2.206   3rd Qu.: 0.6078   3rd Qu.:-0.84266  
+##  Max.   :1.4528   Max.   :-1.423   Max.   : 1.8047   Max.   : 0.06082  
 ##      clr_Mg            clr_Fv     
-##  Min.   :-3.1532   Min.   :3.221  
-##  1st Qu.:-1.9464   1st Qu.:3.466  
-##  Median :-1.7007   Median :3.548  
-##  Mean   :-1.7196   Mean   :3.559  
-##  3rd Qu.:-1.4893   3rd Qu.:3.644  
-##  Max.   :-0.6893   Max.   :4.330</code></pre>
+##  Min.   :-2.7207   Min.   :2.969  
+##  1st Qu.:-1.9545   1st Qu.:3.472  
+##  Median :-1.7108   Median :3.547  
+##  Mean   :-1.7294   Mean   :3.561  
+##  3rd Qu.:-1.5006   3rd Qu.:3.640  
+##  Max.   :-0.6952   Max.   :4.167</code></pre>
 <p>The next one transforms clrs (original and perturbed clrs) back to compositions.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># From clrs to compositions</span>
 leaf_o &lt;-<span class="st"> </span><span class="kw">apply</span>(leaf_clr_o, <span class="dv">1</span>, <span class="cf">function</span>(x) <span class="kw">exp</span>(x) <span class="op">/</span><span class="st"> </span><span class="kw">sum</span>(<span class="kw">exp</span>(x))) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">t</span>()
@@ -383,22 +383,22 @@ Figure 4.1: Perturbation effect of some elements on the whole.
 imbalanced &lt;-<span class="st"> </span>train_df[<span class="kw">sample</span>(<span class="kw">nrow</span>(train_df), <span class="dv">1</span>), ]
 <span class="kw">t</span>(imbalanced)</code></pre></div>
 <pre><code>##              [,1]        
-## NoEssai      &quot;88&quot;        
+## NoEssai      &quot;412&quot;       
 ## NoBloc       &quot;1&quot;         
-## NoTraitement &quot;16&quot;        
-## clr_N        &quot;0.453077&quot;  
-## clr_P        &quot;-2.036963&quot; 
-## clr_K        &quot;0.3393093&quot; 
-## clr_Ca       &quot;-0.9989758&quot;
-## clr_Mg       &quot;-1.300644&quot; 
-## clr_Fv       &quot;3.544197&quot;  
-## RendVendable &quot;44.19891&quot;  
-## rv_cut       &quot;36.19781&quot;  
-## yieldClass   &quot;HY&quot;        
-## Cultivar     &quot;FL 1533&quot;   
+## NoTraitement &quot;9&quot;         
+## clr_N        &quot;0.7735603&quot; 
+## clr_P        &quot;-2.464426&quot; 
+## clr_K        &quot;0.5688289&quot; 
+## clr_Ca       &quot;-1.034959&quot; 
+## clr_Mg       &quot;-1.660053&quot; 
+## clr_Fv       &quot;3.817049&quot;  
+## RendVendable &quot;34.74147&quot;  
+## rv_cut       &quot;41.33053&quot;  
+## yieldClass   &quot;LY&quot;        
+## Cultivar     &quot;Goldrush&quot;  
 ## Maturity5    &quot;mid-season&quot;
 ## pred_yield   &quot;LY&quot;        
-## debal        &quot;0.08202369&quot;</code></pre>
+## debal        &quot;0.2208642&quot;</code></pre>
 <p>Or even, we could rather use the most imbalanced occurrence, why not !</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">imbalanced &lt;-<span class="st"> </span>train_df[<span class="kw">which.max</span>(train_df<span class="op">$</span>debal), ]
 misbalanced &lt;-<span class="st"> </span>imbalanced <span class="co"># copy</span>
@@ -427,8 +427,8 @@ eucl_dist_misbal &lt;-<span class="st"> </span><span class="kw">apply</span>(TNs
 
 index_misbal &lt;-<span class="st"> </span><span class="kw">which.min</span>(<span class="kw">t</span>(<span class="kw">data.frame</span>(eucl_dist_misbal))) 
 index_misbal <span class="co"># return the index of the sample</span></code></pre></div>
-<pre><code>## [1] 60</code></pre>
-<p>The closest healthy sample is the one which index is 60 in TNs charing the same cultivar with the new sample. Using this index we could refind the minimum imbalance index value computed.</p>
+<pre><code>## [1] 50</code></pre>
+<p>The closest healthy sample is the one which index is 50 in TNs charing the same cultivar with the new sample. Using this index we could refind the minimum imbalance index value computed.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(misbal &lt;-<span class="st"> </span>eucl_dist_misbal[index_misbal])</code></pre></div>
 <pre><code>## [1] 1.345815</code></pre>
 <p>The Euclidean distance matches with the corresponding <code>debal</code> value: <code>imbalanced$debal[1]</code> = 1.3458148. The <code>closest point in the TNs</code> subset is this one:</p>
@@ -524,11 +524,12 @@ pmc</code></pre></div>
 ## [1] acomp</code></pre>
 <p>So, the assumption is true. The next codes show the concept using dots plots and histograms for each vector. A data frame is tidded for ggplot. Visualization is better with histograms.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">rbind</span>(misbalanced, closest, clr_diff),
-                 <span class="dt">vectors =</span> <span class="kw">c</span>(<span class="st">&quot;Observation&quot;</span>, <span class="st">&quot;Reference&quot;</span>, <span class="st">&quot;Perturbation&quot;</span>))
-dfreshape =<span class="st"> </span><span class="kw">melt</span>(df) <span class="co"># reshapes df for ggplot</span></code></pre></div>
+                 <span class="dt">vectors =</span> <span class="kw">factor</span>(<span class="kw">c</span>(<span class="st">&quot;Observation&quot;</span>, <span class="st">&quot;Reference&quot;</span>, <span class="st">&quot;Perturbation&quot;</span>)))
+df<span class="op">$</span>vectors &lt;-<span class="st"> </span>df<span class="op">$</span>vectors <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">fct_relevel</span>(<span class="st">&quot;Observation&quot;</span>, <span class="st">&quot;Reference&quot;</span>, <span class="st">&quot;Perturbation&quot;</span>)
+dfreshape &lt;-<span class="st"> </span><span class="kw">melt</span>(df)</code></pre></div>
 <pre><code>## Using vectors as id variables</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dfreshape<span class="op">$</span>variable &lt;-<span class="st"> </span><span class="kw">sub</span>(<span class="dt">pattern =</span> <span class="st">&quot;clr_&quot;</span>, <span class="dt">replacement =</span> <span class="st">&quot;&quot;</span>, <span class="dt">x =</span> dfreshape<span class="op">$</span>variable, <span class="dt">fixed =</span> <span class="ot">TRUE</span>)
-<span class="co">#dfreshape$vectors &lt;- fct_relevel(&quot;Observation&quot;, &quot;Reference&quot;, &quot;Perturbation&quot;)</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dfreshape<span class="op">$</span>variable &lt;-<span class="st"> </span><span class="kw">sub</span>(<span class="dt">pattern =</span> <span class="st">&quot;clr_&quot;</span>, <span class="dt">replacement =</span> <span class="st">&quot;&quot;</span>, <span class="dt">x =</span> dfreshape<span class="op">$</span>variable, <span class="dt">fixed =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">fct_relevel</span>(<span class="st">&quot;N&quot;</span>, <span class="st">&quot;P&quot;</span>, <span class="st">&quot;K&quot;</span>, <span class="st">&quot;Ca&quot;</span>, <span class="st">&quot;Mg&quot;</span>, <span class="st">&quot;Fv&quot;</span>)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(<span class="dt">data =</span> dfreshape, <span class="kw">aes</span>(<span class="dt">x =</span> value, <span class="dt">y =</span> vectors, <span class="dt">colour =</span> vectors)) <span class="op">+</span>
 <span class="st">    </span><span class="kw">geom_point</span>() <span class="op">+</span>
 <span class="st">    </span><span class="kw">facet_wrap</span>(<span class="op">~</span><span class="st"> </span>variable, <span class="dt">scales =</span> <span class="st">&quot;free_x&quot;</span>) <span class="op">+</span>
@@ -549,7 +550,7 @@ Figure 4.2: Perturbation vector computation example dotplot using the most imbal
 <span class="st">    </span><span class="kw">theme</span>(<span class="dt">legend.title =</span> <span class="kw">element_blank</span>()) <span class="op">+</span>
 <span class="st">    </span><span class="kw">theme</span>(<span class="dt">text =</span> <span class="kw">element_text</span>(<span class="dt">family =</span> <span class="st">&quot;Arial&quot;</span>, <span class="dt">face =</span> <span class="st">&quot;bold&quot;</span>, <span class="dt">size =</span> <span class="dv">12</span>))
 g1 <span class="op">+</span><span class="st"> </span><span class="kw">scale_fill_discrete</span>(<span class="dt">breaks =</span> <span class="kw">c</span>(<span class="st">&quot;Observation&quot;</span>,<span class="st">&quot;Reference&quot;</span>,<span class="st">&quot;Perturbation&quot;</span>)) <span class="op">+</span>
-<span class="st">    </span><span class="kw">scale_fill_manual</span>(<span class="dt">values=</span><span class="kw">c</span>(<span class="st">&quot;grey50&quot;</span>, <span class="st">&quot;grey80&quot;</span>, <span class="st">&quot;black&quot;</span>))</code></pre></div>
+<span class="st">    </span><span class="kw">scale_fill_manual</span>(<span class="dt">values=</span><span class="kw">c</span>(<span class="st">&quot;grey50&quot;</span>, <span class="st">&quot;black&quot;</span>, <span class="st">&quot;grey80&quot;</span>))</code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:hi-perturb-barplot"></span>
 <img src="2019_Bookdown_files/figure-html/hi-perturb-barplot-1.png" alt="Perturbation vector computation example barplot using the most imbalanced foliar sample." width="100%" />
 <p class="caption">
