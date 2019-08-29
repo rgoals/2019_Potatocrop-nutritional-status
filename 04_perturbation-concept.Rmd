@@ -265,10 +265,11 @@ So, the assumption is true. The next codes show the concept using dots plots and
 
 ```{r}
 df <- data.frame(rbind(misbalanced, closest, clr_diff),
-                 vectors = c("Observation", "Reference", "Perturbation"))
-dfreshape = melt(df) # reshapes df for ggplot
-dfreshape$variable <- sub(pattern = "clr_", replacement = "", x = dfreshape$variable, fixed = TRUE)
-#dfreshape$vectors <- fct_relevel("Observation", "Reference", "Perturbation")
+                 vectors = factor(c("Observation", "Reference", "Perturbation")))
+df$vectors <- df$vectors %>% fct_relevel("Observation", "Reference", "Perturbation")
+dfreshape <- melt(df) # reshapes df for ggplot
+dfreshape$variable <- sub(pattern = "clr_", replacement = "", x = dfreshape$variable, fixed = TRUE) %>% 
+  fct_relevel("N", "P", "K", "Ca", "Mg", "Fv")
 ```
 
 ```{r hi-perturb-dotplot, fig.height = 4, fig.width = 10, out.width = "100%", fig.align = "center", warning = FALSE, message = FALSE, fig.cap = "Perturbation vector computation example dotplot using the most imbalanced foliar sample."}
@@ -289,10 +290,8 @@ g1 <- ggplot(data = dfreshape, aes(x = variable, y = value, fill = vectors)) +
     theme(legend.title = element_blank()) +
     theme(text = element_text(family = "Arial", face = "bold", size = 12))
 g1 + scale_fill_discrete(breaks = c("Observation","Reference","Perturbation")) +
-    scale_fill_manual(values=c("grey50", "grey80", "black"))
+    scale_fill_manual(values=c("grey50", "black", "grey80"))
 
 ggsave("images/perturb_barplot.tiff",  width = 6, height = 4)
 ```
-
-
 
