@@ -267,7 +267,7 @@ So, the assumption is true. The next codes show the concept using dots plots and
 df <- data.frame(rbind(misbalanced, closest, clr_diff),
                  vectors = factor(c("Observation", "Reference", "Perturbation")))
 df$vectors <- df$vectors %>% fct_relevel("Observation", "Reference", "Perturbation")
-dfreshape <- melt(df) # reshapes df for ggplot
+dfreshape <- melt(df)
 dfreshape$variable <- sub(pattern = "clr_", replacement = "", x = dfreshape$variable, fixed = TRUE) %>% 
   fct_relevel("N", "P", "K", "Ca", "Mg", "Fv")
 ```
