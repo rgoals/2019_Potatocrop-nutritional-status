@@ -267,7 +267,11 @@ So, the assumption is true. The next codes show the concept using dots plots and
 df <- data.frame(rbind(misbalanced, closest, clr_diff),
                  vectors = factor(c("Observation", "Reference", "Perturbation")))
 df$vectors <- df$vectors %>% fct_relevel("Observation", "Reference", "Perturbation")
+<<<<<<< HEAD
 dfreshape <- melt(df) # reshapes df for ggplot
+=======
+dfreshape <- melt(df)
+>>>>>>> 57a4487761e5c5c45b9b0d0c33051354d8e9c63b
 dfreshape$variable <- sub(pattern = "clr_", replacement = "", x = dfreshape$variable, fixed = TRUE) %>% 
   fct_relevel("N", "P", "K", "Ca", "Mg", "Fv")
 ```
@@ -294,6 +298,4 @@ g1 + scale_fill_discrete(breaks = c("Observation","Reference","Perturbation")) +
 
 ggsave("images/perturb_barplot.tiff",  width = 6, height = 4)
 ```
-
-
 
