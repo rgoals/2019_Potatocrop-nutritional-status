@@ -183,7 +183,8 @@ The predictive accuracy is very high for some cultivars, but this result must be
 ggplot(data, aes(x = reorder(Cultivar, Accuracy), y = Accuracy)) +
   geom_col(aes(fill = numb_samples)) +
   scale_fill_gradient(low = "grey50", high = "black") +
-  labs(x = 'Cultivar', y = 'Accuracy', fill = "Samples (n)") +
+  labs(x = 'Cultivar', y = 'Accuracy', fill = "Number of\nsamples") +
+  theme_bw() +
   theme(text = element_text(family = "Arial", face = "bold", size = 12)) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = 12))
 ggsave("images/cultivar_accuracy.tiff", width = 9, height = 5)

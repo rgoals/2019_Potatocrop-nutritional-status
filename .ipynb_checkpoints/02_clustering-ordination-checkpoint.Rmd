@@ -1,0 +1,298 @@
+# Ionome analysis {#Chapter-Clustering}
+
+## Objective
+
+***
+This chapter has two objectives. Firstly, we try to assign cultivars to groups based on diagnostic leaves ionomes. Although plant health is a continuous domain rather than a categorical status, yield thresholds are useful for decision-making. Because yield potential varies widely among cultivars, we split experimental data into low- and high-productivity categories using a marketable yield delimiter at the 65^th percentile for each cultivar. Hence, we use high yielders subpopulation (samples which marketable yield is larger than the yield cut-off) to look for eventual patterns discriminating groups of similar multivariate compositions (`ionomics groups`). Then, a principle components analysis is performed. The experimental sites locations are mapped. At the end, the output data file is called `dfml_df.csv` _i.e._ the data frame for machine learning chapter (Chapter \@ref(Chapter-Modeling)).
+
+***
+
+## Useful libraries and custom functions
+
+A set of packages is needed for data manipulation and visualization like `tidyverse` presented in previous chapter (Chapter \@ref(Chapter-Data-Processing)), [mvoutlier](https://rdrr.io/cran/mvoutlier/) for multivariate outliers detection, [dbscan](http://www.sthda.com/english/wiki/wiki.php?id_contents=7940) a density-based clustering algorithm, which can be used to identify clusters of any shape in data set containing noise and outliers, [factoextra](https://github.com/kassambara/factoextra) needed with `dbscan` for clustering and visualization, [vegan](https://www.rdocumentation.org/packages/vegan/versions/2.4-2) to perform principle components analysis, [ggmap](https://github.com/dkahle/ggmap) makes it easy to retrieve raster map tiles from online mapping services like Google Maps and Stamen Maps and plots them using the ggplot2 framework, [cowplot](https://github.com/wilkelab/cowplot) can combine multiple ggplot plots to make publication-ready plots, and [extrafont](https://www.r-pkg.org/pkg/extrafont) allows custom fonts for graphs with ggplot2.
+
+```{r, warning=FALSE, message=FALSE}
+library("tidyverse")
+library("mvoutlier")
+library("dbscan")
+library("factoextra")
+library("vegan")
+library("ggmap")
+library("cowplot")
+library("extrafont")
+```
+
+## Leaves processed compositions data set
+
+For this chapter, the initial data set is the outcome of the previous chapter (Chapter \@ref(Chapter-Data-Processing)) `leaf_clust_df.csv`. Let's load the data frame.
+
+```{r}
+leaf_clust_df <- read_csv("output/leaf_clust_df.csv")
+```
+
+The experimental sites locations are mapped as follows.
+
+```{r leaf-df-sites-locations, out.width = "100%", fig.align = "center", warning = FALSE, message = FALSE, echo = FALSE, fig.cap = "Location of experimental sites in the Québec potato data set."}
+qc_leaf <- get_stamenmap(bbox = c(left = -76, right = -68, bottom = 45, top = 50), 
+                         zoom = 7, maptype = 'toner-lite')
+ggmap(qc_leaf) +
+  geom_point(data = leaf_clust_df %>%
+               select(LonDD, LatDD) %>%
+               unique(), aes(x = LonDD, y = LatDD),
+             size = 4, pch = 21, fill = rgb(0, 0, 0, 0.5)) + 
+  coord_map("mercator") +
+  labs(x = "Longitude", y = "Latitude") +
+  theme_bw() +
+  theme(text = element_text(family = "Arial", face = "bold", size = 12))
+ggsave("images/leaf-df-sites-locations.tiff", width = 10, height = 8)
+```
+
+## The yield cut-off, low and high yielders delimiter
+
+For cluster analysis, we keep only high yielders filtered as yield 65% quantile cutter for each cultivar. The `cutQ` table is used to add the variable `yieldClass` categorising yield potential to `leaf_clust_df`. `HY` and `LY` stand for high yield and low yield respectively.
+
+```{r}
+cutQ <- leaf_clust_df %>%
+  group_by(Cultivar) %>%
+  select(RendVendable) %>%
+  summarise_if(is.numeric, quantile, probs = 0.65, na.rm = TRUE) #%>%
+colnames(cutQ)[colnames(cutQ) == "RendVendable"] <- "rv_cut"
+```
+
+```{r}
+leaf_clust_df <- leaf_clust_df %>%
+  left_join(cutQ, by = "Cultivar") %>%
+  mutate(yieldClass = forcats::fct_relevel(ifelse(RendVendable >= rv_cut, "HY", "LY"), "LY"))
+```
+
+For sake of verification, let's compute average yield per yieldClass.
+
+```{r, warning=FALSE}
+mean_yield <- leaf_clust_df %>%
+  group_by(yieldClass) %>%
+  select(RendVendable) %>%
+  summarise_if(is.numeric, mean, na.rm = TRUE)
+mean_yield
+```
+
+So, the average marketable yield is 40.48 Mg $ha^-1$ for high yielders and 24.78 Mg $ha^-1$ for low yielders. In comparison, average potato tuber yields in 2018 in Canada and in Québec were [31.21 Mg $ha^-1$](https://www150.statcan.gc.ca/t1/tbl1/fr/tv.action?pid=3210035801&pickMembers%5B0%5D=1.1) and [28.75 Mg $ha^-1$](https://www150.statcan.gc.ca/t1/tbl1/fr/tv.action?pid=3210035801&pickMembers%5B0%5D=1.6) respectively.
+
+## Centered log-ratio (clr) centroids computation
+
+Compositional data transformation is done in the loaded file. We select only clr-transformed variables for high yielders, at 10 % blossom (AnalyseFoliaireStade = 10% fleur) in the next chunk.
+
+```{r}
+hy_df <- leaf_clust_df %>%
+  mutate(isNA = apply(select(., starts_with("clr"), Cultivar, Maturity5, RendVendable), 1, anyNA)) %>%
+  mutate(is10pcf = AnalyseFoliaireStade == "10% fleur") %>%
+  filter(!isNA & is10pcf & yieldClass == "HY" & NoEssai != "2") %>% 
+  select(NoEssai, NoBloc, NoTraitement, starts_with("clr"), Cultivar, Maturity5, RendVendable) %>%
+  droplevels()
+```
+
+`r nrow(hy_df)` lines of observations (samples) will be used to find patterns in potato cultivars. The next chunks check the number of samples per cultivar in this high yielders data set. Some cultivars have been discarded from the table after the previous filter.
+
+```{r}
+percentage <- round(with(hy_df, prop.table(table(Cultivar)) * 100), 2)
+distribution <- with(hy_df, cbind(numHY = table(Cultivar), percentage = percentage))
+distribution <- data.frame(cbind(distribution, rownames(distribution)))
+colnames(distribution)[3] <- "Cultivar"
+distribution$numHY <- as.numeric(as.character(distribution$numHY)) # numHY is the number of samples
+distribution$percentage <- as.numeric(as.character(distribution$percentage))
+distribution <- distribution %>% 
+  arrange(desc(numHY)) # arrange in descending order
+```
+
+```{r, HY-cultivar-abundance, fig.height = 10, fig.width = 5, out.width = "100%", fig.align = "center", warning = FALSE, message = FALSE, fig.cap = "High yielders cultivars abundance.", echo = FALSE}
+distribution %>%
+  ggplot(aes(x = reorder(Cultivar, numHY), y = numHY)) +
+  geom_col() +
+  geom_text(aes(label = numHY), hjust = -0.1) +
+  ylim(c(0, 250)) +
+  labs(x = 'Cultivar', y = 'Number of samples') +
+  coord_flip()
+```
+
+Some cultivars are well represented, like Superior and Goldrush. Let's compute number of cultivars and trials in the data frame.
+
+```{r}
+data.frame(numb_cultivars = n_distinct(hy_df$Cultivar, na.rm = TRUE),
+           numb_trials = n_distinct(hy_df$NoEssai, na.rm = TRUE))
+```
+
+The next chunk creates a table with cultivars, maturity classes and median clr values _i.e._ clr centroids for cultivars (the __S... Table__ of the article).
+
+```{r}
+hy_clr <- hy_df %>%
+  group_by(Cultivar, Maturity5) %>%
+  select(Cultivar, Maturity5, starts_with("clr")) %>%
+  summarise_all(list(median))
+hy_clr
+write_csv(hy_clr, "output/highyielders_medianclr.csv")
+```
+
+Multivariate outliers detection technique is used to identify outliers with a quantitle critical value of `qcrit = 0.975` by cultivar only if cultivars contain at leat 20 rows. If less than 20 rows, all rows are kept. The new data frame `hy_df_in` will be used for patterns recognition and discriminant analysis.
+
+```{r, warning=FALSE, message=FALSE}
+hy_df_IO <- hy_df %>%
+  group_by(Cultivar) %>%
+  select(starts_with("clr")) %>%
+  do({
+    if (nrow(.) < 20) {
+      IO = rep(1, nrow(.))
+    } else {
+      IO = sign1(.[,-1], qcrit=0.975)$wfinal01
+    }
+    cbind(.,IO)
+  }) %>%
+  ungroup()
+
+hy_df_in <- hy_df_IO %>%
+  filter(IO == 1) %>%
+  select(-IO) %>% 
+  droplevels()
+```
+
+`r nrow(hy_df)-nrow(hy_df_in)` outliers have been discarded. 
+
+## Clustering potato cultivars with leaf ionome
+
+Patterns recognition is done with [dbscan](http://www.sthda.com/english/wiki/wiki.php?id_contents=7940#algorithm-of-dbscan) algorithm which can identify dense regions measured by the number of objects close to a given point. As explained by the author, the key idea is that for each point of a cluster, the neighborhood of a given radius has to contain at least a minimum number of points.
+
+We use the high yielders clr centroids of cultivars in a new data frame which is the same as `hy_df_in` without maturity classes.
+
+```{r}
+hy_centroids <- hy_df_in %>%
+  group_by(Cultivar) %>%
+  select(starts_with("clr")) %>%
+  summarise_all(list(median)) %>%
+  ungroup()
+```
+
+Two important parameters are required for dbscan: epsilon (“eps”) and minimum points (“MinPts”). The parameter `eps` defines the radius of neighborhood around a point x. It’s called the \(\epsilon\)-neighborhood of x. The parameter `MinPts` is the minimum number of neighbors within “eps” radius. The optimal value of “eps” parameter can be determined as follow:
+
+```{r, eps-optimal, out.width = "100%", fig.align = "center", warning = FALSE, message = FALSE, fig.cap = "The optimal value of “eps” parameter."}
+set.seed(5773)
+hy_centroids %>%
+  select(starts_with("clr")) %>%
+  as.matrix() %>% 
+  kNNdistplot(., k = 5)
+abline(h = 0.3, lty = 2)
+```
+
+The chunk below makes the prdiction of clusters delineated by the dbscan algorithm. Zeros are not a cluster or designates the cluster of outliers.
+
+```{r}
+res <- hy_centroids %>%
+  select(starts_with("clr")) %>%
+  as.matrix() %>% 
+  dbscan(., eps = .3, minPts = 5)
+predict(res)
+```
+
+This result can also be visualized graphically:
+
+```{r, cluster-plot, out.width = "100%", fig.align = "center", warning = FALSE, message = FALSE, echo = FALSE, fig.cap = "Cluster plot of poato cultivars based on centered log-ratio N P K Mg Ca transformed compositions of diagnostic leaves."}
+fviz_cluster(res, hy_centroids %>%
+  select(starts_with("clr")) %>%
+  as.matrix(), geom = "point", font.family = "Arial", ggtheme = theme_bw()) +
+  theme(text = element_text(size = 12),
+        axis.title = element_text(size = 12),
+        axis.text = element_text(size = 12))
+ggsave("images/cluster_plot.tiff", width=10, height=6, dpi = 300)
+```
+
+Black points are outliers (zeros). As shown on the plot, one cluster means there is no detectable shape between cultivars ionomes as dots are scattered differently. It may not be useful to think of possible structures between potato cultivars based on ionome. Nethertheless, one could extract scores of the first two discriminant axes and loadings of clr variables to check for correlations and elements that best discriminate axes. 
+
+## Axis reduction
+
+Leaves composition data are compositionnal data (non-negative and summing to unity) so are multivariate. It's not possible to draw such a diagram on paper with more than two or eventually three dimensions, however, even though it is a perfectly valid mathematical construct [Legendre et Legendre,  2012](https://www.elsevier.com/books/numerical-ecology/legendre/978-0-444-53868-0). For the purpose of analysis, we project the multidimensional scatter diagram onto bivariate graph. The axes of this graph are chosen to represent a large fraction of the variability of the multidimensional `N-P-K-Mg-Ca-Fv` data matrix, in a space with reduced _i.e._ lower dimensionality relative to the original data set. The next chunks perform a Principle Component Analysis (PCA) to check biplots, using `vegan::rda()` function.
+
+```{r}
+leaf.pca <- rda(hy_df_in %>% 
+                       select(starts_with("clr")))
+```
+
+The rda result object stores samples scores in the `sites` table and variables loadings in `species` data table.
+
+```{r}
+scores_df <- data.frame(scores(leaf.pca, choices = c(1,2))$sites)
+loadings_df <- data.frame(scores(leaf.pca, choices = c(1,2))$species)
+```
+
+The biplot of PCA is presented in separate plots for easy reading. 
+
+```{r, pca-grid-plot, fig.height = 5, fig.width = 10, out.width = "100%", fig.align = "center", warning = FALSE, message = FALSE, echo = FALSE, fig.cap = "Grid plot of potato ionome principle component analysis."}
+rda.scores <- ggplot(data = scores_df, aes(x = PC1, y = PC2)) + 
+  geom_hline(yintercept=0, color="black") +
+  geom_vline(xintercept=0, color="black") + 
+  geom_point(alpha = 0.5) +
+  xlim(c(-0.4, 0.6)) + ylim(c(-0.5, 0.5)) + 
+  labs(title = "A") +
+  guides(colour=FALSE) +
+  theme_bw(base_size = 12) +
+  theme(axis.text=element_text(size=12),
+        text=element_text(family="Arial", face="bold", size=12))
+
+rda.loadings <- ggplot(data = loadings_df) +
+  geom_hline(yintercept = 0, color = "black") +
+  geom_vline(xintercept = 0, color = "black") + 
+  geom_segment(aes(xend = PC1, yend = PC2), x = 0, y = 0, 
+               size = 1, color = "grey50") + 
+  geom_label(aes(x = PC1, y = PC2, label = rownames(loadings_df)), 
+             size = 5, color = "white", bg = "grey50")+
+  xlim(c(-2.5, 2.5)) + ylim(c(-2, 2)) + 
+  labs(x = "PC1", y = "PC2", title = "B") +
+  theme_bw(base_size = 12) +
+  theme(axis.text=element_text(size = 12),
+        text = element_text(family = "Arial", face = "bold", size = 12))
+
+plot_grid(rda.scores, rda.loadings)
+ggsave("images/pca_bi-plots.tiff", width=10, height=6, dpi = 300)
+```
+
+The first principle axis or component (`PC1`) is formed mainly by `Mg` and `K` while the second (`PC2`) is driven mainly by `P` and `Ca`.
+
+## Do clrs affect potato tuber yield?
+
+We will measure the clrs effect on tuber yield by measuring their importance in machine learning models using `varImp()` method of random forest algorithm, in the next chapter (Chapter \@ref(Chapter-Modeling)).  
+
+Let's select useful columns in a new table named `dfml.csv` and filter only `complete cases`.
+
+```{r}
+dfml <- leaf_clust_df %>%
+  select(NoEssai, NoBloc, NoTraitement,
+         starts_with("clr"),
+         RendVendable, rv_cut, yieldClass,
+         AnalyseFoliaireStade,
+         Cultivar, Maturity5) %>%
+  mutate(isNA = apply(select(., starts_with("clr"), Cultivar, Maturity5, RendVendable), 1, anyNA)) %>%
+  mutate(is10pcf = AnalyseFoliaireStade == "10% fleur") %>%
+  filter(!isNA & is10pcf & NoEssai != "2") %>% 
+  select(-c(AnalyseFoliaireStade, isNA, is10pcf)) %>%
+  droplevels() %>% 
+  filter(complete.cases(.))
+write_csv(dfml, "output/dfml.csv")
+```
+
+So, the Machine learning data table contains `r nrow(dfml)` samples. Finally, let's check cultivars abundance in the data frame. Cultivar `Goldrush` overcomes the others.
+
+```{r}
+pc <- round(with(dfml, prop.table(table(Cultivar)) * 100), 2)
+dist <- with(dfml, cbind(freq = table(Cultivar), percentage = pc))
+dist <- data.frame(cbind(dist, rownames(dist)))
+colnames(dist)[3] <- "Cultivar"
+dist$freq <- as.numeric(as.character(dist$freq))
+```
+
+```{r, ml-cultivar-abundance, fig.height = 10, fig.width = 5, out.width = "100%", fig.align = "center", warning = FALSE, message = FALSE, fig.cap = "Cultivars abundance in the machine learning data frame.", echo = FALSE}
+dist %>%
+  ggplot(aes(x = reorder(Cultivar, freq), y = freq)) +
+  geom_col() +
+  geom_text(aes(label = freq), hjust = -0.1) +
+  ylim(c(0, 650)) +
+  labs(x = 'Cultivar', y = 'Number of samples') +
+  coord_flip()
+```
+
+
