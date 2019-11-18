@@ -216,12 +216,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="data-set-and-useful-libraries" class="section level2">
 <h2><span class="header-section-number">4.2</span> Data set and useful libraries</h2>
 <p>We need package <a href="https://www.rdocumentation.org/packages/compositions/versions/1.40-2">compositions</a> for further clr back-transformation to compositional space. The package <a href="https://cran.r-project.org/web/packages/reshape/index.html">reshape</a> will be used to melt an intermediate data frame.</p>
-<div class="sourceCode" id="cb88"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb88-1" title="1"><span class="kw">library</span>(<span class="st">&quot;tidyverse&quot;</span>)</a>
-<a class="sourceLine" id="cb88-2" title="2"><span class="kw">library</span>(<span class="st">&quot;extrafont&quot;</span>)</a>
-<a class="sourceLine" id="cb88-3" title="3"><span class="kw">library</span>(<span class="st">&#39;compositions&#39;</span>)</a>
-<a class="sourceLine" id="cb88-4" title="4"><span class="kw">library</span>(<span class="st">&quot;reshape&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">library</span>(<span class="st">&quot;tidyverse&quot;</span>)</a>
+<a class="sourceLine" id="cb1-2" title="2"><span class="kw">library</span>(<span class="st">&quot;extrafont&quot;</span>)</a>
+<a class="sourceLine" id="cb1-3" title="3"><span class="kw">library</span>(<span class="st">&#39;compositions&#39;</span>)</a>
+<a class="sourceLine" id="cb1-4" title="4"><span class="kw">library</span>(<span class="st">&quot;reshape&quot;</span>)</a></code></pre></div>
 <p>The previous <code>train_df</code> and <code>test_df</code> are loaded.</p>
-<div class="sourceCode" id="cb89"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb89-1" title="1">train_df =<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;output/train_df.csv&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">train_df =<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;output/train_df.csv&quot;</span>)</a></code></pre></div>
 <pre><code>## Parsed with column specification:
 ## cols(
 ##   NoEssai = col_double(),
@@ -240,7 +240,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ##   Maturity5 = col_character(),
 ##   pred_yield = col_character()
 ## )</code></pre>
-<div class="sourceCode" id="cb91"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb91-1" title="1">test_df =<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;output/test_df.csv&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1">test_df =<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;output/test_df.csv&quot;</span>)</a></code></pre></div>
 <pre><code>## Parsed with column specification:
 ## cols(
 ##   NoEssai = col_double(),
@@ -259,32 +259,32 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ##   Maturity5 = col_character(),
 ##   pred_yield = col_character()
 ## )</code></pre>
-<div class="sourceCode" id="cb93"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb93-1" title="1">TNs =<span class="st"> </span>train_df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(yieldClass <span class="op">==</span><span class="st"> &#39;HY&#39;</span> <span class="op">&amp;</span><span class="st"> </span>pred_yield <span class="op">==</span><span class="st"> &#39;HY&#39;</span>)</a>
-<a class="sourceLine" id="cb93-2" title="2">clr_no =<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;clr_N&quot;</span>, <span class="st">&quot;clr_P&quot;</span>, <span class="st">&quot;clr_K&quot;</span>, <span class="st">&quot;clr_Ca&quot;</span>, <span class="st">&quot;clr_Mg&quot;</span>, <span class="st">&quot;clr_Fv&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">TNs =<span class="st"> </span>train_df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(yieldClass <span class="op">==</span><span class="st"> &#39;HY&#39;</span> <span class="op">&amp;</span><span class="st"> </span>pred_yield <span class="op">==</span><span class="st"> &#39;HY&#39;</span>)</a>
+<a class="sourceLine" id="cb6-2" title="2">clr_no =<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;clr_N&quot;</span>, <span class="st">&quot;clr_P&quot;</span>, <span class="st">&quot;clr_K&quot;</span>, <span class="st">&quot;clr_Ca&quot;</span>, <span class="st">&quot;clr_Mg&quot;</span>, <span class="st">&quot;clr_Fv&quot;</span>)</a></code></pre></div>
 <p>Filtrer train_df et test_df pour ne conserver que les observations ayant les cultivars correspondant dans les vrais négatifs, et seulement les déséquilibrés.</p>
-<div class="sourceCode" id="cb94"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb94-1" title="1">train_df &lt;-<span class="st"> </span>train_df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(Cultivar <span class="op">%in%</span><span class="st"> </span><span class="kw">unique</span>(TNs<span class="op">$</span>Cultivar))</a>
-<a class="sourceLine" id="cb94-2" title="2">test_df &lt;-<span class="st"> </span>test_df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(Cultivar <span class="op">%in%</span><span class="st"> </span><span class="kw">unique</span>(TNs<span class="op">$</span>Cultivar))</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1">train_df &lt;-<span class="st"> </span>train_df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(Cultivar <span class="op">%in%</span><span class="st"> </span><span class="kw">unique</span>(TNs<span class="op">$</span>Cultivar))</a>
+<a class="sourceLine" id="cb7-2" title="2">test_df &lt;-<span class="st"> </span>test_df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(Cultivar <span class="op">%in%</span><span class="st"> </span><span class="kw">unique</span>(TNs<span class="op">$</span>Cultivar))</a></code></pre></div>
 </div>
 <div id="euclidean-distance-from-nutritionally-balanced-compositions" class="section level2">
 <h2><span class="header-section-number">4.3</span> Euclidean distance from nutritionally balanced compositions</h2>
 <p>The chunk below activates the custom function used to compute Euclidean distance.</p>
-<div class="sourceCode" id="cb95"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb95-1" title="1">eucl_dist_f &lt;-<span class="st"> </span><span class="cf">function</span>(x, y) {</a>
-<a class="sourceLine" id="cb95-2" title="2">    <span class="kw">sqrt</span>(<span class="kw">sum</span>((x<span class="op">-</span>y)<span class="op">^</span><span class="dv">2</span>))</a>
-<a class="sourceLine" id="cb95-3" title="3">}</a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">eucl_dist_f &lt;-<span class="st"> </span><span class="cf">function</span>(x, y) {</a>
+<a class="sourceLine" id="cb8-2" title="2">    <span class="kw">sqrt</span>(<span class="kw">sum</span>((x<span class="op">-</span>y)<span class="op">^</span><span class="dv">2</span>))</a>
+<a class="sourceLine" id="cb8-3" title="3">}</a></code></pre></div>
 <p>For each imbalanced composition, we use the next loop to compute all the euclidean distances between all the compositions in “TNs” of the corresponding cultivar. The computation is possible even if the cultivar is unknown, the loop must just be updated. Here, the loop returns the smallest Euclidean distance stored in <code>debal</code> vector.</p>
 <p>For train_df:</p>
-<div class="sourceCode" id="cb96"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb96-1" title="1">debal &lt;-<span class="st"> </span><span class="kw">c</span>()</a>
-<a class="sourceLine" id="cb96-2" title="2">debal_index &lt;-<span class="st"> </span><span class="kw">c</span>()</a>
-<a class="sourceLine" id="cb96-3" title="3"><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(train_df)) {</a>
-<a class="sourceLine" id="cb96-4" title="4">    clr_i &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(train_df[i, clr_no])</a>
-<a class="sourceLine" id="cb96-5" title="5">    TNs_target &lt;-<span class="st"> </span>TNs <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(Cultivar <span class="op">==</span><span class="st"> </span>train_df<span class="op">$</span>Cultivar[i]) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(clr_no)</a>
-<a class="sourceLine" id="cb96-6" title="6">    eucl_dist &lt;-<span class="st"> </span><span class="kw">apply</span>(TNs_target, <span class="dv">1</span>, <span class="cf">function</span>(x) <span class="kw">eucl_dist_f</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> clr_i))</a>
-<a class="sourceLine" id="cb96-7" title="7">    debal_index[i] &lt;-<span class="st"> </span><span class="kw">which.min</span>(eucl_dist)</a>
-<a class="sourceLine" id="cb96-8" title="8">    debal[i] &lt;-<span class="st"> </span>eucl_dist[debal_index[i]]</a>
-<a class="sourceLine" id="cb96-9" title="9">}</a>
-<a class="sourceLine" id="cb96-10" title="10">train_df<span class="op">$</span>debal &lt;-<span class="st"> </span>debal</a>
-<a class="sourceLine" id="cb96-11" title="11">train_df &lt;-<span class="st"> </span>train_df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(debal <span class="op">!=</span><span class="st"> </span><span class="dv">0</span>)</a>
-<a class="sourceLine" id="cb96-12" title="12">train_df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">glimpse</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1">debal &lt;-<span class="st"> </span><span class="kw">c</span>()</a>
+<a class="sourceLine" id="cb9-2" title="2">debal_index &lt;-<span class="st"> </span><span class="kw">c</span>()</a>
+<a class="sourceLine" id="cb9-3" title="3"><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(train_df)) {</a>
+<a class="sourceLine" id="cb9-4" title="4">    clr_i &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(train_df[i, clr_no])</a>
+<a class="sourceLine" id="cb9-5" title="5">    TNs_target &lt;-<span class="st"> </span>TNs <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(Cultivar <span class="op">==</span><span class="st"> </span>train_df<span class="op">$</span>Cultivar[i]) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(clr_no)</a>
+<a class="sourceLine" id="cb9-6" title="6">    eucl_dist &lt;-<span class="st"> </span><span class="kw">apply</span>(TNs_target, <span class="dv">1</span>, <span class="cf">function</span>(x) <span class="kw">eucl_dist_f</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> clr_i))</a>
+<a class="sourceLine" id="cb9-7" title="7">    debal_index[i] &lt;-<span class="st"> </span><span class="kw">which.min</span>(eucl_dist)</a>
+<a class="sourceLine" id="cb9-8" title="8">    debal[i] &lt;-<span class="st"> </span>eucl_dist[debal_index[i]]</a>
+<a class="sourceLine" id="cb9-9" title="9">}</a>
+<a class="sourceLine" id="cb9-10" title="10">train_df<span class="op">$</span>debal &lt;-<span class="st"> </span>debal</a>
+<a class="sourceLine" id="cb9-11" title="11">train_df &lt;-<span class="st"> </span>train_df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(debal <span class="op">!=</span><span class="st"> </span><span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb9-12" title="12">train_df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">glimpse</span>()</a></code></pre></div>
 <pre><code>## Observations: 1,724
 ## Variables: 16
 ## $ NoEssai      &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 4, 4, 4, 4, 4, 4...
@@ -304,18 +304,18 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## $ pred_yield   &lt;chr&gt; &quot;LY&quot;, &quot;LY&quot;, &quot;HY&quot;, &quot;LY&quot;, &quot;LY&quot;, &quot;HY&quot;, &quot;LY&quot;, &quot;LY&quot;, &quot;...
 ## $ debal        &lt;dbl&gt; 0.4859422, 0.3245021, 0.2126167, 0.2987338, 0.384...</code></pre>
 <p>For test_df:</p>
-<div class="sourceCode" id="cb98"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb98-1" title="1">debal &lt;-<span class="st"> </span><span class="kw">c</span>()</a>
-<a class="sourceLine" id="cb98-2" title="2">debal_index &lt;-<span class="st"> </span><span class="kw">c</span>()</a>
-<a class="sourceLine" id="cb98-3" title="3"><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(test_df)) {</a>
-<a class="sourceLine" id="cb98-4" title="4">    clr_i &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(test_df[i, clr_no])</a>
-<a class="sourceLine" id="cb98-5" title="5">    TNs_target &lt;-<span class="st"> </span>TNs <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(Cultivar <span class="op">==</span><span class="st"> </span>test_df<span class="op">$</span>Cultivar[i]) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(clr_no)</a>
-<a class="sourceLine" id="cb98-6" title="6">    eucl_dist &lt;-<span class="st"> </span><span class="kw">apply</span>(TNs_target, <span class="dv">1</span>, <span class="cf">function</span>(x) <span class="kw">eucl_dist_f</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> clr_i))</a>
-<a class="sourceLine" id="cb98-7" title="7">    debal_index[i] &lt;-<span class="st"> </span><span class="kw">which.min</span>(eucl_dist)</a>
-<a class="sourceLine" id="cb98-8" title="8">    debal[i] &lt;-<span class="st"> </span>eucl_dist[debal_index[i]]</a>
-<a class="sourceLine" id="cb98-9" title="9">}</a>
-<a class="sourceLine" id="cb98-10" title="10">test_df<span class="op">$</span>debal &lt;-<span class="st"> </span>debal</a>
-<a class="sourceLine" id="cb98-11" title="11">test_df &lt;-<span class="st"> </span>test_df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(debal <span class="op">!=</span><span class="st"> </span><span class="dv">0</span>)</a>
-<a class="sourceLine" id="cb98-12" title="12">test_df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">glimpse</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1">debal &lt;-<span class="st"> </span><span class="kw">c</span>()</a>
+<a class="sourceLine" id="cb11-2" title="2">debal_index &lt;-<span class="st"> </span><span class="kw">c</span>()</a>
+<a class="sourceLine" id="cb11-3" title="3"><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(test_df)) {</a>
+<a class="sourceLine" id="cb11-4" title="4">    clr_i &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(test_df[i, clr_no])</a>
+<a class="sourceLine" id="cb11-5" title="5">    TNs_target &lt;-<span class="st"> </span>TNs <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(Cultivar <span class="op">==</span><span class="st"> </span>test_df<span class="op">$</span>Cultivar[i]) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(clr_no)</a>
+<a class="sourceLine" id="cb11-6" title="6">    eucl_dist &lt;-<span class="st"> </span><span class="kw">apply</span>(TNs_target, <span class="dv">1</span>, <span class="cf">function</span>(x) <span class="kw">eucl_dist_f</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> clr_i))</a>
+<a class="sourceLine" id="cb11-7" title="7">    debal_index[i] &lt;-<span class="st"> </span><span class="kw">which.min</span>(eucl_dist)</a>
+<a class="sourceLine" id="cb11-8" title="8">    debal[i] &lt;-<span class="st"> </span>eucl_dist[debal_index[i]]</a>
+<a class="sourceLine" id="cb11-9" title="9">}</a>
+<a class="sourceLine" id="cb11-10" title="10">test_df<span class="op">$</span>debal &lt;-<span class="st"> </span>debal</a>
+<a class="sourceLine" id="cb11-11" title="11">test_df &lt;-<span class="st"> </span>test_df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(debal <span class="op">!=</span><span class="st"> </span><span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb11-12" title="12">test_df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">glimpse</span>()</a></code></pre></div>
 <pre><code>## Observations: 803
 ## Variables: 16
 ## $ NoEssai      &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 4, 4, 4, 4, 4, 5, 5, 5, 5...
@@ -339,12 +339,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2><span class="header-section-number">4.4</span> Perturbation effect of some elements on the whole</h2>
 <p>This subsection illustrates the principle that strictly positive data constrained to some whole are inherently related to each other. Changing a proportion (so, perturbation on some proportion(s)) inherently affects at least another proportion, because such data convey only relative information <a href="https://rss.onlinelibrary.wiley.com/doi/abs/10.1111/j.2517-6161.1982.tb01195.x">(Aitchison, 1982)</a>.</p>
 <p><code>leaf_clr_o</code> stands for original clr values of the tidded test set <code>test_df</code>.</p>
-<div class="sourceCode" id="cb100"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb100-1" title="1"><span class="co"># Compute (or select here) the clrs</span></a>
-<a class="sourceLine" id="cb100-2" title="2">leaf_clr_o &lt;-<span class="st"> </span>test_df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(clr_no)</a>
-<a class="sourceLine" id="cb100-3" title="3"><span class="co">#leaf_clr_o &lt;- test_df %&gt;% </span></a>
-<a class="sourceLine" id="cb100-4" title="4"><span class="co">#  filter(debal &gt;= quantile(train_df$debal, p = .75)) %&gt;% </span></a>
-<a class="sourceLine" id="cb100-5" title="5"><span class="co">#  select(clr_no)</span></a>
-<a class="sourceLine" id="cb100-6" title="6"><span class="kw">summary</span>(leaf_clr_o)</a></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" title="1"><span class="co"># Compute (or select here) the clrs</span></a>
+<a class="sourceLine" id="cb13-2" title="2">leaf_clr_o &lt;-<span class="st"> </span>test_df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(clr_no)</a>
+<a class="sourceLine" id="cb13-3" title="3"><span class="co">#leaf_clr_o &lt;- test_df %&gt;% </span></a>
+<a class="sourceLine" id="cb13-4" title="4"><span class="co">#  filter(debal &gt;= quantile(train_df$debal, p = .75)) %&gt;% </span></a>
+<a class="sourceLine" id="cb13-5" title="5"><span class="co">#  select(clr_no)</span></a>
+<a class="sourceLine" id="cb13-6" title="6"><span class="kw">summary</span>(leaf_clr_o)</a></code></pre></div>
 <pre><code>##      clr_N            clr_P            clr_K             clr_Ca        
 ##  Min.   :0.0000   Min.   :-3.159   Min.   :-0.3560   Min.   :-1.98953  
 ##  1st Qu.:0.6253   1st Qu.:-2.171   1st Qu.: 0.2671   1st Qu.:-1.16304  
@@ -360,14 +360,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ##  3rd Qu.:-1.5006   3rd Qu.:3.640  
 ##  Max.   :-0.6952   Max.   :4.167</code></pre>
 <p>Let’s perturb the original clr values for <code>N</code> and <code>P</code>.</p>
-<div class="sourceCode" id="cb102"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb102-1" title="1"><span class="co"># Perturb the original clrs</span></a>
-<a class="sourceLine" id="cb102-2" title="2">pert_col &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>) <span class="co"># the column indices which is perturbed: clr_N and clr_K respectively</span></a>
-<a class="sourceLine" id="cb102-3" title="3">perturbation &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="fl">0.2</span>, <span class="fl">0.2</span>) <span class="co"># the amount added to the clr of the pert_col, same lenght as pert_col</span></a>
-<a class="sourceLine" id="cb102-4" title="4">leaf_clr_f &lt;-<span class="st"> </span>leaf_clr_o</a>
-<a class="sourceLine" id="cb102-5" title="5"><span class="cf">for</span> (i <span class="cf">in</span> <span class="kw">seq_along</span>(pert_col)) {</a>
-<a class="sourceLine" id="cb102-6" title="6">  leaf_clr_f[, pert_col[i]] &lt;-<span class="st"> </span>leaf_clr_f[, pert_col[i]] <span class="op">*</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span>perturbation[i])</a>
-<a class="sourceLine" id="cb102-7" title="7">}</a>
-<a class="sourceLine" id="cb102-8" title="8"><span class="kw">summary</span>(leaf_clr_f)</a></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" title="1"><span class="co"># Perturb the original clrs</span></a>
+<a class="sourceLine" id="cb15-2" title="2">pert_col &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>) <span class="co"># the column indices which is perturbed: clr_N and clr_K respectively</span></a>
+<a class="sourceLine" id="cb15-3" title="3">perturbation &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="fl">0.2</span>, <span class="fl">0.2</span>) <span class="co"># the amount added to the clr of the pert_col, same lenght as pert_col</span></a>
+<a class="sourceLine" id="cb15-4" title="4">leaf_clr_f &lt;-<span class="st"> </span>leaf_clr_o</a>
+<a class="sourceLine" id="cb15-5" title="5"><span class="cf">for</span> (i <span class="cf">in</span> <span class="kw">seq_along</span>(pert_col)) {</a>
+<a class="sourceLine" id="cb15-6" title="6">  leaf_clr_f[, pert_col[i]] &lt;-<span class="st"> </span>leaf_clr_f[, pert_col[i]] <span class="op">*</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span>perturbation[i])</a>
+<a class="sourceLine" id="cb15-7" title="7">}</a>
+<a class="sourceLine" id="cb15-8" title="8"><span class="kw">summary</span>(leaf_clr_f)</a></code></pre></div>
 <pre><code>##      clr_N            clr_P            clr_K             clr_Ca        
 ##  Min.   :0.0000   Min.   :-3.791   Min.   :-0.3560   Min.   :-1.98953  
 ##  1st Qu.:0.7503   1st Qu.:-2.605   1st Qu.: 0.2671   1st Qu.:-1.16304  
@@ -383,19 +383,19 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ##  3rd Qu.:-1.5006   3rd Qu.:3.640  
 ##  Max.   :-0.6952   Max.   :4.167</code></pre>
 <p>The next one transforms clrs (original and perturbed clrs) back to compositions.</p>
-<div class="sourceCode" id="cb104"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb104-1" title="1"><span class="co"># From clrs to compositions</span></a>
-<a class="sourceLine" id="cb104-2" title="2">leaf_o &lt;-<span class="st"> </span><span class="kw">apply</span>(leaf_clr_o, <span class="dv">1</span>, <span class="cf">function</span>(x) <span class="kw">exp</span>(x) <span class="op">/</span><span class="st"> </span><span class="kw">sum</span>(<span class="kw">exp</span>(x))) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">t</span>()</a>
-<a class="sourceLine" id="cb104-3" title="3">leaf_f &lt;-<span class="st"> </span><span class="kw">apply</span>(leaf_clr_f, <span class="dv">1</span>, <span class="cf">function</span>(x) <span class="kw">exp</span>(x) <span class="op">/</span><span class="st"> </span><span class="kw">sum</span>(<span class="kw">exp</span>(x))) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">t</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" title="1"><span class="co"># From clrs to compositions</span></a>
+<a class="sourceLine" id="cb17-2" title="2">leaf_o &lt;-<span class="st"> </span><span class="kw">apply</span>(leaf_clr_o, <span class="dv">1</span>, <span class="cf">function</span>(x) <span class="kw">exp</span>(x) <span class="op">/</span><span class="st"> </span><span class="kw">sum</span>(<span class="kw">exp</span>(x))) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">t</span>()</a>
+<a class="sourceLine" id="cb17-3" title="3">leaf_f &lt;-<span class="st"> </span><span class="kw">apply</span>(leaf_clr_f, <span class="dv">1</span>, <span class="cf">function</span>(x) <span class="kw">exp</span>(x) <span class="op">/</span><span class="st"> </span><span class="kw">sum</span>(<span class="kw">exp</span>(x))) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">t</span>()</a></code></pre></div>
 <p>Then, we plot the original and perturbed ionomes to check a general tendency. <code>Observation</code> column plots the original “N”, “P”, “K”, “Ca”, “Mg” and “Fv” compositions, <code>Perturbation</code> represents new compositions after perturbation and <code>Difference</code> column stands for perturbation occured in the Observation to yied new compositions. Data are tidded before.</p>
-<div class="sourceCode" id="cb105"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb105-1" title="1">rshleaf_o &lt;-<span class="st"> </span><span class="kw">melt</span>(<span class="kw">data.frame</span>(leaf_o)) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">vector =</span> <span class="kw">rep</span>(<span class="st">&quot;Observation&quot;</span>, <span class="kw">nrow</span>(.)))</a></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" title="1">rshleaf_o &lt;-<span class="st"> </span><span class="kw">melt</span>(<span class="kw">data.frame</span>(leaf_o)) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">vector =</span> <span class="kw">rep</span>(<span class="st">&quot;Observation&quot;</span>, <span class="kw">nrow</span>(.)))</a></code></pre></div>
 <pre><code>## Using  as id variables</code></pre>
-<div class="sourceCode" id="cb107"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb107-1" title="1">rshleaf_f &lt;-<span class="st"> </span><span class="kw">melt</span>(<span class="kw">data.frame</span>(leaf_f)) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">vector =</span> <span class="kw">rep</span>(<span class="st">&quot;Perturbation&quot;</span>, <span class="kw">nrow</span>(.)))</a></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" title="1">rshleaf_f &lt;-<span class="st"> </span><span class="kw">melt</span>(<span class="kw">data.frame</span>(leaf_f)) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">vector =</span> <span class="kw">rep</span>(<span class="st">&quot;Perturbation&quot;</span>, <span class="kw">nrow</span>(.)))</a></code></pre></div>
 <pre><code>## Using  as id variables</code></pre>
-<div class="sourceCode" id="cb109"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb109-1" title="1">rshdf &lt;-<span class="st"> </span><span class="kw">bind_rows</span>(rshleaf_o, rshleaf_f)</a>
-<a class="sourceLine" id="cb109-2" title="2">rshdf<span class="op">$</span>is_perturbed &lt;-<span class="st"> </span><span class="kw">ifelse</span>(rshdf<span class="op">$</span>variable <span class="op">%in%</span><span class="st"> </span><span class="kw">colnames</span>(leaf_o[, pert_col]), </a>
-<a class="sourceLine" id="cb109-3" title="3">                          <span class="st">&quot;Perturbed&quot;</span>, <span class="st">&quot;Not perturbed&quot;</span>)</a></code></pre></div>
-<div class="sourceCode" id="cb110"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb110-1" title="1">rshdf<span class="op">$</span>variable &lt;-<span class="st"> </span><span class="kw">sub</span>(<span class="dt">pattern =</span> <span class="st">&quot;clr_&quot;</span>, <span class="dt">replacement =</span> <span class="st">&quot;&quot;</span>, <span class="dt">x =</span> rshdf<span class="op">$</span>variable, <span class="dt">fixed =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb110-2" title="2"><span class="st">  </span><span class="kw">fct_relevel</span>(<span class="st">&quot;N&quot;</span>, <span class="st">&quot;P&quot;</span>, <span class="st">&quot;K&quot;</span>, <span class="st">&quot;Ca&quot;</span>, <span class="st">&quot;Mg&quot;</span>, <span class="st">&quot;Fv&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" title="1">rshdf &lt;-<span class="st"> </span><span class="kw">bind_rows</span>(rshleaf_o, rshleaf_f)</a>
+<a class="sourceLine" id="cb22-2" title="2">rshdf<span class="op">$</span>is_perturbed &lt;-<span class="st"> </span><span class="kw">ifelse</span>(rshdf<span class="op">$</span>variable <span class="op">%in%</span><span class="st"> </span><span class="kw">colnames</span>(leaf_o[, pert_col]), </a>
+<a class="sourceLine" id="cb22-3" title="3">                          <span class="st">&quot;Perturbed&quot;</span>, <span class="st">&quot;Not perturbed&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" title="1">rshdf<span class="op">$</span>variable &lt;-<span class="st"> </span><span class="kw">sub</span>(<span class="dt">pattern =</span> <span class="st">&quot;clr_&quot;</span>, <span class="dt">replacement =</span> <span class="st">&quot;&quot;</span>, <span class="dt">x =</span> rshdf<span class="op">$</span>variable, <span class="dt">fixed =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb23-2" title="2"><span class="st">  </span><span class="kw">fct_relevel</span>(<span class="st">&quot;N&quot;</span>, <span class="st">&quot;P&quot;</span>, <span class="st">&quot;K&quot;</span>, <span class="st">&quot;Ca&quot;</span>, <span class="st">&quot;Mg&quot;</span>, <span class="st">&quot;Fv&quot;</span>)</a></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:wraped-perturb-boxplots"></span>
 <img src="2019_Bookdown_files/figure-html/wraped-perturb-boxplots-1.png" alt="Perturbation effect of some elements on the whole." width="100%" />
 <p class="caption">
@@ -407,9 +407,9 @@ Figure 4.1: Perturbation effect of some elements on the whole.
 <div id="rebalancing-a-misbalanced-sample-by-perturbation" class="section level2">
 <h2><span class="header-section-number">4.5</span> Rebalancing a misbalanced sample by perturbation</h2>
 <p>Let’s suppose that we got this point selected at random in <code>imbalanced or misbalanced specimens</code>.</p>
-<div class="sourceCode" id="cb111"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb111-1" title="1"><span class="kw">set.seed</span>(<span class="dv">92559</span>) </a>
-<a class="sourceLine" id="cb111-2" title="2">imbalanced &lt;-<span class="st"> </span>train_df[<span class="kw">sample</span>(<span class="kw">nrow</span>(train_df), <span class="dv">1</span>), ]</a>
-<a class="sourceLine" id="cb111-3" title="3"><span class="kw">t</span>(imbalanced)</a></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" title="1"><span class="kw">set.seed</span>(<span class="dv">92559</span>) </a>
+<a class="sourceLine" id="cb24-2" title="2">imbalanced &lt;-<span class="st"> </span>train_df[<span class="kw">sample</span>(<span class="kw">nrow</span>(train_df), <span class="dv">1</span>), ]</a>
+<a class="sourceLine" id="cb24-3" title="3"><span class="kw">t</span>(imbalanced)</a></code></pre></div>
 <pre><code>##              [,1]        
 ## NoEssai      &quot;412&quot;       
 ## NoBloc       &quot;1&quot;         
@@ -428,9 +428,9 @@ Figure 4.1: Perturbation effect of some elements on the whole.
 ## pred_yield   &quot;LY&quot;        
 ## debal        &quot;0.2208642&quot;</code></pre>
 <p>Or even, we could rather use the most imbalanced occurrence, why not !</p>
-<div class="sourceCode" id="cb113"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb113-1" title="1">imbalanced &lt;-<span class="st"> </span>train_df[<span class="kw">which.max</span>(train_df<span class="op">$</span>debal), ]</a>
-<a class="sourceLine" id="cb113-2" title="2">misbalanced &lt;-<span class="st"> </span>imbalanced <span class="co"># copy</span></a>
-<a class="sourceLine" id="cb113-3" title="3"><span class="kw">t</span>(misbalanced)</a></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" title="1">imbalanced &lt;-<span class="st"> </span>train_df[<span class="kw">which.max</span>(train_df<span class="op">$</span>debal), ]</a>
+<a class="sourceLine" id="cb26-2" title="2">misbalanced &lt;-<span class="st"> </span>imbalanced <span class="co"># copy</span></a>
+<a class="sourceLine" id="cb26-3" title="3"><span class="kw">t</span>(misbalanced)</a></code></pre></div>
 <pre><code>##              [,1]              
 ## NoEssai      &quot;200&quot;             
 ## NoBloc       &quot;1&quot;               
@@ -449,21 +449,21 @@ Figure 4.1: Perturbation effect of some elements on the whole.
 ## pred_yield   &quot;LY&quot;              
 ## debal        &quot;1.345815&quot;</code></pre>
 <p>How could we rebalance it? The first step is to find the closest balanced point in the TNs of the corresponding cultivar. Let’s re-compute its Euclidean distances from TNs and identify the TNs’ sample from which the distance is minimum.</p>
-<div class="sourceCode" id="cb115"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb115-1" title="1">misbalanced &lt;-<span class="st"> </span>misbalanced[clr_no]</a>
-<a class="sourceLine" id="cb115-2" title="2">eucl_dist_misbal &lt;-<span class="st"> </span><span class="kw">apply</span>(TNs <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(Cultivar <span class="op">==</span><span class="st"> </span>imbalanced<span class="op">$</span>Cultivar) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(clr_no), </a>
-<a class="sourceLine" id="cb115-3" title="3">                          <span class="dv">1</span>, <span class="cf">function</span>(x) <span class="kw">eucl_dist_f</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> misbalanced))</a>
-<a class="sourceLine" id="cb115-4" title="4"></a>
-<a class="sourceLine" id="cb115-5" title="5">index_misbal &lt;-<span class="st"> </span><span class="kw">which.min</span>(<span class="kw">t</span>(<span class="kw">data.frame</span>(eucl_dist_misbal))) </a>
-<a class="sourceLine" id="cb115-6" title="6">index_misbal <span class="co"># return the index of the sample</span></a></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" title="1">misbalanced &lt;-<span class="st"> </span>misbalanced[clr_no]</a>
+<a class="sourceLine" id="cb28-2" title="2">eucl_dist_misbal &lt;-<span class="st"> </span><span class="kw">apply</span>(TNs <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(Cultivar <span class="op">==</span><span class="st"> </span>imbalanced<span class="op">$</span>Cultivar) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(clr_no), </a>
+<a class="sourceLine" id="cb28-3" title="3">                          <span class="dv">1</span>, <span class="cf">function</span>(x) <span class="kw">eucl_dist_f</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> misbalanced))</a>
+<a class="sourceLine" id="cb28-4" title="4"></a>
+<a class="sourceLine" id="cb28-5" title="5">index_misbal &lt;-<span class="st"> </span><span class="kw">which.min</span>(<span class="kw">t</span>(<span class="kw">data.frame</span>(eucl_dist_misbal))) </a>
+<a class="sourceLine" id="cb28-6" title="6">index_misbal <span class="co"># return the index of the sample</span></a></code></pre></div>
 <pre><code>## [1] 50</code></pre>
 <p>The closest healthy sample is the one which index is 50 in TNs charing the same cultivar with the new sample. Using this index we could refind the minimum imbalance index value computed.</p>
-<div class="sourceCode" id="cb117"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb117-1" title="1">(misbal &lt;-<span class="st"> </span>eucl_dist_misbal[index_misbal])</a></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" title="1">(misbal &lt;-<span class="st"> </span>eucl_dist_misbal[index_misbal])</a></code></pre></div>
 <pre><code>## [1] 1.345815</code></pre>
 <p>The Euclidean distance matches with the corresponding <code>debal</code> value: <code>imbalanced$debal[1]</code> = 1.3458148. The <code>closest point in the TNs</code> subset is this one:</p>
-<div class="sourceCode" id="cb119"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb119-1" title="1">target_TNs &lt;-<span class="st"> </span>TNs <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb119-2" title="2"><span class="st">  </span><span class="kw">filter</span>(Cultivar <span class="op">==</span><span class="st"> </span>imbalanced<span class="op">$</span>Cultivar)</a>
-<a class="sourceLine" id="cb119-3" title="3">closest &lt;-<span class="st"> </span>target_TNs[index_misbal, ]</a>
-<a class="sourceLine" id="cb119-4" title="4"><span class="kw">t</span>(closest)</a></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb32-1" title="1">target_TNs &lt;-<span class="st"> </span>TNs <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb32-2" title="2"><span class="st">  </span><span class="kw">filter</span>(Cultivar <span class="op">==</span><span class="st"> </span>imbalanced<span class="op">$</span>Cultivar)</a>
+<a class="sourceLine" id="cb32-3" title="3">closest &lt;-<span class="st"> </span>target_TNs[index_misbal, ]</a>
+<a class="sourceLine" id="cb32-4" title="4"><span class="kw">t</span>(closest)</a></code></pre></div>
 <pre><code>##              [,1]              
 ## NoEssai      &quot;71&quot;              
 ## NoBloc       &quot;3&quot;               
@@ -481,9 +481,9 @@ Figure 4.1: Perturbation effect of some elements on the whole.
 ## Maturity5    &quot;early mid-season&quot;
 ## pred_yield   &quot;HY&quot;</code></pre>
 <p>Note that <code>Cultivar</code> of the misbalanced and the closest healthy composition are the same. We compute the clr difference between the closest and the misbalanced points.</p>
-<div class="sourceCode" id="cb121"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb121-1" title="1">closest =<span class="st"> </span>closest[clr_no]</a>
-<a class="sourceLine" id="cb121-2" title="2">clr_diff =<span class="st"> </span>closest <span class="op">-</span><span class="st"> </span>misbalanced</a>
-<a class="sourceLine" id="cb121-3" title="3"><span class="kw">t</span>(clr_diff)</a></code></pre></div>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb34-1" title="1">closest =<span class="st"> </span>closest[clr_no]</a>
+<a class="sourceLine" id="cb34-2" title="2">clr_diff =<span class="st"> </span>closest <span class="op">-</span><span class="st"> </span>misbalanced</a>
+<a class="sourceLine" id="cb34-3" title="3"><span class="kw">t</span>(clr_diff)</a></code></pre></div>
 <pre><code>##              [,1]
 ## clr_N  -0.4000826
 ## clr_P  -0.2463863
@@ -492,10 +492,10 @@ Figure 4.1: Perturbation effect of some elements on the whole.
 ## clr_Mg  0.2250562
 ## clr_Fv  0.7480496</code></pre>
 <p>The perturbation vector is that clr difference back-transformed to leaf compositional space.</p>
-<div class="sourceCode" id="cb123"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb123-1" title="1">comp_names &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;N&quot;</span>, <span class="st">&quot;P&quot;</span>, <span class="st">&quot;K&quot;</span>, <span class="st">&quot;Ca&quot;</span>, <span class="st">&quot;Mg&quot;</span>, <span class="st">&quot;Fv&quot;</span>)</a>
-<a class="sourceLine" id="cb123-2" title="2">perturbation_vector &lt;-<span class="st"> </span><span class="kw">clrInv</span>(clr_diff)</a>
-<a class="sourceLine" id="cb123-3" title="3"><span class="kw">names</span>(perturbation_vector) &lt;-<span class="st"> </span>comp_names</a>
-<a class="sourceLine" id="cb123-4" title="4"><span class="kw">t</span>(perturbation_vector)</a></code></pre></div>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb36-1" title="1">comp_names &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;N&quot;</span>, <span class="st">&quot;P&quot;</span>, <span class="st">&quot;K&quot;</span>, <span class="st">&quot;Ca&quot;</span>, <span class="st">&quot;Mg&quot;</span>, <span class="st">&quot;Fv&quot;</span>)</a>
+<a class="sourceLine" id="cb36-2" title="2">perturbation_vector &lt;-<span class="st"> </span><span class="kw">clrInv</span>(clr_diff)</a>
+<a class="sourceLine" id="cb36-3" title="3"><span class="kw">names</span>(perturbation_vector) &lt;-<span class="st"> </span>comp_names</a>
+<a class="sourceLine" id="cb36-4" title="4"><span class="kw">t</span>(perturbation_vector)</a></code></pre></div>
 <pre><code>##    [,1]      
 ## N  0.09679140
 ## P  0.11287200
@@ -506,15 +506,15 @@ Figure 4.1: Perturbation effect of some elements on the whole.
 ## attr(,&quot;class&quot;)
 ## [1] acomp</code></pre>
 <p>Next, we should compute the corresponding compositions of the clr coordinates of the misbalanced point, as well as the closest TN point. The vectors could be gathered in a table made up of perturbation vector, misbalanced composition and the closest reference sample (pmc).</p>
-<div class="sourceCode" id="cb125"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb125-1" title="1">misbal_comp &lt;-<span class="st"> </span><span class="kw">clrInv</span>(misbalanced)</a>
-<a class="sourceLine" id="cb125-2" title="2"><span class="kw">names</span>(misbal_comp) &lt;-<span class="st"> </span>comp_names</a>
-<a class="sourceLine" id="cb125-3" title="3"></a>
-<a class="sourceLine" id="cb125-4" title="4">closest_comp &lt;-<span class="st"> </span><span class="kw">clrInv</span>(closest)</a>
-<a class="sourceLine" id="cb125-5" title="5"><span class="kw">names</span>(closest_comp) &lt;-<span class="st"> </span>comp_names</a>
-<a class="sourceLine" id="cb125-6" title="6"></a>
-<a class="sourceLine" id="cb125-7" title="7">pmc =<span class="st"> </span><span class="kw">rbind</span>(perturbation_vector, misbal_comp, closest_comp)</a>
-<a class="sourceLine" id="cb125-8" title="8"><span class="kw">rownames</span>(pmc) =<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;perturbation_vector&quot;</span>,<span class="st">&quot;misbal_comp&quot;</span>,<span class="st">&quot;closest_comp&quot;</span>)</a>
-<a class="sourceLine" id="cb125-9" title="9">pmc</a></code></pre></div>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb38-1" title="1">misbal_comp &lt;-<span class="st"> </span><span class="kw">clrInv</span>(misbalanced)</a>
+<a class="sourceLine" id="cb38-2" title="2"><span class="kw">names</span>(misbal_comp) &lt;-<span class="st"> </span>comp_names</a>
+<a class="sourceLine" id="cb38-3" title="3"></a>
+<a class="sourceLine" id="cb38-4" title="4">closest_comp &lt;-<span class="st"> </span><span class="kw">clrInv</span>(closest)</a>
+<a class="sourceLine" id="cb38-5" title="5"><span class="kw">names</span>(closest_comp) &lt;-<span class="st"> </span>comp_names</a>
+<a class="sourceLine" id="cb38-6" title="6"></a>
+<a class="sourceLine" id="cb38-7" title="7">pmc =<span class="st"> </span><span class="kw">rbind</span>(perturbation_vector, misbal_comp, closest_comp)</a>
+<a class="sourceLine" id="cb38-8" title="8"><span class="kw">rownames</span>(pmc) =<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;perturbation_vector&quot;</span>,<span class="st">&quot;misbal_comp&quot;</span>,<span class="st">&quot;closest_comp&quot;</span>)</a>
+<a class="sourceLine" id="cb38-9" title="9">pmc</a></code></pre></div>
 <pre><code>##                             N           P         K         Ca        Mg
 ## perturbation_vector 0.0967914 0.112872002 0.2422774 0.06208853 0.1808552
 ## misbal_comp         0.1282805 0.007881602 0.0470000 0.07860000 0.0052000
@@ -524,68 +524,68 @@ Figure 4.1: Perturbation effect of some elements on the whole.
 ## misbal_comp         0.7330379
 ## closest_comp        0.8799500</code></pre>
 <p>We could even check that the simplex is closed to 1 for each vector.</p>
-<div class="sourceCode" id="cb127"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb127-1" title="1"><span class="kw">sum</span>(perturbation_vector); <span class="kw">sum</span>(misbal_comp); <span class="kw">sum</span>(closest_comp)</a></code></pre></div>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb40-1" title="1"><span class="kw">sum</span>(perturbation_vector); <span class="kw">sum</span>(misbal_comp); <span class="kw">sum</span>(closest_comp)</a></code></pre></div>
 <pre><code>## [1] 1</code></pre>
 <pre><code>## [1] 1</code></pre>
 <pre><code>## [1] 1</code></pre>
 <p>The closest composition minus the misbalanced composition should return the perturbation vector.</p>
-<div class="sourceCode" id="cb131"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb131-1" title="1"><span class="kw">print</span>(closest_comp <span class="op">-</span><span class="st"> </span>misbal_comp)</a></code></pre></div>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb44-1" title="1"><span class="kw">print</span>(closest_comp <span class="op">-</span><span class="st"> </span>misbal_comp)</a></code></pre></div>
 <pre><code>##      N         P        K         Ca         Mg        Fv       
 ## [1,] 0.0967914 0.112872 0.2422774 0.06208853 0.1808552 0.3051155
 ## attr(,&quot;class&quot;)
 ## [1] acomp</code></pre>
-<div class="sourceCode" id="cb133"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb133-1" title="1"><span class="kw">print</span>(perturbation_vector) <span class="co"># for comparison</span></a></code></pre></div>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb46-1" title="1"><span class="kw">print</span>(perturbation_vector) <span class="co"># for comparison</span></a></code></pre></div>
 <pre><code>##      N         P        K         Ca         Mg        Fv       
 ## [1,] 0.0967914 0.112872 0.2422774 0.06208853 0.1808552 0.3051155
 ## attr(,&quot;class&quot;)
 ## [1] acomp</code></pre>
 <p>Or even, perturb the misbalanced point by the perturbation vector, you should obtain the closest TN point:</p>
-<div class="sourceCode" id="cb135"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb135-1" title="1"><span class="kw">print</span>(misbal_comp <span class="op">+</span><span class="st"> </span>perturbation_vector) <span class="co"># perturbation</span></a></code></pre></div>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb48-1" title="1"><span class="kw">print</span>(misbal_comp <span class="op">+</span><span class="st"> </span>perturbation_vector) <span class="co"># perturbation</span></a></code></pre></div>
 <pre><code>##      N       P      K      Ca     Mg     Fv     
 ## [1,] 0.04885 0.0035 0.0448 0.0192 0.0037 0.87995
 ## attr(,&quot;class&quot;)
 ## [1] acomp</code></pre>
-<div class="sourceCode" id="cb137"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb137-1" title="1"><span class="kw">print</span>(closest_comp)                      <span class="co"># for comparison</span></a></code></pre></div>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb50-1" title="1"><span class="kw">print</span>(closest_comp)                      <span class="co"># for comparison</span></a></code></pre></div>
 <pre><code>##      N       P      K      Ca     Mg     Fv     
 ## [1,] 0.04885 0.0035 0.0448 0.0192 0.0037 0.87995
 ## attr(,&quot;class&quot;)
 ## [1] acomp</code></pre>
 <p>So, the assumption is true. The next codes show the concept using dots plots and histograms for each vector. A data frame is tidded for ggplot. Visualization is better with histograms.</p>
-<div class="sourceCode" id="cb139"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb139-1" title="1">df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">rbind</span>(misbalanced, closest, clr_diff),</a>
-<a class="sourceLine" id="cb139-2" title="2">                 <span class="dt">vectors =</span> <span class="kw">factor</span>(<span class="kw">c</span>(<span class="st">&quot;Observation&quot;</span>, <span class="st">&quot;Reference&quot;</span>, <span class="st">&quot;Perturbation&quot;</span>)))</a>
-<a class="sourceLine" id="cb139-3" title="3">df<span class="op">$</span>vectors &lt;-<span class="st"> </span>df<span class="op">$</span>vectors <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">fct_relevel</span>(<span class="st">&quot;Observation&quot;</span>, <span class="st">&quot;Reference&quot;</span>, <span class="st">&quot;Perturbation&quot;</span>)</a>
-<a class="sourceLine" id="cb139-4" title="4">dfreshape &lt;-<span class="st"> </span><span class="kw">melt</span>(df)</a></code></pre></div>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb52-1" title="1">df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">rbind</span>(misbalanced, closest, clr_diff),</a>
+<a class="sourceLine" id="cb52-2" title="2">                 <span class="dt">vectors =</span> <span class="kw">factor</span>(<span class="kw">c</span>(<span class="st">&quot;Observation&quot;</span>, <span class="st">&quot;Reference&quot;</span>, <span class="st">&quot;Perturbation&quot;</span>)))</a>
+<a class="sourceLine" id="cb52-3" title="3">df<span class="op">$</span>vectors &lt;-<span class="st"> </span>df<span class="op">$</span>vectors <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">fct_relevel</span>(<span class="st">&quot;Observation&quot;</span>, <span class="st">&quot;Reference&quot;</span>, <span class="st">&quot;Perturbation&quot;</span>)</a>
+<a class="sourceLine" id="cb52-4" title="4">dfreshape &lt;-<span class="st"> </span><span class="kw">melt</span>(df)</a></code></pre></div>
 <pre><code>## Using vectors as id variables</code></pre>
-<div class="sourceCode" id="cb141"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb141-1" title="1">dfreshape<span class="op">$</span>variable &lt;-<span class="st"> </span><span class="kw">sub</span>(<span class="dt">pattern =</span> <span class="st">&quot;clr_&quot;</span>, <span class="dt">replacement =</span> <span class="st">&quot;&quot;</span>, <span class="dt">x =</span> dfreshape<span class="op">$</span>variable, <span class="dt">fixed =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb141-2" title="2"><span class="st">  </span><span class="kw">fct_relevel</span>(<span class="st">&quot;N&quot;</span>, <span class="st">&quot;P&quot;</span>, <span class="st">&quot;K&quot;</span>, <span class="st">&quot;Ca&quot;</span>, <span class="st">&quot;Mg&quot;</span>, <span class="st">&quot;Fv&quot;</span>)</a></code></pre></div>
-<div class="sourceCode" id="cb142"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb142-1" title="1"><span class="kw">ggplot</span>(<span class="dt">data =</span> dfreshape, <span class="kw">aes</span>(<span class="dt">x =</span> value, <span class="dt">y =</span> vectors, <span class="dt">colour =</span> vectors)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb142-2" title="2"><span class="st">    </span><span class="kw">geom_point</span>() <span class="op">+</span></a>
-<a class="sourceLine" id="cb142-3" title="3"><span class="st">    </span><span class="kw">facet_wrap</span>(<span class="op">~</span><span class="st"> </span>variable, <span class="dt">scales =</span> <span class="st">&quot;free_x&quot;</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb142-4" title="4"><span class="st">    </span><span class="kw">labs</span>(<span class="dt">x=</span><span class="st">&#39;Nutrient clr coordinate&#39;</span>, <span class="dt">y =</span><span class="st">&#39;&#39;</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb142-5" title="5"><span class="st">    </span><span class="kw">theme</span>(<span class="dt">text=</span><span class="kw">element_text</span>(<span class="dt">family=</span><span class="st">&quot;Arial&quot;</span>, <span class="dt">face=</span><span class="st">&quot;bold&quot;</span>, <span class="dt">size=</span><span class="dv">12</span>)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb142-6" title="6"><span class="st">    </span><span class="kw">theme_bw</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb54-1" title="1">dfreshape<span class="op">$</span>variable &lt;-<span class="st"> </span><span class="kw">sub</span>(<span class="dt">pattern =</span> <span class="st">&quot;clr_&quot;</span>, <span class="dt">replacement =</span> <span class="st">&quot;&quot;</span>, <span class="dt">x =</span> dfreshape<span class="op">$</span>variable, <span class="dt">fixed =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb54-2" title="2"><span class="st">  </span><span class="kw">fct_relevel</span>(<span class="st">&quot;N&quot;</span>, <span class="st">&quot;P&quot;</span>, <span class="st">&quot;K&quot;</span>, <span class="st">&quot;Ca&quot;</span>, <span class="st">&quot;Mg&quot;</span>, <span class="st">&quot;Fv&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb55-1" title="1"><span class="kw">ggplot</span>(<span class="dt">data =</span> dfreshape, <span class="kw">aes</span>(<span class="dt">x =</span> value, <span class="dt">y =</span> vectors, <span class="dt">colour =</span> vectors)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb55-2" title="2"><span class="st">    </span><span class="kw">geom_point</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb55-3" title="3"><span class="st">    </span><span class="kw">facet_wrap</span>(<span class="op">~</span><span class="st"> </span>variable, <span class="dt">scales =</span> <span class="st">&quot;free_x&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb55-4" title="4"><span class="st">    </span><span class="kw">labs</span>(<span class="dt">x=</span><span class="st">&#39;Nutrient clr coordinate&#39;</span>, <span class="dt">y =</span><span class="st">&#39;&#39;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb55-5" title="5"><span class="st">    </span><span class="kw">theme</span>(<span class="dt">text=</span><span class="kw">element_text</span>(<span class="dt">family=</span><span class="st">&quot;Arial&quot;</span>, <span class="dt">face=</span><span class="st">&quot;bold&quot;</span>, <span class="dt">size=</span><span class="dv">12</span>)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb55-6" title="6"><span class="st">    </span><span class="kw">theme_bw</span>()</a></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:hi-perturb-dotplot"></span>
 <img src="2019_Bookdown_files/figure-html/hi-perturb-dotplot-1.png" alt="Perturbation vector computation example dotplot using the most imbalanced foliar sample." width="100%" />
 <p class="caption">
 Figure 4.2: Perturbation vector computation example dotplot using the most imbalanced foliar sample.
 </p>
 </div>
-<div class="sourceCode" id="cb143"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb143-1" title="1"><span class="kw">ggsave</span>(<span class="st">&quot;images/perturb_dotplot.tiff&quot;</span>,  <span class="dt">width =</span> <span class="dv">7</span>, <span class="dt">height =</span> <span class="dv">3</span>)</a></code></pre></div>
-<div class="sourceCode" id="cb144"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb144-1" title="1">g1 &lt;-<span class="st"> </span><span class="kw">ggplot</span>(<span class="dt">data =</span> dfreshape, <span class="kw">aes</span>(<span class="dt">x =</span> variable, <span class="dt">y =</span> value, <span class="dt">fill =</span> vectors)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb144-2" title="2"><span class="st">    </span><span class="kw">geom_bar</span>(<span class="kw">aes</span>(<span class="dt">fill =</span> vectors), <span class="dt">stat =</span> <span class="st">&quot;identity&quot;</span>, <span class="dt">position =</span> <span class="kw">position_dodge</span>()) <span class="op">+</span></a>
-<a class="sourceLine" id="cb144-3" title="3"><span class="st">    </span><span class="kw">coord_flip</span>() <span class="op">+</span><span class="st"> </span><span class="kw">theme_bw</span>() <span class="op">+</span></a>
-<a class="sourceLine" id="cb144-4" title="4"><span class="st">    </span><span class="kw">ylab</span>(<span class="st">&quot;Nutrients clr coordinates&quot;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">xlab</span>(<span class="st">&quot;Diagnostic nutrients&quot;</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb144-5" title="5"><span class="st">    </span><span class="kw">theme</span>(<span class="dt">legend.title =</span> <span class="kw">element_blank</span>()) <span class="op">+</span></a>
-<a class="sourceLine" id="cb144-6" title="6"><span class="st">    </span><span class="kw">theme</span>(<span class="dt">text =</span> <span class="kw">element_text</span>(<span class="dt">family =</span> <span class="st">&quot;Arial&quot;</span>, <span class="dt">face =</span> <span class="st">&quot;bold&quot;</span>, <span class="dt">size =</span> <span class="dv">12</span>))</a>
-<a class="sourceLine" id="cb144-7" title="7">g1 <span class="op">+</span><span class="st"> </span><span class="kw">scale_fill_discrete</span>(<span class="dt">breaks =</span> <span class="kw">c</span>(<span class="st">&quot;Observation&quot;</span>,<span class="st">&quot;Reference&quot;</span>,<span class="st">&quot;Perturbation&quot;</span>)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb144-8" title="8"><span class="st">    </span><span class="kw">scale_fill_manual</span>(<span class="dt">values=</span><span class="kw">c</span>(<span class="st">&quot;grey50&quot;</span>, <span class="st">&quot;black&quot;</span>, <span class="st">&quot;grey80&quot;</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb56-1" title="1"><span class="kw">ggsave</span>(<span class="st">&quot;images/perturb_dotplot.tiff&quot;</span>,  <span class="dt">width =</span> <span class="dv">7</span>, <span class="dt">height =</span> <span class="dv">3</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb57-1" title="1">g1 &lt;-<span class="st"> </span><span class="kw">ggplot</span>(<span class="dt">data =</span> dfreshape, <span class="kw">aes</span>(<span class="dt">x =</span> variable, <span class="dt">y =</span> value, <span class="dt">fill =</span> vectors)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb57-2" title="2"><span class="st">    </span><span class="kw">geom_bar</span>(<span class="kw">aes</span>(<span class="dt">fill =</span> vectors), <span class="dt">stat =</span> <span class="st">&quot;identity&quot;</span>, <span class="dt">position =</span> <span class="kw">position_dodge</span>()) <span class="op">+</span></a>
+<a class="sourceLine" id="cb57-3" title="3"><span class="st">    </span><span class="kw">coord_flip</span>() <span class="op">+</span><span class="st"> </span><span class="kw">theme_bw</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb57-4" title="4"><span class="st">    </span><span class="kw">ylab</span>(<span class="st">&quot;Nutrients clr coordinates&quot;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">xlab</span>(<span class="st">&quot;Diagnostic nutrients&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb57-5" title="5"><span class="st">    </span><span class="kw">theme</span>(<span class="dt">legend.title =</span> <span class="kw">element_blank</span>()) <span class="op">+</span></a>
+<a class="sourceLine" id="cb57-6" title="6"><span class="st">    </span><span class="kw">theme</span>(<span class="dt">text =</span> <span class="kw">element_text</span>(<span class="dt">family =</span> <span class="st">&quot;Arial&quot;</span>, <span class="dt">face =</span> <span class="st">&quot;bold&quot;</span>, <span class="dt">size =</span> <span class="dv">12</span>))</a>
+<a class="sourceLine" id="cb57-7" title="7">g1 <span class="op">+</span><span class="st"> </span><span class="kw">scale_fill_discrete</span>(<span class="dt">breaks =</span> <span class="kw">c</span>(<span class="st">&quot;Observation&quot;</span>,<span class="st">&quot;Reference&quot;</span>,<span class="st">&quot;Perturbation&quot;</span>)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb57-8" title="8"><span class="st">    </span><span class="kw">scale_fill_manual</span>(<span class="dt">values=</span><span class="kw">c</span>(<span class="st">&quot;grey50&quot;</span>, <span class="st">&quot;black&quot;</span>, <span class="st">&quot;grey80&quot;</span>))</a></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:hi-perturb-barplot"></span>
 <img src="2019_Bookdown_files/figure-html/hi-perturb-barplot-1.png" alt="Perturbation vector computation example barplot using the most imbalanced foliar sample." width="100%" />
 <p class="caption">
 Figure 4.3: Perturbation vector computation example barplot using the most imbalanced foliar sample.
 </p>
 </div>
-<div class="sourceCode" id="cb145"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb145-1" title="1"><span class="kw">ggsave</span>(<span class="st">&quot;images/perturb_barplot.tiff&quot;</span>,  <span class="dt">width =</span> <span class="dv">6</span>, <span class="dt">height =</span> <span class="dv">4</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb58-1" title="1"><span class="kw">ggsave</span>(<span class="st">&quot;images/perturb_barplot.tiff&quot;</span>,  <span class="dt">width =</span> <span class="dv">6</span>, <span class="dt">height =</span> <span class="dv">4</span>)</a></code></pre></div>
 
 </div>
 </div>
@@ -640,20 +640,6 @@ gitbook.start({
 });
 </script>
 
-<!-- dynamically load mathjax for compatibility with self-contained -->
-<script>
-  (function () {
-    var script = document.createElement("script");
-    script.type = "text/javascript";
-    var src = "true";
-    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
-    if (location.protocol !== "file:")
-      if (/^https?:/.test(src))
-        src = src.replace(/^https?:/, '');
-    script.src = src;
-    document.getElementsByTagName("head")[0].appendChild(script);
-  })();
-</script>
 </body>
 
 </html>
