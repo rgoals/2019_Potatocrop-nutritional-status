@@ -16,8 +16,8 @@ Gradients in the elemental composition of a potato leaf tissue (_i.e._ its ionom
 
 [Chapter 2: Ionome analysis](https://rgoals.github.io/2019_PotatoCrop-nutritional-status/Chapter-Clustering.html)
 
-[Chapter 3 Predicting tuber yield](https://rgoals.github.io/2019_PotatoCrop-nutritional-status/Chapter-Modeling.html)
+[Chapter 3: Predicting tuber yield](https://rgoals.github.io/2019_PotatoCrop-nutritional-status/Chapter-Modeling.html)
 
-[Chapter 4 Ionome perturbation concept](https://rgoals.github.io/2019_PotatoCrop-nutritional-status/Chapter-Perturbation-vector.html)
+[Chapter 4: Ionome perturbation concept](https://rgoals.github.io/2019_PotatoCrop-nutritional-status/Chapter-Perturbation-vector.html)
 
 [References](https://rgoals.github.io/2019_PotatoCrop-nutritional-status/references.html)
