@@ -18,6 +18,7 @@ library("tidyverse")
 library('extrafont')
 library('caret')
 library('kknn')
+library("randomForest")
 ```
 
 ## Machine learning data set

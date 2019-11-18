@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Balancing the nutritional status of potato crops.</title>
   <meta name="description" content="We use the bookdown package to write a book that describs the statistical computations of my PhD Project, for publication on Github." />
-  <meta name="generator" content="bookdown 0.10 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.15 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Balancing the nutritional status of potato crops." />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Zonlehoua Coulibali and Serge-Étienne Parent" />
 
 
-<meta name="date" content="2019-08-01" />
+<meta name="date" content="2019-11-18" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -32,7 +32,7 @@
   
   
 
-<link rel="next" href="Chapter-Clustering.html">
+<link rel="next" href="Chapter-Clustering.html"/>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -40,6 +40,9 @@
 <link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
 
 
 
@@ -50,41 +53,66 @@
 
 
 <style type="text/css">
-div.sourceCode { overflow-x: auto; }
-table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
-  margin: 0; padding: 0; vertical-align: baseline; border: none; }
-table.sourceCode { width: 100%; line-height: 100%; }
-td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
-td.sourceCode { padding-left: 5px; }
-code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code > span.dt { color: #902000; } /* DataType */
-code > span.dv { color: #40a070; } /* DecVal */
-code > span.bn { color: #40a070; } /* BaseN */
-code > span.fl { color: #40a070; } /* Float */
-code > span.ch { color: #4070a0; } /* Char */
-code > span.st { color: #4070a0; } /* String */
-code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code > span.ot { color: #007020; } /* Other */
-code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code > span.fu { color: #06287e; } /* Function */
-code > span.er { color: #ff0000; font-weight: bold; } /* Error */
-code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-code > span.cn { color: #880000; } /* Constant */
-code > span.sc { color: #4070a0; } /* SpecialChar */
-code > span.vs { color: #4070a0; } /* VerbatimString */
-code > span.ss { color: #bb6688; } /* SpecialString */
-code > span.im { } /* Import */
-code > span.va { color: #19177c; } /* Variable */
-code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code > span.op { color: #666666; } /* Operator */
-code > span.bu { } /* BuiltIn */
-code > span.ex { } /* Extension */
-code > span.pp { color: #bc7a00; } /* Preprocessor */
-code > span.at { color: #7d9029; } /* Attribute */
-code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
 <link rel="stylesheet" href="style.css" type="text/css" />
@@ -168,7 +196,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="header">
 <h1 class="title">Balancing the nutritional status of potato crops.</h1>
 <p class="author"><em>Zonlehoua Coulibali and Serge-Étienne Parent</em></p>
-<p class="date"><em>2019-08-01</em></p>
+<p class="date"><em>2019-11-18</em></p>
 </div>
 <div id="Chapter-Data-Processing" class="section level1">
 <h1><span class="header-section-number">Chapter 1</span> Data processing</h1>
@@ -181,32 +209,32 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="useful-libraries-for-data-handling" class="section level2">
 <h2><span class="header-section-number">1.2</span> Useful libraries for data handling</h2>
 <p>We need package <a href="https://www.tidyverse.org/">tidyverse</a> which loads a set of packages for easy data manipulation and visualization. A set of other packages is used: <a href="https://www.rdocumentation.org/packages/Amelia/versions/1.7.5">Amelia</a> for missing data vizualisation, <a href="https://www.rdocumentation.org/packages/robCompositions/versions/2.1.0">robCompositions</a> to robustely impute missing values in compositional data using k-nearest neigbhors methods, and <a href="http://www.stat.boogaart.de/compositions">compositions</a> to transforme compositions into compositionnal space.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(<span class="st">&quot;tidyverse&quot;</span>)
-<span class="kw">library</span>(<span class="st">&#39;Amelia&#39;</span>)
-<span class="kw">library</span>(<span class="st">&quot;robCompositions&quot;</span>)
-<span class="kw">library</span>(<span class="st">&quot;compositions&quot;</span>)</code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">library</span>(<span class="st">&quot;tidyverse&quot;</span>)</a>
+<a class="sourceLine" id="cb1-2" title="2"><span class="kw">library</span>(<span class="st">&#39;Amelia&#39;</span>)</a>
+<a class="sourceLine" id="cb1-3" title="3"><span class="kw">library</span>(<span class="st">&quot;robCompositions&quot;</span>)</a>
+<a class="sourceLine" id="cb1-4" title="4"><span class="kw">library</span>(<span class="st">&quot;compositions&quot;</span>)</a></code></pre></div>
 </div>
 <div id="quebec-potato-data-set" class="section level2">
 <h2><span class="header-section-number">1.3</span> Québec potato data set</h2>
 <p>Let’s load the Québec potato leaves raw compositions data set <code>raw_leaf_df.csv</code> available for the project in the <code>data</code> folder.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">raw_leaf_df &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;data/raw_leaf_df.csv&quot;</span>)</code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">raw_leaf_df &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;data/raw_leaf_df.csv&quot;</span>)</a></code></pre></div>
 </div>
 <div id="selection-of-useful-variables" class="section level2">
 <h2><span class="header-section-number">1.4</span> Selection of useful variables</h2>
 <p>We create custom vectors of attributes which help select useful data columns for computations. The year of experiment is not needed instead it permits to know how long ago expériements have been monitored. Geographical coordinates are useful to map experimental sites locations later.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">keys_col &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;NoEssai&#39;</span>, <span class="st">&#39;NoBloc&#39;</span>, <span class="st">&#39;NoTraitement&#39;</span>)
-location &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;Annee&#39;</span>, <span class="st">&#39;LatDD&#39;</span>, <span class="st">&#39;LonDD&#39;</span>)
-cultivars &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;AnalyseFoliaireStade&#39;</span>, <span class="st">&#39;Cultivar&#39;</span>, <span class="st">&#39;Maturity5&#39;</span>)
-discard_col &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;AnalyseFoliaireC&quot;</span>, <span class="st">&quot;AnalyseFoliaireS&quot;</span>, <span class="st">&quot;AnalyseFoliaireB&quot;</span>, <span class="st">&quot;AnalyseFoliaireCu&quot;</span>, 
-                <span class="st">&quot;AnalyseFoliaireZn&quot;</span>, <span class="st">&quot;AnalyseFoliaireMn&quot;</span>, <span class="st">&quot;AnalyseFoliaireFe&quot;</span>, <span class="st">&quot;AnalyseFoliaireAl&quot;</span>)
-longNameMacro &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;AnalyseFoliaireN&quot;</span>,<span class="st">&quot;AnalyseFoliaireP&quot;</span>,<span class="st">&quot;AnalyseFoliaireK&quot;</span>, 
-                   <span class="st">&quot;AnalyseFoliaireCa&quot;</span>,<span class="st">&quot;AnalyseFoliaireMg&quot;</span>)
-outputs &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;RendVendable&#39;</span>, <span class="st">&#39;RendPetit&#39;</span>, <span class="st">&#39;RendMoy&#39;</span>, <span class="st">&#39;RendGros&#39;</span>)
-macroElements &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;N&quot;</span>, <span class="st">&quot;P&quot;</span>, <span class="st">&quot;K&quot;</span>, <span class="st">&quot;Ca&quot;</span>, <span class="st">&quot;Mg&quot;</span>) <span class="co"># for simplicity</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1">keys_col &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;NoEssai&#39;</span>, <span class="st">&#39;NoBloc&#39;</span>, <span class="st">&#39;NoTraitement&#39;</span>)</a>
+<a class="sourceLine" id="cb3-2" title="2">location &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;Annee&#39;</span>, <span class="st">&#39;LatDD&#39;</span>, <span class="st">&#39;LonDD&#39;</span>)</a>
+<a class="sourceLine" id="cb3-3" title="3">cultivars &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;AnalyseFoliaireStade&#39;</span>, <span class="st">&#39;Cultivar&#39;</span>, <span class="st">&#39;Maturity5&#39;</span>)</a>
+<a class="sourceLine" id="cb3-4" title="4">discard_col &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;AnalyseFoliaireC&quot;</span>, <span class="st">&quot;AnalyseFoliaireS&quot;</span>, <span class="st">&quot;AnalyseFoliaireB&quot;</span>, <span class="st">&quot;AnalyseFoliaireCu&quot;</span>, </a>
+<a class="sourceLine" id="cb3-5" title="5">                <span class="st">&quot;AnalyseFoliaireZn&quot;</span>, <span class="st">&quot;AnalyseFoliaireMn&quot;</span>, <span class="st">&quot;AnalyseFoliaireFe&quot;</span>, <span class="st">&quot;AnalyseFoliaireAl&quot;</span>)</a>
+<a class="sourceLine" id="cb3-6" title="6">longNameMacro &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;AnalyseFoliaireN&quot;</span>,<span class="st">&quot;AnalyseFoliaireP&quot;</span>,<span class="st">&quot;AnalyseFoliaireK&quot;</span>, </a>
+<a class="sourceLine" id="cb3-7" title="7">                   <span class="st">&quot;AnalyseFoliaireCa&quot;</span>,<span class="st">&quot;AnalyseFoliaireMg&quot;</span>)</a>
+<a class="sourceLine" id="cb3-8" title="8">outputs &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;RendVendable&#39;</span>, <span class="st">&#39;RendPetit&#39;</span>, <span class="st">&#39;RendMoy&#39;</span>, <span class="st">&#39;RendGros&#39;</span>)</a>
+<a class="sourceLine" id="cb3-9" title="9">macroElements &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;N&quot;</span>, <span class="st">&quot;P&quot;</span>, <span class="st">&quot;K&quot;</span>, <span class="st">&quot;Ca&quot;</span>, <span class="st">&quot;Mg&quot;</span>) <span class="co"># for simplicity</span></a></code></pre></div>
 <p>The reduced data frame becomes <code>leaf_df</code> which stands for the diagnostic leaves macroelements composition data frame combining corresponding cultivars names, marketable yield, year of experiment and sites geographical coordinates.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">leaf_df &lt;-<span class="st"> </span>raw_leaf_df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(<span class="op">-</span>discard_col)
-<span class="kw">colnames</span>(leaf_df)[<span class="kw">which</span>(<span class="kw">names</span>(leaf_df) <span class="op">%in%</span><span class="st"> </span>longNameMacro)] &lt;-<span class="st"> </span>macroElements
-<span class="kw">glimpse</span>(leaf_df)</code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1">leaf_df &lt;-<span class="st"> </span>raw_leaf_df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(<span class="op">-</span>discard_col)</a>
+<a class="sourceLine" id="cb4-2" title="2"><span class="kw">colnames</span>(leaf_df)[<span class="kw">which</span>(<span class="kw">names</span>(leaf_df) <span class="op">%in%</span><span class="st"> </span>longNameMacro)] &lt;-<span class="st"> </span>macroElements</a>
+<a class="sourceLine" id="cb4-3" title="3"><span class="kw">glimpse</span>(leaf_df)</a></code></pre></div>
 <pre><code>## Observations: 12,991
 ## Variables: 18
 ## $ NoEssai              &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,...
@@ -231,26 +259,26 @@ macroElements &lt;-<span class="st"> </span><span class="kw">c</span>(<span clas
 <div id="arranging-the-data-frame" class="section level2">
 <h2><span class="header-section-number">1.5</span> Arranging the data frame</h2>
 <p>These chunks set trial number <code>NoEssai</code> as factor, relevel categorical <code>maturity order</code> variable and choose cultivar <code>Superior</code> as reference as it has the maximum number of observations. Then, abundance of cultivars is ploted.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">percentage &lt;-<span class="st"> </span><span class="kw">round</span>(<span class="kw">with</span>(leaf_df, <span class="kw">prop.table</span>(<span class="kw">table</span>(Cultivar)) <span class="op">*</span><span class="st"> </span><span class="dv">100</span>), <span class="dv">2</span>)
-distribution &lt;-<span class="st"> </span><span class="kw">with</span>(leaf_df, <span class="kw">cbind</span>(<span class="dt">numbOfsamples =</span> <span class="kw">table</span>(Cultivar), <span class="dt">percentage =</span> percentage))
-distribution &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">cbind</span>(distribution, <span class="kw">rownames</span>(distribution)))
-<span class="kw">colnames</span>(distribution)[<span class="dv">3</span>] &lt;-<span class="st"> &quot;Cultivar&quot;</span>
-distribution<span class="op">$</span>numbOfsamples &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="kw">as.character</span>(distribution<span class="op">$</span>numbOfsamples))
-distribution<span class="op">$</span>percentage &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="kw">as.character</span>(distribution<span class="op">$</span>percentage))</code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">percentage &lt;-<span class="st"> </span><span class="kw">round</span>(<span class="kw">with</span>(leaf_df, <span class="kw">prop.table</span>(<span class="kw">table</span>(Cultivar)) <span class="op">*</span><span class="st"> </span><span class="dv">100</span>), <span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb6-2" title="2">distribution &lt;-<span class="st"> </span><span class="kw">with</span>(leaf_df, <span class="kw">cbind</span>(<span class="dt">numbOfsamples =</span> <span class="kw">table</span>(Cultivar), <span class="dt">percentage =</span> percentage))</a>
+<a class="sourceLine" id="cb6-3" title="3">distribution &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">cbind</span>(distribution, <span class="kw">rownames</span>(distribution)))</a>
+<a class="sourceLine" id="cb6-4" title="4"><span class="kw">colnames</span>(distribution)[<span class="dv">3</span>] &lt;-<span class="st"> &quot;Cultivar&quot;</span></a>
+<a class="sourceLine" id="cb6-5" title="5">distribution<span class="op">$</span>numbOfsamples &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="kw">as.character</span>(distribution<span class="op">$</span>numbOfsamples))</a>
+<a class="sourceLine" id="cb6-6" title="6">distribution<span class="op">$</span>percentage &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="kw">as.character</span>(distribution<span class="op">$</span>percentage))</a></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:cultivar-abundance"></span>
 <img src="2019_Bookdown_files/figure-html/cultivar-abundance-1.png" alt="Repported cultivars abundance in the potato data frame." width="100%" />
 <p class="caption">
 Figure 1.1: Repported cultivars abundance in the potato data frame.
 </p>
 </div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">leaf_df<span class="op">$</span>NoEssai &lt;-<span class="st"> </span><span class="kw">as.factor</span>(leaf_df<span class="op">$</span>NoEssai)
-leaf_df<span class="op">$</span>Cultivar &lt;-<span class="st">  </span><span class="kw">relevel</span>(<span class="kw">factor</span>(leaf_df<span class="op">$</span>Cultivar), <span class="dt">ref =</span> <span class="st">&quot;Superior&quot;</span>)
-leaf_df<span class="op">$</span>Maturity5 &lt;-<span class="st"> </span><span class="kw">ordered</span>(leaf_df<span class="op">$</span>Maturity5, 
-                            <span class="dt">levels =</span> <span class="kw">c</span>(<span class="st">&quot;early&quot;</span>,<span class="st">&quot;early mid-season&quot;</span>,
-                                       <span class="st">&quot;mid-season&quot;</span>,<span class="st">&quot;mid-season late&quot;</span>,<span class="st">&quot;late&quot;</span>))</code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1">leaf_df<span class="op">$</span>NoEssai &lt;-<span class="st"> </span><span class="kw">as.factor</span>(leaf_df<span class="op">$</span>NoEssai)</a>
+<a class="sourceLine" id="cb7-2" title="2">leaf_df<span class="op">$</span>Cultivar &lt;-<span class="st">  </span><span class="kw">relevel</span>(<span class="kw">factor</span>(leaf_df<span class="op">$</span>Cultivar), <span class="dt">ref =</span> <span class="st">&quot;Superior&quot;</span>)</a>
+<a class="sourceLine" id="cb7-3" title="3">leaf_df<span class="op">$</span>Maturity5 &lt;-<span class="st"> </span><span class="kw">ordered</span>(leaf_df<span class="op">$</span>Maturity5, </a>
+<a class="sourceLine" id="cb7-4" title="4">                            <span class="dt">levels =</span> <span class="kw">c</span>(<span class="st">&quot;early&quot;</span>,<span class="st">&quot;early mid-season&quot;</span>,</a>
+<a class="sourceLine" id="cb7-5" title="5">                                       <span class="st">&quot;mid-season&quot;</span>,<span class="st">&quot;mid-season late&quot;</span>,<span class="st">&quot;late&quot;</span>))</a></code></pre></div>
 <p>We portray missing values for the sake of imputation. As explained in the section <a href="#Objective"><strong>??</strong></a>, we will retain after this processing only reasonably imputable data <em>i.e.</em> samples with a number of missing variable values less than half the number of studied attributes. The next cell maps the portrait of missing values.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">leafIonome &lt;-<span class="st"> </span>leaf_df[macroElements]
-<span class="kw">missmap</span>(leafIonome)</code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">leafIonome &lt;-<span class="st"> </span>leaf_df[macroElements]</a>
+<a class="sourceLine" id="cb8-2" title="2"><span class="kw">missmap</span>(leafIonome)</a></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:matrix-missing-comp"></span>
 <img src="2019_Bookdown_files/figure-html/matrix-missing-comp-1.png" alt="Portrait of missing macroelements." width="100%" />
 <p class="caption">
@@ -258,34 +286,34 @@ Figure 1.2: Portrait of missing macroelements.
 </p>
 </div>
 <p>This figure compiles the samples identifiers on the Y axis and macroelements on the X axis. A complete horizontal unique color band indicates wether the 5 elements are totally observed (blue band) or totally missing (red band). Only N and P have missing values that will be imputed and retained at the end. The totally missing compositions will be removed. The next cell initializes this process.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># keep track of empty rows:</span>
-leaf_df<span class="op">$</span>leaf_allNA &lt;-<span class="st"> </span><span class="kw">apply</span>(leaf_df[macroElements], <span class="dv">1</span>, <span class="cf">function</span>(X) <span class="kw">all</span>(<span class="kw">is.na</span>(X)))
-<span class="co"># keep track of rows where there is any NA:</span>
-leaf_df<span class="op">$</span>leaf_anyNA &lt;-<span class="st"> </span><span class="kw">apply</span>(leaf_df[macroElements], <span class="dv">1</span>, <span class="cf">function</span>(X) <span class="kw">any</span>(<span class="kw">is.na</span>(X)))
-<span class="co"># number of NAs (missing values):</span>
-leaf_df<span class="op">$</span>leaf_countNA &lt;-<span class="st"> </span><span class="kw">apply</span>(leaf_df[macroElements], <span class="dv">1</span>, <span class="cf">function</span>(X) <span class="kw">sum</span>(<span class="kw">is.na</span>(X)))</code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1"><span class="co"># keep track of empty rows:</span></a>
+<a class="sourceLine" id="cb9-2" title="2">leaf_df<span class="op">$</span>leaf_allNA &lt;-<span class="st"> </span><span class="kw">apply</span>(leaf_df[macroElements], <span class="dv">1</span>, <span class="cf">function</span>(X) <span class="kw">all</span>(<span class="kw">is.na</span>(X)))</a>
+<a class="sourceLine" id="cb9-3" title="3"><span class="co"># keep track of rows where there is any NA:</span></a>
+<a class="sourceLine" id="cb9-4" title="4">leaf_df<span class="op">$</span>leaf_anyNA &lt;-<span class="st"> </span><span class="kw">apply</span>(leaf_df[macroElements], <span class="dv">1</span>, <span class="cf">function</span>(X) <span class="kw">any</span>(<span class="kw">is.na</span>(X)))</a>
+<a class="sourceLine" id="cb9-5" title="5"><span class="co"># number of NAs (missing values):</span></a>
+<a class="sourceLine" id="cb9-6" title="6">leaf_df<span class="op">$</span>leaf_countNA &lt;-<span class="st"> </span><span class="kw">apply</span>(leaf_df[macroElements], <span class="dv">1</span>, <span class="cf">function</span>(X) <span class="kw">sum</span>(<span class="kw">is.na</span>(X)))</a></code></pre></div>
 <p>The next cell performs the imputation. Since the imputation is a time-consuming process, we saved it in a <code>csv</code> stored in the subfolder <code>output</code> and have put a switch to put on if one wants to perform the computation again. The imputation is made by KNNs in the Aitchison (compositions-friendly) metric for rows where there are 1 or 2 missing values, <em>i.e.</em> <code>filter(leaf_countNA &lt;= 3)</code>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Warning: could be a long process</span>
-perform_imputation &lt;-<span class="st"> </span><span class="ot">FALSE</span> <span class="co"># set to FALSE if you want to load the saved file</span>
-<span class="cf">if</span> (perform_imputation) {
-  <span class="kw">set.seed</span>(<span class="dv">628125</span>)
-  leaf_imp &lt;-<span class="st"> </span>leaf_df <span class="op">%&gt;%</span>
-<span class="st">    </span><span class="kw">filter</span>(leaf_countNA <span class="op">&lt;=</span><span class="st"> </span><span class="dv">3</span>) <span class="op">%&gt;%</span>
-<span class="st">    </span><span class="kw">select</span>(macroElements) <span class="op">%&gt;%</span>
-<span class="st">    </span><span class="kw">impKNNa</span>(<span class="kw">as.matrix</span>(.),
-            <span class="dt">metric =</span> <span class="st">&quot;Aitchison&quot;</span>, 
-            <span class="dt">k =</span> <span class="dv">6</span>, 
-            <span class="dt">primitive =</span> <span class="ot">TRUE</span>,
-            <span class="dt">normknn =</span> <span class="ot">TRUE</span>, 
-            <span class="dt">adj =</span> <span class="st">&#39;median&#39;</span>)
-  leaf_complete &lt;-<span class="st"> </span>leaf_df <span class="op">%&gt;%</span>
-<span class="st">    </span><span class="kw">select</span>(macroElements)
-  leaf_complete[leaf_df<span class="op">$</span>leaf_countNA <span class="op">&lt;=</span><span class="st"> </span><span class="dv">3</span>, ] &lt;-<span class="st"> </span>leaf_imp<span class="op">$</span>xImp
-  <span class="kw">names</span>(leaf_complete) &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="kw">names</span>(leaf_complete), <span class="st">&quot;_imp&quot;</span>)
-  <span class="kw">write_csv</span>(leaf_complete, <span class="st">&quot;output/leaf_complete.csv&quot;</span>)
-} <span class="cf">else</span> {
-  leaf_complete &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;output/leaf_complete.csv&quot;</span>)
-}</code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="co"># Warning: could be a long process</span></a>
+<a class="sourceLine" id="cb10-2" title="2">perform_imputation &lt;-<span class="st"> </span><span class="ot">FALSE</span> <span class="co"># set to FALSE if you want to load the saved file</span></a>
+<a class="sourceLine" id="cb10-3" title="3"><span class="cf">if</span> (perform_imputation) {</a>
+<a class="sourceLine" id="cb10-4" title="4">  <span class="kw">set.seed</span>(<span class="dv">628125</span>)</a>
+<a class="sourceLine" id="cb10-5" title="5">  leaf_imp &lt;-<span class="st"> </span>leaf_df <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb10-6" title="6"><span class="st">    </span><span class="kw">filter</span>(leaf_countNA <span class="op">&lt;=</span><span class="st"> </span><span class="dv">3</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb10-7" title="7"><span class="st">    </span><span class="kw">select</span>(macroElements) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb10-8" title="8"><span class="st">    </span><span class="kw">impKNNa</span>(<span class="kw">as.matrix</span>(.),</a>
+<a class="sourceLine" id="cb10-9" title="9">            <span class="dt">metric =</span> <span class="st">&quot;Aitchison&quot;</span>, </a>
+<a class="sourceLine" id="cb10-10" title="10">            <span class="dt">k =</span> <span class="dv">6</span>, </a>
+<a class="sourceLine" id="cb10-11" title="11">            <span class="dt">primitive =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb10-12" title="12">            <span class="dt">normknn =</span> <span class="ot">TRUE</span>, </a>
+<a class="sourceLine" id="cb10-13" title="13">            <span class="dt">adj =</span> <span class="st">&#39;median&#39;</span>)</a>
+<a class="sourceLine" id="cb10-14" title="14">  leaf_complete &lt;-<span class="st"> </span>leaf_df <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb10-15" title="15"><span class="st">    </span><span class="kw">select</span>(macroElements)</a>
+<a class="sourceLine" id="cb10-16" title="16">  leaf_complete[leaf_df<span class="op">$</span>leaf_countNA <span class="op">&lt;=</span><span class="st"> </span><span class="dv">3</span>, ] &lt;-<span class="st"> </span>leaf_imp<span class="op">$</span>xImp</a>
+<a class="sourceLine" id="cb10-17" title="17">  <span class="kw">names</span>(leaf_complete) &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="kw">names</span>(leaf_complete), <span class="st">&quot;_imp&quot;</span>)</a>
+<a class="sourceLine" id="cb10-18" title="18">  <span class="kw">write_csv</span>(leaf_complete, <span class="st">&quot;output/leaf_complete.csv&quot;</span>)</a>
+<a class="sourceLine" id="cb10-19" title="19">} <span class="cf">else</span> {</a>
+<a class="sourceLine" id="cb10-20" title="20">  leaf_complete &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;output/leaf_complete.csv&quot;</span>)</a>
+<a class="sourceLine" id="cb10-21" title="21">}</a></code></pre></div>
 <pre><code>## Parsed with column specification:
 ## cols(
 ##   N_imp = col_double(),
@@ -295,50 +323,50 @@ perform_imputation &lt;-<span class="st"> </span><span class="ot">FALSE</span> <
 ##   Mg_imp = col_double()
 ## )</code></pre>
 <p>With the next cell, imputed columnsare appended to the data frame. The nutrients diagnosis will be done with imputed compositions.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">leaf_df &lt;-<span class="st"> </span><span class="kw">bind_cols</span>(leaf_df, leaf_complete)
-leaf_df &lt;-<span class="st"> </span>leaf_df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(<span class="op">-</span><span class="kw">c</span>(<span class="st">&quot;leaf_allNA&quot;</span>, <span class="st">&quot;leaf_anyNA&quot;</span>))</code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1">leaf_df &lt;-<span class="st"> </span><span class="kw">bind_cols</span>(leaf_df, leaf_complete)</a>
+<a class="sourceLine" id="cb12-2" title="2">leaf_df &lt;-<span class="st"> </span>leaf_df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(<span class="op">-</span><span class="kw">c</span>(<span class="st">&quot;leaf_allNA&quot;</span>, <span class="st">&quot;leaf_anyNA&quot;</span>))</a></code></pre></div>
 <p><a href="https://en.wikipedia.org/wiki/Compositional_data">Compositional data</a> are data where the elements of the composition are non-negative and sum to unity. I compute <code>Fv</code> standing for <code>filling value</code>, an amalgamation of all other elements closing the <a href="https://en.wikipedia.org/wiki/Simplex">simplex</a> proportions to 100%.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">leaf_df &lt;-<span class="st"> </span>leaf_df <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sum_imp =</span> <span class="kw">rowSums</span>(<span class="kw">select</span>(., <span class="kw">paste0</span>(macroElements, <span class="st">&quot;_imp&quot;</span>))),
-         <span class="dt">Fv_imp =</span> <span class="dv">100</span> <span class="op">-</span><span class="st"> </span>sum_imp) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">select</span>(<span class="op">-</span>sum_imp)
-<span class="cf">if</span> (<span class="op">!</span><span class="st">&quot;Fv&quot;</span> <span class="op">%in%</span><span class="st"> </span>macroElements) macroElements &lt;-<span class="st"> </span><span class="kw">c</span>(macroElements, <span class="st">&quot;Fv&quot;</span>)</code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" title="1">leaf_df &lt;-<span class="st"> </span>leaf_df <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb13-2" title="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sum_imp =</span> <span class="kw">rowSums</span>(<span class="kw">select</span>(., <span class="kw">paste0</span>(macroElements, <span class="st">&quot;_imp&quot;</span>))),</a>
+<a class="sourceLine" id="cb13-3" title="3">         <span class="dt">Fv_imp =</span> <span class="dv">100</span> <span class="op">-</span><span class="st"> </span>sum_imp) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb13-4" title="4"><span class="st">  </span><span class="kw">select</span>(<span class="op">-</span>sum_imp)</a>
+<a class="sourceLine" id="cb13-5" title="5"><span class="cf">if</span> (<span class="op">!</span><span class="st">&quot;Fv&quot;</span> <span class="op">%in%</span><span class="st"> </span>macroElements) macroElements &lt;-<span class="st"> </span><span class="kw">c</span>(macroElements, <span class="st">&quot;Fv&quot;</span>)</a></code></pre></div>
 <p>The centered log-ratio (<code>clr</code>) transformed compositions will be used for discriminant analysis and perturbation vector concept assessment.The next cell performs this calculation. The <code>clr</code> coordinates are computed in an external (intermediate) data table.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">leaf_composition &lt;-<span class="st"> </span>leaf_df <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">select</span>(<span class="kw">paste0</span>(macroElements, <span class="st">&quot;_imp&quot;</span>)) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">acomp</span>(.)
-leaf_clr &lt;-<span class="st"> </span><span class="kw">clr</span>(leaf_composition) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">unclass</span>() <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">as_tibble</span>()
-<span class="kw">names</span>(leaf_clr) &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;clr_&quot;</span>, macroElements)
-<span class="kw">write_csv</span>(leaf_clr, <span class="st">&quot;output/leaf_clr.csv&quot;</span>)</code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" title="1">leaf_composition &lt;-<span class="st"> </span>leaf_df <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb14-2" title="2"><span class="st">  </span><span class="kw">select</span>(<span class="kw">paste0</span>(macroElements, <span class="st">&quot;_imp&quot;</span>)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb14-3" title="3"><span class="st">  </span><span class="kw">acomp</span>(.)</a>
+<a class="sourceLine" id="cb14-4" title="4">leaf_clr &lt;-<span class="st"> </span><span class="kw">clr</span>(leaf_composition) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb14-5" title="5"><span class="st">  </span><span class="kw">unclass</span>() <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb14-6" title="6"><span class="st">  </span><span class="kw">as_tibble</span>()</a>
+<a class="sourceLine" id="cb14-7" title="7"><span class="kw">names</span>(leaf_clr) &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;clr_&quot;</span>, macroElements)</a>
+<a class="sourceLine" id="cb14-8" title="8"><span class="kw">write_csv</span>(leaf_clr, <span class="st">&quot;output/leaf_clr.csv&quot;</span>)</a></code></pre></div>
 <p>The next cell binds these clr-transformed compositions to the raw composition data frame and retains useful columns. This cell also discards all the samples with too many missing compositions.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">leaf_df &lt;-<span class="st"> </span><span class="kw">bind_cols</span>(leaf_df, leaf_clr)
-leaf_df &lt;-<span class="st"> </span>leaf_df <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="kw">select</span>(keys_col, location, cultivars, outputs, <span class="st">&quot;leaf_countNA&quot;</span>, <span class="kw">starts_with</span>(<span class="st">&quot;clr&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="kw">filter</span>(leaf_countNA <span class="op">&lt;=</span><span class="st"> </span><span class="dv">3</span>)</code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" title="1">leaf_df &lt;-<span class="st"> </span><span class="kw">bind_cols</span>(leaf_df, leaf_clr)</a>
+<a class="sourceLine" id="cb15-2" title="2">leaf_df &lt;-<span class="st"> </span>leaf_df <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb15-3" title="3"><span class="st">  </span><span class="kw">select</span>(keys_col, location, cultivars, outputs, <span class="st">&quot;leaf_countNA&quot;</span>, <span class="kw">starts_with</span>(<span class="st">&quot;clr&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb15-4" title="4"><span class="st">  </span><span class="kw">filter</span>(leaf_countNA <span class="op">&lt;=</span><span class="st"> </span><span class="dv">3</span>)</a></code></pre></div>
 </div>
 <div id="cultivar-classes-correction" class="section level2">
 <h2><span class="header-section-number">1.6</span> Cultivar classes correction</h2>
 <p>From a preliminary checking, we noticed that cultivars <code>Mystere</code> and <code>Vivaldi</code> have different repported maturity classes in the data set, <code>mid-season late</code> and <code>late</code> for <code>Mystere</code>, then <code>early mid-season</code> and <code>mid-season</code> for <code>Vivaldi</code> respectively. Their new maturity classes names are based on a majority vote for this study. The next cell perform this correction. We also make missing values explicit for this categorical variable.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">leaf_df<span class="op">$</span>Maturity5[leaf_df<span class="op">$</span>Cultivar <span class="op">==</span><span class="st"> &quot;Mystere&quot;</span>] &lt;-<span class="st"> &quot;late&quot;</span>
-leaf_df<span class="op">$</span>Maturity5[leaf_df<span class="op">$</span>Cultivar <span class="op">==</span><span class="st"> &quot;Vivaldi&quot;</span>] &lt;-<span class="st"> &quot;early mid-season&quot;</span>
-leaf_df<span class="op">$</span>Cultivar &lt;-<span class="st"> </span>forcats<span class="op">::</span><span class="kw">fct_explicit_na</span>(leaf_df<span class="op">$</span>Cultivar) <span class="co"># makes missing values explicit.</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" title="1">leaf_df<span class="op">$</span>Maturity5[leaf_df<span class="op">$</span>Cultivar <span class="op">==</span><span class="st"> &quot;Mystere&quot;</span>] &lt;-<span class="st"> &quot;late&quot;</span></a>
+<a class="sourceLine" id="cb16-2" title="2">leaf_df<span class="op">$</span>Maturity5[leaf_df<span class="op">$</span>Cultivar <span class="op">==</span><span class="st"> &quot;Vivaldi&quot;</span>] &lt;-<span class="st"> &quot;early mid-season&quot;</span></a>
+<a class="sourceLine" id="cb16-3" title="3">leaf_df<span class="op">$</span>Cultivar &lt;-<span class="st"> </span>forcats<span class="op">::</span><span class="kw">fct_explicit_na</span>(leaf_df<span class="op">$</span>Cultivar) <span class="co"># makes missing values explicit.</span></a></code></pre></div>
 </div>
 <div id="summarise-and-backup" class="section level2">
 <h2><span class="header-section-number">1.7</span> Summarise and backup</h2>
 <p>Finally, we summarized the processed data frame to record the years of begining and ending of experiments, the remaining number of experiments, cultivars and maturity classes. The definitive leaves data frame is stored as <code>leaf_clust_df.csv</code> in <code>output</code> subfolder as it is an intermediate file, for cluster analysis (Chapter <a href="Chapter-Clustering.html#Chapter-Clustering">2</a>).</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">leaf_df <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">summarise</span>(<span class="dt">start_year =</span> <span class="kw">min</span>(Annee, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>),
-            <span class="dt">end_year =</span> <span class="kw">max</span>(Annee, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>),
-            <span class="dt">numb_trials =</span> <span class="kw">n_distinct</span>(NoEssai, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>),
-            <span class="dt">numb_cultivars =</span> <span class="kw">n_distinct</span>(Cultivar, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>),
-            <span class="dt">numb_maturityClasses =</span> <span class="kw">n_distinct</span>(Maturity5, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>))</code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" title="1">leaf_df <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb17-2" title="2"><span class="st">  </span><span class="kw">summarise</span>(<span class="dt">start_year =</span> <span class="kw">min</span>(Annee, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>),</a>
+<a class="sourceLine" id="cb17-3" title="3">            <span class="dt">end_year =</span> <span class="kw">max</span>(Annee, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>),</a>
+<a class="sourceLine" id="cb17-4" title="4">            <span class="dt">numb_trials =</span> <span class="kw">n_distinct</span>(NoEssai, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>),</a>
+<a class="sourceLine" id="cb17-5" title="5">            <span class="dt">numb_cultivars =</span> <span class="kw">n_distinct</span>(Cultivar, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>),</a>
+<a class="sourceLine" id="cb17-6" title="6">            <span class="dt">numb_maturityClasses =</span> <span class="kw">n_distinct</span>(Maturity5, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>))</a></code></pre></div>
 <pre><code>## # A tibble: 1 x 5
 ##   start_year end_year numb_trials numb_cultivars numb_maturityClasses
 ##        &lt;dbl&gt;    &lt;dbl&gt;       &lt;int&gt;          &lt;int&gt;                &lt;int&gt;
 ## 1       1970     2017        4714             59                    5</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">write_csv</span>(leaf_df, <span class="st">&#39;output/leaf_clust_df.csv&#39;</span>)</code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" title="1"><span class="kw">write_csv</span>(leaf_df, <span class="st">&#39;output/leaf_clust_df.csv&#39;</span>)</a></code></pre></div>
 
 </div>
 </div>
@@ -353,24 +381,24 @@ leaf_df<span class="op">$</span>Cultivar &lt;-<span class="st"> </span>forcats<s
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
 <script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
 <script>
 gitbook.require(["gitbook"], function(gitbook) {
 gitbook.start({
 "sharing": {
-"github": false,
 "facebook": true,
 "twitter": true,
-"google": false,
 "linkedin": false,
 "weibo": false,
 "instapaper": false,
 "vk": false,
-"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
 },
 "fontsettings": {
 "theme": "white",
