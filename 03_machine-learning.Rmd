@@ -227,7 +227,7 @@ The null hypothesis for a non-informative classification is rejected after the c
 
 We consider as True Negatives (TN) specimens for this study, observations of the training data set having a high yield (HY) and correctly predicted with the `__k nearest neighbors__` model. 
 
-Let's save prediction for training set
+Let's save prediction for training set.
 
 ```{r}
 tr_pred <- predict(kknn_)#, train_df %>% select(ml_col))
@@ -239,7 +239,7 @@ train_df <- bind_cols(dfml[split_index, ], pred_yield = tr_pred)
 TNs = train_df[train_df$yieldClass == 'HY' & tr_pred == 'HY', ]
 ```
 
-Then, we compute __clr centroids (means)__ for cultivars using True Negatives original (not scaled) clr values. These centroids (__S3 Table of the article__) could be used as provisional `clr norms` for cultivars. The standard deviations could also be computed.
+Then, we compute __clr centroids (means)__ for cultivars using True Negatives original (not scaled) clr values. These centroids (__S3 Table of the article__) could be used as provisional `clr mean norms` for cultivars. The standard deviations could also be computed. We considered all the TNs as norms. Cultivars Lamoka and Sifra had no true negative specimens.
 
 ```{r}
 TNmeanNorms <- TNs %>%
@@ -247,7 +247,7 @@ TNmeanNorms <- TNs %>%
   select(clr_no) %>%
   summarise_all(list(mean))
 TNmeanNorms
-write_csv(TNmeanNorms, "output/provisional_norms.csv")
+write_csv(TNmeanNorms, "output/provisional_meanNorms.csv")
 ```
 
 We also save prediction for testing set.
@@ -257,11 +257,9 @@ te_pred <- predict(kknn_, test_df %>% select(ml_col))
 test_df <- bind_cols(dfml[-split_index, ], pred_yield = te_pred)
 ```
 
-And finally backup for next chapter.
+And finally backup for the next chapter.
 
 ```{r}
 write_csv(train_df, "output/train_df.csv")
 write_csv(test_df, "output/test_df.csv")
 ```
-
-

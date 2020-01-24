@@ -120,7 +120,7 @@ data.frame(numb_cultivars = n_distinct(hy_df$Cultivar, na.rm = TRUE),
            numb_trials = n_distinct(hy_df$NoEssai, na.rm = TRUE))
 ```
 
-The next chunk creates a table with cultivars, maturity classes and median clr values _i.e._ clr centroids for cultivars (the __S3 Table__ of the article).
+The next chunk creates a table with cultivars, maturity classes and median clr values _i.e._ clr centroids for cultivars (the __S2 Table__ of the article).
 
 ```{r}
 hy_clr <- hy_df %>%
@@ -257,7 +257,7 @@ The first principle axis or component (`PC1`) is formed mainly by `Mg` and `K` w
 
 We will measure the clrs effect on tuber yield by measuring their importance in machine learning models using `varImp()` method of random forest algorithm, in the next chapter (Chapter \@ref(Chapter-Modeling)).  
 
-Let's select useful columns in a new table named `dfml.csv` and filter only `complete cases`.
+Let's select useful columns in a new table named `dfml.csv` and filter only `complete cases` with the following chunks.
 
 ```{r}
 rdt_max <- rep(NA, nrow(leaf_clust_df)) # max yield per trial (empty vector)
@@ -310,15 +310,14 @@ dist %>%
   coord_flip()
 ```
 
-The S3 table:
+The following chuk draws the S2 table of the manuscript.
 
 ```{r}
 yield_cutoff <- cutQ %>% filter(Cultivar %in% distribution$Cultivar)
-s3table <- hy_clr %>% select(Cultivar, Maturity5) %>%
+s2table <- hy_clr %>% select(Cultivar, Maturity5) %>%
   left_join(distribution, by = "Cultivar") %>% 
   left_join(yield_cutoff, by = "Cultivar") %>% 
   left_join(hy_centroids, by = "Cultivar") %>% 
   left_join(dist, by = "Cultivar") %>% 
   select(Cultivar, Maturity5, numHY, freq, rv_cut, starts_with('clr'))
 ```
-
