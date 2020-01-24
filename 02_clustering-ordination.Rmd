@@ -120,7 +120,7 @@ data.frame(numb_cultivars = n_distinct(hy_df$Cultivar, na.rm = TRUE),
            numb_trials = n_distinct(hy_df$NoEssai, na.rm = TRUE))
 ```
 
-The next chunk creates a table with cultivars, maturity classes and median clr values _i.e._ clr centroids for cultivars (the __S... Table__ of the article).
+The next chunk creates a table with cultivars, maturity classes and median clr values _i.e._ clr centroids for cultivars (the __S3 Table__ of the article).
 
 ```{r}
 hy_clr <- hy_df %>%
@@ -260,16 +260,31 @@ We will measure the clrs effect on tuber yield by measuring their importance in 
 Let's select useful columns in a new table named `dfml.csv` and filter only `complete cases`.
 
 ```{r}
+rdt_max <- rep(NA, nrow(leaf_clust_df)) # max yield per trial (empty vector)
+
+for (i in 1:nlevels(factor(leaf_clust_df$NoEssai))) {
+  filtre <- leaf_clust_df$NoEssai == levels(factor(leaf_clust_df$NoEssai))[i] # filter for test i
+  rdt_max[filtre] <- ifelse(is.na(leaf_clust_df$RendVendable[filtre]), NA, 
+                            max(leaf_clust_df$RendVendable[filtre], na.rm = TRUE))
+}
+rdt_max[!is.finite(rdt_max)] <- NA
+leaf_clust_df$RendVendableMaxParEssai <- rdt_max
+```
+
+```{r}
 dfml <- leaf_clust_df %>%
   select(NoEssai, NoBloc, NoTraitement,
          starts_with("clr"),
          RendVendable, rv_cut, yieldClass,
-         AnalyseFoliaireStade,
-         Cultivar, Maturity5) %>%
-  mutate(isNA = apply(select(., starts_with("clr"), Cultivar, Maturity5, RendVendable), 1, anyNA)) %>%
+         AnalyseFoliaireStade, Maturity5,
+#         RendVendableMaxParEssai,
+         Cultivar) %>%
+  mutate(isNA = apply(select(., starts_with("clr"), 
+                             Cultivar, Maturity5, RendVendable), 1, anyNA)) %>% #Maturity5,
   mutate(is10pcf = AnalyseFoliaireStade == "10% fleur") %>%
   filter(!isNA & is10pcf & NoEssai != "2") %>% 
-  select(-c(AnalyseFoliaireStade, isNA, is10pcf)) %>%
+#  filter(RendVendableMaxParEssai >= 28) %>% 
+  select(-c(AnalyseFoliaireStade, isNA, is10pcf)) %>% #, RendVendableMaxParEssai)) %>%
   droplevels() %>% 
   filter(complete.cases(.))
 write_csv(dfml, "output/dfml.csv")
@@ -295,4 +310,15 @@ dist %>%
   coord_flip()
 ```
 
+The S3 table:
+
+```{r}
+yield_cutoff <- cutQ %>% filter(Cultivar %in% distribution$Cultivar)
+s3table <- hy_clr %>% select(Cultivar, Maturity5) %>%
+  left_join(distribution, by = "Cultivar") %>% 
+  left_join(yield_cutoff, by = "Cultivar") %>% 
+  left_join(hy_centroids, by = "Cultivar") %>% 
+  left_join(dist, by = "Cultivar") %>% 
+  select(Cultivar, Maturity5, numHY, freq, rv_cut, starts_with('clr'))
+```
 
