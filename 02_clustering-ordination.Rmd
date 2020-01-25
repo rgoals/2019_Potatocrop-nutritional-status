@@ -103,7 +103,7 @@ distribution <- distribution %>%
   arrange(desc(numHY)) # arrange in descending order
 ```
 
-```{r, HY-cultivar-abundance, fig.height = 10, fig.width = 5, out.width = "100%", fig.align = "center", warning = FALSE, message = FALSE, fig.cap = "High yielders cultivars abundance.", echo = FALSE}
+```{r, HY-cultivar-abundance2, fig.height = 10, fig.width = 5, out.width = "100%", fig.align = "center", warning = FALSE, message = FALSE, fig.cap = "High yielders cultivars abundance.", echo = FALSE}
 distribution %>%
   ggplot(aes(x = reorder(Cultivar, numHY), y = numHY)) +
   geom_col() +

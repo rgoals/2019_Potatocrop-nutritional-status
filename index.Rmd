@@ -73,7 +73,7 @@ distribution$numbOfsamples <- as.numeric(as.character(distribution$numbOfsamples
 distribution$percentage <- as.numeric(as.character(distribution$percentage))
 ```
 
-```{r, cultivar-abundance, fig.height = 10, fig.width = 5, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Repported cultivars abundance in the potato data frame.", echo = FALSE}
+```{r, cultivar-abundance1, fig.height = 10, fig.width = 5, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Repported cultivars abundance in the potato data frame.", echo = FALSE}
 distribution %>%
   ggplot(aes(x = reorder(Cultivar, numbOfsamples), y = numbOfsamples)) +
   geom_col() +
@@ -94,7 +94,7 @@ leaf_df$Maturity5 <- ordered(leaf_df$Maturity5,
 
 We portray missing values for the sake of imputation. As explained in the section \@ref(Objective), we will retain after this processing only reasonably imputable data _i.e._ samples with a number of missing variable values less than half the number of studied attributes. The next cell maps the portrait of missing values.
 
-```{r matrix-missing-comp, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Portrait of missing macroelements."}
+```{r matrix-missing-compo, out.width="100%", fig.align="center", warning=FALSE, message=FALSE, fig.cap="Portrait of missing macroelements."}
 leafIonome <- leaf_df[macroElements]
 missmap(leafIonome)
 ```
