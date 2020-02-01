@@ -24,7 +24,7 @@
 <meta name="author" content="Zonlehoua Coulibali and Serge-Étienne Parent" />
 
 
-<meta name="date" content="2020-01-23" />
+<meta name="date" content="2020-02-01" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -231,7 +231,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="header">
 <h1 class="title">Balancing the nutritional status of potato crops.</h1>
 <p class="author"><em>Zonlehoua Coulibali and Serge-Étienne Parent</em></p>
-<p class="date"><em>2020-01-23</em></p>
+<p class="date"><em>2020-02-01</em></p>
 </div>
 <div id="Chapter-Data-Processing" class="section level1">
 <h1><span class="header-section-number">Chapter 1</span> Data processing</h1>
@@ -300,8 +300,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb6-4" title="4"><span class="kw">colnames</span>(distribution)[<span class="dv">3</span>] &lt;-<span class="st"> &quot;Cultivar&quot;</span></a>
 <a class="sourceLine" id="cb6-5" title="5">distribution<span class="op">$</span>numbOfsamples &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="kw">as.character</span>(distribution<span class="op">$</span>numbOfsamples))</a>
 <a class="sourceLine" id="cb6-6" title="6">distribution<span class="op">$</span>percentage &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="kw">as.character</span>(distribution<span class="op">$</span>percentage))</a></code></pre></div>
-<div class="figure" style="text-align: center"><span id="fig:cultivar-abundance"></span>
-<img src="2019_Bookdown_files/figure-html/cultivar-abundance-1.png" alt="Repported cultivars abundance in the potato data frame." width="100%" />
+<div class="figure" style="text-align: center"><span id="fig:cultivar-abundance1"></span>
+<img src="2019_Bookdown_files/figure-html/cultivar-abundance1-1.png" alt="Repported cultivars abundance in the potato data frame." width="100%" />
 <p class="caption">
 Figure 1.1: Repported cultivars abundance in the potato data frame.
 </p>
@@ -314,8 +314,8 @@ Figure 1.1: Repported cultivars abundance in the potato data frame.
 <p>We portray missing values for the sake of imputation. As explained in the section <a href="#Objective"><strong>??</strong></a>, we will retain after this processing only reasonably imputable data <em>i.e.</em> samples with a number of missing variable values less than half the number of studied attributes. The next cell maps the portrait of missing values.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">leafIonome &lt;-<span class="st"> </span>leaf_df[macroElements]</a>
 <a class="sourceLine" id="cb8-2" title="2"><span class="kw">missmap</span>(leafIonome)</a></code></pre></div>
-<div class="figure" style="text-align: center"><span id="fig:matrix-missing-comp"></span>
-<img src="2019_Bookdown_files/figure-html/matrix-missing-comp-1.png" alt="Portrait of missing macroelements." width="100%" />
+<div class="figure" style="text-align: center"><span id="fig:matrix-missing-compo"></span>
+<img src="2019_Bookdown_files/figure-html/matrix-missing-compo-1.png" alt="Portrait of missing macroelements." width="100%" />
 <p class="caption">
 Figure 1.2: Portrait of missing macroelements.
 </p>
